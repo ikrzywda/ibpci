@@ -22,7 +22,7 @@ int isnumber(char* str){
 	return 1;
 }
 
-token* tokenize(char* in){
+token** tokenize(char* in, token** buffer){
 	token *tk = malloc(sizeof(token));
 	if(isnumber(in)){
 		tk ->val = atoi(in);
@@ -37,23 +37,22 @@ token* tokenize(char* in){
 		printf("errno 1: invalid type");
 		exit(EXIT_FAILURE);	
 	}
-	return tk;
-}
-
-void store_token(token tk, token* tk_buf){
 	
+	buffer = realloc(tk,sizeof(token));
+	free(tk);
+	return buffer;
 }
 
-void read_file(char* filename, token* tokenBuffer){
+
+
+void read_file(char* filename, token** buffer){
 	FILE* fp = fopen(filename,"r");
 	char* in = malloc(sizeof(char) * 10);
 	int c, i = 0;
-	printf("Hello read_file");
 	while((c = getc(fp)) != EOF){
 		if(c == ' ' || c == '\n'){
-			tokenize(in);
+			tokenize(in,buffer);
 			printf("%s\n",in);
-			printf("<%d,%d>\n", tokenize(in) -> type, tokenize(in) -> val);
 			memset(in,0,i);
 			i = 0;
 		} else {
@@ -64,9 +63,13 @@ void read_file(char* filename, token* tokenBuffer){
 }
 
 int main(){
-	token* tokenBuffer = malloc(sizeof(token));
-	token** tk_ptr;
-	read_file("test.ib", tokenBuffer);
+	token** buffer = NULL;
+	read_file("test.ib", buffer);
+	token (*tk_ptr)[];
+	tk_ptr = &buffer;
+	for(int i = 0; (*tk_ptr)[i] != NULL; ++i){
+		
+	}
 }
 
 

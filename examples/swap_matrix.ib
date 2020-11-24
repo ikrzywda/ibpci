@@ -1,0 +1,15 @@
+A = 3
+B = 5
+MAT[A][B]
+
+method swap_rows(MAT, LEN, K, L)
+    loop INDEX from 0 to LEN - 1
+        TEMP = MAT[L][INDEX]
+        MAT[L][INDEX] = MAT[K][INDEX]
+        MAT[K][INDEX] = TEMP
+    end loop
+end method
+
+swap_rows(MAT, 2, 1, B)
+output(MAT)
+

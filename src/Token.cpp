@@ -50,6 +50,15 @@ std::string *id_to_str(int id){
         case ELSE: *out = "else"; break;
         case END: *out = "end"; break;
         case OUTPUT: *out = "output"; break;
+        case ADD_ITEM: *out = "addItem"; break;
+        case GET_NEXT: *out = "getNext"; break;
+        case RESET_NEXT: *out = "resetNext"; break;
+        case HAS_NEXT: *out = "hasNext"; break;
+        case PUSH: *out = "push"; break;
+        case POP: *out = "pop"; break;
+        case ENQUEUE: *out = "enqueue"; break;
+        case DEQUEUE: *out = "dequeue"; break;
+        case IS_EMPTY: *out = "isEmpty"; break;
         default: *out = "NULL"; break;
     }
     return out;
@@ -65,11 +74,11 @@ int lookup_keyword(std::string lexeme){
 
 std::string *tok_to_str(tk::Token *token){
     std::string *out = new std::string;
-    out->append("<");
+    out->append("<{");
     out->append(*id_to_str(token->id));
-    out->append(",");
+    out->append("},{");
     out->append(*token->attr);
-    out->append(">\n");
+    out->append("}>\n");
     return out;
 }
 

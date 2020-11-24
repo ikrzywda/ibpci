@@ -2,6 +2,10 @@
 
 namespace lxr{
 
+int is_upcase(char c){
+    return (c >= 'A' && c <= 'Z') || isdigit(c) || c == '_' ? 1 : 0;
+}
+
 Lexer::Lexer(std::string *buffer){
     Lexer::input_buffer = buffer;
     attr_buffer = new std::string;
@@ -14,38 +18,31 @@ void Lexer::advance(){
     c = input_buffer->at(pos);
 }
 
-tk::Token *Lexer::number(){
-    attr_buffer->push_back(c);
-    advance();
-    while(std::isdigit(c)){
-        attr_buffer->push_back(c);
-        advance();
-    }
-    return new tk::Token(tk::NUM, attr_buffer);
-}   
 
-tk::Token *Lexer::id_method(){
+tk::Token *Lexer::number(){
+    int id = tk::INT;
     attr_buffer->push_back(c);
     advance();
-    while(isalnum(c) || al::is_miscchar(c)){
+    while(std::isdigit(c) || c =='.'){
+        if(c == '.' && id == tk::FLOAT) break;
+        if(c == '.') id = tk::FLOAT;
         attr_buffer->push_back(c);
         advance();
     }
-    return new tk::Token(tk::ID_METHOD, attr_buffer);
+    return new tk::Token(id, attr_buffer);
 }   
 
 tk::Token *Lexer::id(){
+    int id = tk::ID_VAR;
     attr_buffer->push_back(c);
     advance();
-    while(al::is_upcase(c) || al::is_miscchar(c)){
+    while(std::isalnum(c) || c == '_'){
+        if(!is_upcase(c)) id = tk::ID_METHOD;
         attr_buffer->push_back(c);
         advance();
-        if(al::is_lowcase(c)){
-            return id_method();
-        }
     }
-    return new tk::Token(tk::ID_VAR, attr_buffer);
-}
+    return new tk::Token(id, attr_buffer);
+}   
 
 tk::Token *Lexer::op_eq(char ch){
     advance();
@@ -70,10 +67,8 @@ tk::Token *Lexer::get_next_token(){
         attr_buffer->clear();
         if(std::isdigit(c)){
             return number();
-        }else if(al::is_upcase(c)){
-            return id();
         }else if(std::isalnum(c)){
-            return id_method();
+            return id();
         }else if(std::isspace(c)){
             advance();
         }else{

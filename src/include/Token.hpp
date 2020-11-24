@@ -26,7 +26,9 @@ enum id{
     COMMA,
     ID_VAR,
     ID_METHOD,
-    NUM
+    INT,
+    FLOAT,
+    STRING,
 };
 
 class Token{

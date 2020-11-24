@@ -2,11 +2,12 @@
 #define TOKEN_HPP
 
 #include <string>
+#include <map>
 
 namespace tk{
 
 enum id{
-    END,
+    END_FILE,
     PLUS,
     MINUS,
     MULT,
@@ -16,6 +17,7 @@ enum id{
     RSQBR,
     LPAREN,
     RPAREN,
+    QTMARK,
     LT,
     GT,
     LEQ,
@@ -24,11 +26,22 @@ enum id{
     IS,
     DOT,
     COMMA,
-    ID_VAR,
-    ID_METHOD,
     INT,
     FLOAT,
     STRING,
+    ID_VAR,
+    ID_METHOD,
+    METHOD,
+    RETURN,
+    LOOP,
+    FROM,
+    TO,
+    WHILE,
+    UNTIL,
+    IF,
+    ELSE,
+    END,
+    OUTPUT
 };
 
 class Token{
@@ -38,8 +51,26 @@ class Token{
         Token(int id, std::string *attr);
 };
 
+const std::map<std::string, int> RESERVED_KEYWORDS = {
+    {"method", METHOD},
+    {"return", RETURN},
+    {"loop", LOOP},
+    {"from", FROM},
+    {"to", TO},
+    {"while", WHILE},
+    {"until", UNTIL},
+    {"if", IF},
+    {"else", ELSE},
+    {"end", END},
+    {"output", OUTPUT}
+};
+
+int lookup_keyword(std::string lexeme);
+
 std::string *tok_to_str(Token *token);
    
 std::string *id_to_str(int id);
+
+
 }
 #endif

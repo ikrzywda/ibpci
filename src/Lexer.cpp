@@ -56,6 +56,9 @@ tk::Token *Lexer::id(){
         attr_buffer->push_back(c);
         advance();
     }
+    if(id == tk::ID_METHOD && tk::lookup_keyword(*attr_buffer) > 0){
+        id = tk::lookup_keyword(*attr_buffer); 
+    }
     return new tk::Token(id, attr_buffer);
 }   
 
@@ -106,15 +109,15 @@ tk::Token *Lexer::get_next_token(){
                         skip_comment();
                         break;   
                     }else return new tk::Token(tk::DIV, &noattr);
-                case EOF: return new tk::Token(tk::END, &noattr);
+                case EOF: return new tk::Token(tk::END_FILE, &noattr);
                 default:
                     std::cout << "\nunexpected character: '" << c << "'\n";
-                    return new tk::Token(tk::END, &noattr);
+                    return new tk::Token(tk::END_FILE, &noattr);
 
             }
         }
     }
-    return new tk::Token(tk::END, &noattr);
+    return new tk::Token(tk::END_FILE, &noattr);
 }
 
 }

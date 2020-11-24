@@ -46,7 +46,16 @@ enum id{
     ELSE,
     THEN,
     END,
-    OUTPUT
+    OUTPUT,
+    ADD_ITEM,
+    GET_NEXT,
+    RESET_NEXT,
+    HAS_NEXT,
+    PUSH,
+    POP,
+    ENQUEUE,
+    DEQUEUE,
+    IS_EMPTY
 };
 
 class Token{
@@ -73,7 +82,16 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"else", ELSE},
     {"then", THEN},
     {"end", END},
-    {"output", OUTPUT}
+    {"output", OUTPUT},
+    {"addItem", ADD_ITEM},
+    {"getNext", GET_NEXT},
+    {"resetNext", RESET_NEXT},
+    {"hasNext", HAS_NEXT},
+    {"push", PUSH},
+    {"pop", POP},
+    {"enqueue", ENQUEUE},
+    {"dequeue", DEQUEUE},
+    {"isEmpty", IS_EMPTY}
 };
 
 int lookup_keyword(std::string lexeme);

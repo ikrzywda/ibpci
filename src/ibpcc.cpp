@@ -11,7 +11,6 @@ std::string *get_buffer(char *filename){
         file.get(c);
         *buffer += c;
     }
-    *buffer += '\0';
     file.close();
     return buffer;
 }

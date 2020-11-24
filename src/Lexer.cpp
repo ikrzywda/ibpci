@@ -9,15 +9,30 @@ int is_upcase(char c){
 Lexer::Lexer(std::string *buffer){
     Lexer::input_buffer = buffer;
     attr_buffer = new std::string;
-    pos = 0;
+    pos = 0, len = buffer->size();
     c = input_buffer->at(pos);
 }
 
 void Lexer::advance(){
     pos++;
-    c = input_buffer->at(pos);
+    if(pos < len - 1){ 
+        c = input_buffer->at(pos);
+    }else{
+        c = EOF;
+    }
 }
 
+void Lexer::skip_whitespace(){
+    while(std::isspace(c)){
+        advance();
+    }
+}
+
+void Lexer::skip_comment(){
+    while(c != '\n'){
+        advance();
+    }
+}
 
 tk::Token *Lexer::number(){
     int id = tk::INT;
@@ -63,20 +78,18 @@ tk::Token *Lexer::op_eq(char ch){
 }
 
 tk::Token *Lexer::get_next_token(){
-    while(c != '\0'){
+    while(1){
+        skip_whitespace();
         attr_buffer->clear();
         if(std::isdigit(c)){
             return number();
         }else if(std::isalnum(c)){
             return id();
-        }else if(std::isspace(c)){
-            advance();
         }else{
             switch(c){
                 case '+': advance(); return new tk::Token(tk::PLUS, &noattr);
                 case '-': advance(); return new tk::Token(tk::MINUS, &noattr);
                 case '*': advance(); return new tk::Token(tk::MULT, &noattr);
-                case '/': advance(); return new tk::Token(tk::DIV, &noattr);
                 case '%': advance(); return new tk::Token(tk::MOD, &noattr);
                 case '[': advance(); return new tk::Token(tk::LSQBR, &noattr);
                 case ']': advance(); return new tk::Token(tk::RSQBR, &noattr);
@@ -87,10 +100,20 @@ tk::Token *Lexer::get_next_token(){
                 case '=': return op_eq('=');
                 case '>': return op_eq('>');
                 case '<': return op_eq('<');
+                case '/': 
+                    advance();
+                    if(c == '/'){ 
+                        skip_comment();
+                        break;   
+                    }else return new tk::Token(tk::DIV, &noattr);
+                case EOF: return new tk::Token(tk::END, &noattr);
+                default:
+                    std::cout << "\nunexpected character: '" << c << "'\n";
+                    return new tk::Token(tk::END, &noattr);
+
             }
         }
     }
-    std::cout << "unexpected char" << std::endl;
     return new tk::Token(tk::END, &noattr);
 }
 

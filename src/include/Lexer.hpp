@@ -15,9 +15,11 @@ class Lexer{
         std::string *input_buffer;
         std::string *attr_buffer;
         std::string noattr = "0";
-        int pos;
+        int pos, len;
         char c;
         void advance();
+        void skip_whitespace();
+        void skip_comment();
         tk::Token *advance_with(char ch);
         tk::Token *number();
         tk::Token *id();

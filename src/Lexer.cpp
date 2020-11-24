@@ -56,11 +56,21 @@ tk::Token *Lexer::id(){
         attr_buffer->push_back(c);
         advance();
     }
-    if(id == tk::ID_METHOD && tk::lookup_keyword(*attr_buffer) > 0){
+    if(tk::lookup_keyword(*attr_buffer) > 0){
         id = tk::lookup_keyword(*attr_buffer); 
     }
     return new tk::Token(id, attr_buffer);
 }   
+
+tk::Token *Lexer::string(){
+    advance();
+    while(c != '\"' && c != EOF){
+        attr_buffer->push_back(c);
+        advance();
+    }
+    advance();
+    return new tk::Token(tk::STRING, attr_buffer);
+}
 
 tk::Token *Lexer::op_eq(char ch){
     advance();
@@ -100,6 +110,7 @@ tk::Token *Lexer::get_next_token(){
                 case ')': advance(); return new tk::Token(tk::RPAREN, &noattr);
                 case '.': advance(); return new tk::Token(tk::DOT, &noattr);
                 case ',': advance(); return new tk::Token(tk::COMMA, &noattr);
+                case '\"': return string();
                 case '=': return op_eq('=');
                 case '>': return op_eq('>');
                 case '<': return op_eq('<');
@@ -108,7 +119,7 @@ tk::Token *Lexer::get_next_token(){
                     if(c == '/'){ 
                         skip_comment();
                         break;   
-                    }else return new tk::Token(tk::DIV, &noattr);
+                    }else return new tk::Token(tk::DIV_WOQ, &noattr);
                 case EOF: return new tk::Token(tk::END_FILE, &noattr);
                 default:
                     std::cout << "\nunexpected character: '" << c << "'\n";

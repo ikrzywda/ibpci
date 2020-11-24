@@ -14,8 +14,9 @@ std::string *id_to_str(int id){
         case PLUS: *out = "+"; break;
         case MINUS: *out = "-"; break;
         case MULT: *out = "*"; break;
-        case DIV: *out = "/"; break;
-        case MOD: *out = "%"; break;
+        case DIV_WOQ: *out = "/"; break;
+        case DIV_WQ: *out = "div"; break;
+        case MOD: *out = "mod"; break;
         case LSQBR: *out = "["; break;
         case RSQBR: *out = "]"; break;
         case LPAREN: *out = "("; break;
@@ -31,8 +32,12 @@ std::string *id_to_str(int id){
         case COMMA: *out = ","; break;
         case INT: *out = "INT"; break;
         case FLOAT: *out = "FLOAT"; break;
+        case STRING: *out = "STRING"; break;
         case ID_VAR: *out = "ID_VAR"; break;
         case ID_METHOD: *out = "ID_METHOD"; break;
+        case AND: *out = "AND"; break;
+        case OR: *out = "OR"; break;
+        case NOT: *out = "NOT"; break;
         case METHOD: *out = "method"; break;
         case RETURN: *out = "return"; break;
         case LOOP: *out = "loop"; break;
@@ -41,6 +46,7 @@ std::string *id_to_str(int id){
         case WHILE: *out = "while"; break;
         case UNTIL: *out = "until"; break;
         case IF: *out = "if"; break;
+        case THEN: *out = "then"; break;
         case ELSE: *out = "else"; break;
         case END: *out = "end"; break;
         case OUTPUT: *out = "output"; break;

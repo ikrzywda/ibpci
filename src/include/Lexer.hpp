@@ -20,9 +20,9 @@ class Lexer{
         void advance();
         void skip_whitespace();
         void skip_comment();
-        tk::Token *advance_with(char ch);
         tk::Token *number();
         tk::Token *id();
+        tk::Token *string();
         tk::Token *op_eq(char ch);
     public:
         Lexer(std::string *buffer);

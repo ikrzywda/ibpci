@@ -11,7 +11,8 @@ enum id{
     PLUS,
     MINUS,
     MULT,
-    DIV,
+    DIV_WOQ,
+    DIV_WQ,
     MOD,
     LSQBR,
     RSQBR,
@@ -31,6 +32,9 @@ enum id{
     STRING,
     ID_VAR,
     ID_METHOD,
+    AND,
+    OR,
+    NOT,
     METHOD,
     RETURN,
     LOOP,
@@ -40,6 +44,7 @@ enum id{
     UNTIL,
     IF,
     ELSE,
+    THEN,
     END,
     OUTPUT
 };
@@ -52,6 +57,11 @@ class Token{
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {
+    {"div", DIV_WQ},
+    {"mod", MOD},
+    {"AND", AND},
+    {"OR", OR},
+    {"NOT", NOT},
     {"method", METHOD},
     {"return", RETURN},
     {"loop", LOOP},
@@ -61,6 +71,7 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"until", UNTIL},
     {"if", IF},
     {"else", ELSE},
+    {"then", THEN},
     {"end", END},
     {"output", OUTPUT}
 };

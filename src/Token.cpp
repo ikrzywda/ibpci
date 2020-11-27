@@ -49,17 +49,8 @@ std::string *id_to_str(int id){
         case THEN: *out = "then"; break;
         case ELSE: *out = "else"; break;
         case END: *out = "end"; break;
-        case OUTPUT: *out = "output"; break;
-        case ADD_ITEM: *out = "addItem"; break;
-        case GET_NEXT: *out = "getNext"; break;
-        case RESET_NEXT: *out = "resetNext"; break;
-        case HAS_NEXT: *out = "hasNext"; break;
-        case PUSH: *out = "push"; break;
-        case POP: *out = "pop"; break;
-        case ENQUEUE: *out = "enqueue"; break;
-        case DEQUEUE: *out = "dequeue"; break;
-        case IS_EMPTY: *out = "isEmpty"; break;
-        case LENGTH: *out = "length"; break;
+        case STANDARD_METHOD: *out = "standard method"; break;
+        case STANDARD_METHOD_ATTR: *out = "standard method by attribute"; break;
         default: *out = "NULL"; break;
     }
     return out;

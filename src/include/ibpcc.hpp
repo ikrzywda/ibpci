@@ -12,6 +12,10 @@ std::string *get_buffer(char *filename);
 
 void compile(char *filename);
 
+void test_lexer(char *filename);
+
+void test_parser(char *filename);
+
 }
 
 #endif

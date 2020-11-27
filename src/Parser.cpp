@@ -20,9 +20,7 @@ void Parser::eat(int token_id){
 
 void Parser::parse(){
     while(current_token->id != tk::END_FILE){
-        switch(current_token->id){
-            case tk::METHOD: method(); break;
-        }   
+        statement();
     }
     eat(tk::END_FILE);
 }
@@ -49,15 +47,13 @@ ast::AST *Parser::method(){
 
 ast::AST *Parser::statement(){
     switch(current_token->id){
-        case tk::ID_VAR:
-            eat(tk::ID_VAR);
-            if(current_token->id == tk::EQ) assignment();
-            else expr();
-            break;
+        case tk::ID_VAR: assignment(); break;
+        case tk::METHOD: method(); break;
         case tk::INT: expr(); break;
         case tk::FLOAT: expr(); break;
         case tk::IF: if_statement(); break;
         case tk::LOOP: loop(); break;
+        case tk::RETURN: return_statement(); break;
         case tk::ID_METHOD: method_call(); break;
         case tk::INPUT: input(); break;
         case tk::OUTPUT: output(); break;
@@ -122,15 +118,21 @@ ast::AST *Parser::loop(){
 ast::AST *Parser::loop_for(){
     eat(tk::ID_VAR);
     eat(tk::FROM);
-    factor();
+    expr();
     eat(tk::TO);
-    factor();
+    expr();
     return 0;
 }
 
 ast::AST *Parser::loop_while(){
     eat(tk::WHILE);
     comparison_list();
+    return 0;
+}
+
+ast::AST *Parser::return_statement(){
+    eat(tk::RETURN);
+    expr();
     return 0;
 }
 
@@ -147,6 +149,13 @@ ast::AST *Parser::method_call(){
 }
 
 ast::AST *Parser::assignment(){
+    eat(tk::ID_VAR);
+    if(current_token->id == tk::LSQBR){
+        array_element();
+        if(current_token->id != tk::EQ){
+            return 0;
+        }
+    }
     eat(tk::EQ);
     if(current_token->id == tk::LSQBR){
         array_initialization();
@@ -177,6 +186,15 @@ ast::AST *Parser::array_argument(){
             break;
     }
     return 0;
+}
+
+ast::AST *Parser::array_element(){
+    while(current_token->id == tk::LSQBR){
+        eat(tk::LSQBR);
+        factor();
+        eat(tk::RSQBR);
+    }
+    return 0; 
 }
 
 ast::AST *Parser::comparison_list(){
@@ -258,11 +276,7 @@ ast::AST *Parser::factor(){
         case tk::ID_VAR:
             eat(tk::ID_VAR);
             if(current_token->id == tk::LSQBR){
-                while(current_token->id == tk::LSQBR){
-                    eat(tk::LSQBR);
-                    eat(tk::INT);
-                    eat(tk::RSQBR);
-                }
+                array_element();
             }else if(current_token->id == tk::DOT){
                 eat(tk::DOT);
                 eat(tk::STANDARD_METHOD);

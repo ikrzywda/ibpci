@@ -22,6 +22,7 @@ class Parser{
         ast::AST *loop();
         ast::AST *loop_for();
         ast::AST *loop_while();
+        ast::AST *return_statement();
         ast::AST *method_call();
         ast::AST *assignment();
         ast::AST *array_initialization();

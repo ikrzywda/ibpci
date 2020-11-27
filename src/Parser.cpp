@@ -58,7 +58,7 @@ ast::AST *Parser::statement(){
         case tk::FLOAT: expr(); break;
         case tk::IF: if_statement(); break;
         case tk::LOOP: loop(); break;
-        case tk::ID_METHOD: break;
+        case tk::ID_METHOD: method_call(); break;
         default: std::cout << "unexpected token: " <<
                  *tk::id_to_str(current_token->id); 
                  exit(1);
@@ -116,9 +116,50 @@ ast::AST *Parser::loop_while(){
     return 0;
 }
 
+ast::AST *Parser::method_call(){
+    eat(tk::ID_METHOD);
+    eat(tk::LPAREN);
+    factor();
+    while(current_token->id != tk::RPAREN){
+        eat(tk::COMMA);
+        factor();
+    }
+    eat(tk::RPAREN);
+    return 0;
+}
+
 ast::AST *Parser::assignment(){
     eat(tk::EQ);
-    expr();
+    if(current_token-> id == tk::LSQBR){
+        while(current_token->id == tk::LSQBR){
+            array_initialization();
+        }
+    }else{
+        expr();
+    }
+    return 0;
+}
+
+ast::AST *Parser::array_initialization(){
+    array_argument();
+    while(current_token->id == tk::COMMA){
+        eat(tk::COMMA);
+        array_argument();
+    }
+    return 0; 
+}
+
+ast::AST *Parser::array_argument(){
+    switch(current_token->id){
+        case tk::INT: eat(tk::INT); break;
+        case tk::FLOAT: eat(tk::FLOAT); break;
+        case tk::STRING: eat(tk::STRING); break;
+        case tk::LSQBR:
+            eat(tk::LSQBR);
+            array_initialization(); 
+            eat(tk::RSQBR);
+            break;
+    }
     return 0;
 }
 
@@ -195,13 +236,26 @@ ast::AST *Parser::factor(){
         case tk::FLOAT:
             eat(tk::FLOAT);
             break;
+        case tk::STRING:
+            eat(tk::STRING);
+            break;
         case tk::ID_VAR:
             eat(tk::ID_VAR);
+            if(current_token->id == tk::LSQBR){
+                while(current_token->id == tk::LSQBR){
+                    eat(tk::LSQBR);
+                    eat(tk::INT);
+                    eat(tk::RSQBR);
+                }
+            }
             break;
         case tk::LPAREN:
             eat(tk::LPAREN);
             expr();
             eat(tk::RPAREN);
+            break;
+        case tk::ID_METHOD:
+            method_call();
             break;
         default: break;
     }

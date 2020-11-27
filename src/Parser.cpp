@@ -56,8 +56,8 @@ ast::AST *Parser::statement(){
             break;
         case tk::INT: expr(); break;
         case tk::FLOAT: expr(); break;
-        case tk::IF: break;
-        case tk::LOOP: break;
+        case tk::IF: if_statement(); break;
+        case tk::LOOP: loop(); break;
         case tk::ID_METHOD: break;
         default: std::cout << "unexpected token: " <<
                  *tk::id_to_str(current_token->id); 
@@ -66,10 +66,92 @@ ast::AST *Parser::statement(){
     return 0;
 }
 
+ast::AST *Parser::if_statement(){
+    eat(tk::IF);
+    comparison_list();
+    eat(tk::THEN);
+    while(current_token->id != tk::END){
+        if(current_token->id == tk::ELSE){
+            eat(tk::ELSE);
+            if(current_token->id == tk::IF){
+                eat(tk::IF);
+                comparison_list();
+                eat(tk::THEN);
+            }
+        }
+        statement();
+
+    }
+    eat(tk::END);
+    eat(tk::IF);
+    return 0;
+}
+
+ast::AST *Parser::loop(){
+    eat(tk::LOOP);
+    switch(current_token->id){
+        case tk::ID_VAR: loop_for(); break;
+        case tk::WHILE: loop_while(); break;
+    }
+    while(current_token->id != tk::END){
+        statement();
+    }
+    eat(tk::END);
+    eat(tk::LOOP);
+    return 0;
+}
+
+ast::AST *Parser::loop_for(){
+    eat(tk::ID_VAR);
+    eat(tk::FROM);
+    factor();
+    eat(tk::TO);
+    factor();
+    return 0;
+}
+
+ast::AST *Parser::loop_while(){
+    eat(tk::WHILE);
+    comparison_list();
+    return 0;
+}
 
 ast::AST *Parser::assignment(){
     eat(tk::EQ);
     expr();
+    return 0;
+}
+
+ast::AST *Parser::comparison_list(){
+    comparison();
+    while(current_token->id == tk::AND ||
+            current_token->id == tk::OR){
+        if(current_token->id == tk::AND){
+            eat(tk::AND);
+            comparison();
+        }else if(current_token->id == tk::OR){
+            eat(tk::OR);
+            comparison();
+        }
+    }
+   return 0; 
+}
+
+ast::AST *Parser::comparison(){
+    term();
+    if(current_token->id == tk::LT ||
+            current_token->id == tk::GT ||
+            current_token->id == tk::LEQ ||
+            current_token->id == tk::GEQ ||
+            current_token->id == tk::IS){
+        switch(current_token->id){
+            case tk::LT: eat(tk::LT); term(); break;
+            case tk::GT: eat(tk::GT); term(); break;
+            case tk::LEQ: eat(tk::LEQ); term(); break;
+            case tk::GEQ: eat(tk::GEQ); term(); break;
+            case tk::IS: eat(tk::IS); term(); break;
+        }
+    }
     return 0;
 }
 

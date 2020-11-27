@@ -59,9 +59,27 @@ ast::AST *Parser::statement(){
         case tk::IF: if_statement(); break;
         case tk::LOOP: loop(); break;
         case tk::ID_METHOD: method_call(); break;
+        case tk::INPUT: input(); break;
+        case tk::OUTPUT: output(); break;
         default: std::cout << "unexpected token: " <<
                  *tk::id_to_str(current_token->id); 
                  exit(1);
+    }
+    return 0;
+}
+
+ast::AST *Parser::input(){
+    eat(tk::INPUT);
+    eat(tk::ID_VAR);
+    return 0;
+}
+
+ast::AST *Parser::output(){
+    eat(tk::OUTPUT);
+    factor();
+    while(current_token->id == tk::COMMA){
+        eat(tk::COMMA);
+        factor();
     }
     return 0;
 }
@@ -130,10 +148,8 @@ ast::AST *Parser::method_call(){
 
 ast::AST *Parser::assignment(){
     eat(tk::EQ);
-    if(current_token-> id == tk::LSQBR){
-        while(current_token->id == tk::LSQBR){
-            array_initialization();
-        }
+    if(current_token->id == tk::LSQBR){
+        array_initialization();
     }else{
         expr();
     }
@@ -247,6 +263,11 @@ ast::AST *Parser::factor(){
                     eat(tk::INT);
                     eat(tk::RSQBR);
                 }
+            }else if(current_token->id == tk::DOT){
+                eat(tk::DOT);
+                eat(tk::STANDARD_METHOD);
+                eat(tk::LPAREN);
+                eat(tk::RPAREN);
             }
             break;
         case tk::LPAREN:

@@ -49,8 +49,9 @@ std::string *id_to_str(int id){
         case THEN: *out = "then"; break;
         case ELSE: *out = "else"; break;
         case END: *out = "end"; break;
+        case OUTPUT: *out = "output"; break;
+        case INPUT: *out = "intput"; break;
         case STANDARD_METHOD: *out = "standard method"; break;
-        case STANDARD_METHOD_ATTR: *out = "standard method by attribute"; break;
         default: *out = "NULL"; break;
     }
     return out;

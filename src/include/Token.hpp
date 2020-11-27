@@ -55,7 +55,8 @@ enum id{
     POP,
     ENQUEUE,
     DEQUEUE,
-    IS_EMPTY
+    IS_EMPTY,
+    LENGTH,
 };
 
 class Token{
@@ -91,7 +92,8 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"pop", POP},
     {"enqueue", ENQUEUE},
     {"dequeue", DEQUEUE},
-    {"isEmpty", IS_EMPTY}
+    {"isEmpty", IS_EMPTY},
+    {"length", LENGTH}
 };
 
 int lookup_keyword(std::string lexeme);

@@ -17,11 +17,9 @@ std::string *get_buffer(char *filename){
 
 
 void compile(char *filename){
-    tk::Token *tkn;
     lxr::Lexer lex(get_buffer(filename));
-    while((tkn = lex.get_next_token())->id != tk::END_FILE){
-        std::cout << *tk::tok_to_str(tkn);
-    }
+    prs::Parser parser(lex);
+    parser.parse();
 }
 
 }

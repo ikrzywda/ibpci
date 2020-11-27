@@ -59,6 +59,7 @@ std::string *id_to_str(int id){
         case ENQUEUE: *out = "enqueue"; break;
         case DEQUEUE: *out = "dequeue"; break;
         case IS_EMPTY: *out = "isEmpty"; break;
+        case LENGTH: *out = "length"; break;
         default: *out = "NULL"; break;
     }
     return out;

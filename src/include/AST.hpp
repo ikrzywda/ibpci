@@ -4,19 +4,27 @@
 #include "Token.hpp"
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace ast{
 
+enum id{
+    TOKEN,
+    BIN_OP
+};
+
 class AST{
     public:
+        int id;
         AST *left_node;
         AST *right_node;
         tk::Token *token;
-        AST(AST *left_node, tk::Token *token, AST *right_node);
+        std::vector<AST*> children;
+        AST(int id, AST *ln, tk::Token *tk, AST *rn);
+        AST(tk::Token *tk);
 };
 
-void print_AST(AST *node);
+std::string *id_to_str(AST *node);
 
 }
-
 #endif

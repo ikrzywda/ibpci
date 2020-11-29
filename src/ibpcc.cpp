@@ -30,7 +30,8 @@ void test_lexer(char *filename){
 void test_parser(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     prs::Parser parser(lex);
-    parser.parse();
+    ast::AST *root = parser.parse();
+    nv::print_tree(root);
 }
 
 }

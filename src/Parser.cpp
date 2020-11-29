@@ -18,11 +18,9 @@ void Parser::eat(int token_id){
     }   
 }
 
-void Parser::parse(){
-    while(current_token->id != tk::END_FILE){
-        statement();
-    }
-    eat(tk::END_FILE);
+ast::AST *Parser::parse(){
+    ast::AST *root = expr();
+    return root;
 }
 
 ast::AST *Parser::method(){
@@ -231,48 +229,42 @@ ast::AST *Parser::comparison(){
 }
 
 ast::AST *Parser::expr(){
-    term();
-    while(current_token->id == tk::PLUS ||
-            current_token->id == tk::MINUS){
-        if(current_token->id == tk::PLUS){
-            eat(tk::PLUS);
-            term();
-        }else if(current_token->id == tk::MINUS){
-            eat(tk::MINUS);
-            term();
-        }
+    ast::AST *node = term();
+    tk::Token *token;
+    if(current_token->id == tk::PLUS 
+            || current_token->id == tk::MINUS){
+        token = current_token;
+        eat(current_token->id);
     }
-    return 0;
+    return new ast::AST(ast::BIN_OP, node, token, term());
 }
 
 ast::AST *Parser::term(){
-    factor();
-    while(current_token->id == tk::MULT ||
+    ast::AST *node = factor();
+    tk::Token *token;
+    if(current_token->id == tk::MULT ||
             current_token->id == tk::DIV_WQ ||
             current_token->id == tk::DIV_WOQ ||
             current_token->id == tk::MOD){
-        switch(current_token->id){
-            case tk::MULT: eat(tk::MULT); factor(); break;
-            case tk::DIV_WQ: eat(tk::DIV_WQ); factor(); break;
-            case tk::DIV_WOQ: eat(tk::DIV_WOQ); factor(); break;
-            case tk::MOD: eat(tk::MOD); factor(); break;
-            default: break;
-        }
+        token = current_token;
+        eat(current_token->id);   
     }
-    return 0;
+        return new ast::AST(ast::BIN_OP, node, token, factor());
 }
 
 ast::AST *Parser::factor(){
+    ast::AST *node;
+    tk::Token *token = current_token;
     switch(current_token->id){
         case tk::INT:
             eat(tk::INT);
-            break;
+            return new ast::AST(token);
         case tk::FLOAT:
             eat(tk::FLOAT);
-            break;
+            return new ast::AST(token);
         case tk::STRING:
             eat(tk::STRING);
-            break;
+            return new ast::AST(token);
         case tk::ID_VAR:
             eat(tk::ID_VAR);
             if(current_token->id == tk::LSQBR){
@@ -286,9 +278,9 @@ ast::AST *Parser::factor(){
             break;
         case tk::LPAREN:
             eat(tk::LPAREN);
-            expr();
+            node = expr();
             eat(tk::RPAREN);
-            break;
+            return node;
         case tk::ID_METHOD:
             method_call();
             break;

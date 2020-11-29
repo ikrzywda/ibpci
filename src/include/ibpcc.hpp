@@ -3,6 +3,7 @@
 
 #include "Lexer.hpp"
 #include "Parser.hpp"
+#include "NodeVisitor.hpp"
 #include <fstream>
 #include <iostream>
 

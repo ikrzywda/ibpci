@@ -35,7 +35,7 @@ class Parser{
         ast::AST *factor();
     public:
         Parser(const lxr::Lexer &lexer);
-        void parse();
+        ast::AST *parse();
 };
 
 }

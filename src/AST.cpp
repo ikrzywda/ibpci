@@ -3,7 +3,6 @@
 namespace ast{
 
 AST::AST(int id, AST *ln, tk::Token *tk, AST *rn){
-    std::cout << "full node created!\n";
     AST::id = id;
     left_node = ln;
     right_node = rn;
@@ -11,7 +10,6 @@ AST::AST(int id, AST *ln, tk::Token *tk, AST *rn){
 }
 
 AST::AST(tk::Token *tk){
-    std::cout << "leaf created!\n";
     id = TOKEN;
     token = tk;
     left_node = right_node = NULL;
@@ -25,6 +23,14 @@ std::string *id_to_str(AST *node){
         default: *out = "null"; break;
     }
     return out;
+}
+
+void print_tree_in_ast(AST *root){
+    if(root == NULL)
+        return;
+    print_tree_in_ast(root->left_node);
+    print_tree_in_ast(root->right_node);
+    std::cout << *tk::tok_to_str(root->token) << std::endl;
 }
 
 }

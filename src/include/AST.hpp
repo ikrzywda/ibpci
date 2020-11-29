@@ -26,5 +26,7 @@ class AST{
 
 std::string *id_to_str(AST *node);
 
+void print_tree_in_ast(AST *root);
+
 }
 #endif

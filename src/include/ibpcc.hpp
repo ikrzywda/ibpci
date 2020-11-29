@@ -4,6 +4,7 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
 #include "NodeVisitor.hpp"
+#include "AST.hpp"
 #include <fstream>
 #include <iostream>
 

@@ -3,6 +3,7 @@
 
 #include "AST.hpp"
 #include "Token.hpp"
+#include <string>
 
 namespace nv{
 

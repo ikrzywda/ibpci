@@ -6,9 +6,15 @@ Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){
     current_token = lex.get_next_token();
 }
 
+Parser::~Parser(){
+    std::cout << "here goes parser";
+}
+
 void Parser::eat(int token_id){
+    std::cout << "old token: " << *tk::tok_to_str(current_token);
     if(current_token->id == token_id){
         current_token = lex.get_next_token();
+        std::cout << "new token: " << *tk::tok_to_str(current_token);
         }else{
         std::cout << "unexpected token: " << 
             *tk::id_to_str(current_token->id) <<
@@ -20,6 +26,8 @@ void Parser::eat(int token_id){
 
 ast::AST *Parser::parse(){
     ast::AST *root = expr();
+    std::cout << "root addr: " << root->token->attr;
+    std::cout << "root_addr: " << *root->token->attr;
     return root;
 }
 
@@ -231,34 +239,45 @@ ast::AST *Parser::comparison(){
 ast::AST *Parser::expr(){
     ast::AST *node = term();
     tk::Token *token;
-    if(current_token->id == tk::PLUS 
+    while(current_token->id == tk::PLUS 
             || current_token->id == tk::MINUS){
         token = current_token;
         eat(current_token->id);
+        node = new ast::AST(ast::BIN_OP, node, token, term());
     }
-    return new ast::AST(ast::BIN_OP, node, token, term());
+    return node; 
 }
 
 ast::AST *Parser::term(){
     ast::AST *node = factor();
     tk::Token *token;
-    if(current_token->id == tk::MULT ||
+    while(current_token->id == tk::MULT ||
             current_token->id == tk::DIV_WQ ||
             current_token->id == tk::DIV_WOQ ||
             current_token->id == tk::MOD){
+        switch(current_token->id){
+            case tk::MULT: eat(tk::MULT); break;
+            case tk::DIV_WQ: eat(tk::DIV_WQ); break;
+            case tk::DIV_WOQ: eat(tk::DIV_WOQ); break;
+            case tk::MOD: eat(tk::MOD); break;
+        }
         token = current_token;
         eat(current_token->id);   
+        node = new ast::AST(ast::BIN_OP, node, token, factor()); 
     }
-        return new ast::AST(ast::BIN_OP, node, token, factor());
+    return node;
 }
 
 ast::AST *Parser::factor(){
     ast::AST *node;
     tk::Token *token = current_token;
+    std::cout << "*token = current_token = " << *token->attr;
     switch(current_token->id){
         case tk::INT:
+            node = new ast::AST(token);
             eat(tk::INT);
-            return new ast::AST(token);
+            std::cout << token->attr;
+            return node;
         case tk::FLOAT:
             eat(tk::FLOAT);
             return new ast::AST(token);

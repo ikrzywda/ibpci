@@ -30,11 +30,12 @@ class Parser{
         ast::AST *array_element();
         ast::AST *comparison_list();
         ast::AST *comparison();
-        ast::AST *expr();
         ast::AST *term();
         ast::AST *factor();
     public:
         Parser(const lxr::Lexer &lexer);
+        ~Parser();
+        ast::AST *expr();
         ast::AST *parse();
 };
 

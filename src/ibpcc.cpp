@@ -30,8 +30,9 @@ void test_lexer(char *filename){
 void test_parser(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     prs::Parser parser(lex);
-    ast::AST *root = parser.parse();
-    nv::print_tree(root);
+    ast::AST *root = parser.expr();
+    //std::cout << "root addr @ ibcc: " << *root->token->attr;
+    ast::print_tree_in_ast(root);
 }
 
 }

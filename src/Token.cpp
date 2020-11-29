@@ -7,6 +7,7 @@ Token::Token(int id, std::string *attr){
     Token::attr = attr;
 }
 
+
 std::string *id_to_str(int id){
     std::string *out = new std::string;
     switch(id){

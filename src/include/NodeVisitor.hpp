@@ -3,11 +3,14 @@
 
 #include "AST.hpp"
 #include "Token.hpp"
+#include <iostream>
 #include <string>
 
 namespace nv{
 
-void print_tree(ast::AST *root);
+void print_ast(ast::AST *root);
+
+const char *tok_to_str(tk::Token *token);
 
 }
 

@@ -4,6 +4,7 @@
 #include "Lexer.hpp"
 #include "AST.hpp"
 #include "Token.hpp"
+#include "NodeVisitor.hpp"
 #include <iostream>
 #include <string>
 
@@ -14,6 +15,7 @@ class Parser{
         lxr::Lexer lex;
         tk::Token *current_token;
         void eat(int token_id);
+        ast::AST *block();
         ast::AST *method();
         ast::AST *statement();
         ast::AST *input();
@@ -30,12 +32,11 @@ class Parser{
         ast::AST *array_element();
         ast::AST *comparison_list();
         ast::AST *comparison();
+        ast::AST *expr();
         ast::AST *term();
         ast::AST *factor();
     public:
         Parser(const lxr::Lexer &lexer);
-        ~Parser();
-        ast::AST *expr();
         ast::AST *parse();
 };
 

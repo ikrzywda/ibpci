@@ -53,9 +53,10 @@ enum id{
 
 class Token{
     public:
-        std::string *attr;
+        const char *attr;
         int id;
         Token(int id, std::string *attr);
+        Token();
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {

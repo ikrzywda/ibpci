@@ -8,25 +8,22 @@
 
 namespace ast{
 
-enum id{
-    TOKEN,
-    BIN_OP
+enum ast_id{
+    BINOP,
+    NUM
 };
 
-class AST{
-    public:
-        int id;
-        AST *left_node;
-        AST *right_node;
-        tk::Token *token;
-        std::vector<AST*> children;
-        AST(int id, AST *ln, tk::Token *tk, AST *rn);
-        AST(tk::Token *tk);
+typedef struct AST AST;
+
+struct AST{
+    int id;
+    tk::Token *token;
+    std::vector<AST*> nodes;
 };
 
-std::string *id_to_str(AST *node);
+AST *BinOp(AST *left_node, tk::Token *token, AST *right_node);
 
-void print_tree_in_ast(AST *root);
+AST *Num(tk::Token *token);
 
 }
 #endif

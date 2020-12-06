@@ -8,22 +8,25 @@
 
 namespace ast{
 
-enum ast_id{
-    BINOP,
-    NUM
-};
+const int BINOP = 9;
+const int NUM = 10;
 
 typedef struct AST AST;
 
 struct AST{
     int id;
-    tk::Token *token;
+    int op;
+    const char *attr;
     std::vector<AST*> nodes;
 };
 
-AST *BinOp(AST *left_node, tk::Token *token, AST *right_node);
+AST *NewNode(int node_id, const char *attr);
 
-AST *Num(tk::Token *token);
+AST *populate_by_attr(AST *parent, int id, const char *attr);
+
+AST *populate_by_node(AST *parent, AST *child);
+
+void print_tree(AST *root);
 
 }
 #endif

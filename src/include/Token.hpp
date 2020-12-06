@@ -53,7 +53,7 @@ enum id{
 
 class Token{
     public:
-        const char *attr;
+        std::string *attr;
         int id;
         Token(int id, std::string *attr);
         Token();

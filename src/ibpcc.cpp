@@ -28,19 +28,10 @@ void test_lexer(char *filename){
 }
 
 void test_parser(char *filename){
-    //lxr::Lexer lex(get_buffer(filename));
-    std::string str1, str2;
-    str1 = "+";
-    str2 = "12";
-    tk::Token *tt1 = new tk::Token(tk::PLUS, &str1);
-    tk::Token *tt2 = new tk::Token(tk::INT, &str2);
-    tk::Token *tt3 = new tk::Token(tk::INT, &str2);
-    ast::AST *l1 = ast::Num(tt2);
-    ast::AST *l2 = ast::Num(tt3);
-    ast::AST *new_node = ast::BinOp(l1, tt1, l2);
-    nv::print_ast(new_node);
-    //prs::Parser parser(lex);
-    //parser.parse();
+    lxr::Lexer lex(get_buffer(filename));
+    prs::Parser parser(lex);
+    ast::AST *root = parser.parse();
+    ast::print_tree(root);
 }
 
 }

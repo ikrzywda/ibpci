@@ -4,8 +4,10 @@ namespace tk{
 
 Token::Token(int id, std::string *attr){
     Token::id = id;
-    Token::attr = attr->c_str();
+    Token::attr = attr;
 }
+
+
 
 Token::Token(){}
 
@@ -72,7 +74,7 @@ std::string *tok_to_str(tk::Token *token){
     out->append("<{");
     out->append(*id_to_str(token->id));
     out->append("},{");
-    out->append(token->attr);
+    out->append(token->attr->c_str());
     out->append("}>\n");
     return out;
 }

@@ -2,22 +2,32 @@
 
 namespace ast{
 
-AST *BinOp(AST *left_node, tk::Token *token, AST *right_node){
-    AST *new_ast = new AST;
-    new_ast->id = BINOP;
-    new_ast->nodes.push_back(left_node);
-    new_ast->nodes.push_back(right_node);
-    new_ast->token = token;
-    std::cout << new_ast->token << std::endl;
-    return new_ast;
+AST *NewNode(int node_id, const char *attr){
+    AST *new_node = new AST;
+    new_node->id = node_id;
+    new_node->attr = attr;
+    return new_node;
 }
 
-AST *Num(tk::Token *token){
-    AST *leaf = new AST;
-    leaf->id = NUM;
-    leaf->token = token;
-    std::cout << leaf->token << std::endl;
-    return leaf;
+AST *populate_by_attr(AST *parent, int id, const char *attr){
+    if(parent == NULL) return NewNode(id, attr);
+    AST *new_node = NewNode(id, attr);
+    parent->nodes.push_back(new_node);
+    return new_node;
+}
+
+AST *populate_by_node(AST *parent, AST *child){
+    if(parent == NULL) return child;
+    parent->nodes.push_back(child);
+    return child;
+}
+
+void print_tree(AST *root){
+    if(root == NULL) return;
+    for(unsigned i = 0; i < root->nodes.size(); ++i){
+        print_tree(root->nodes[i]);
+    }
+    std::cout << root->id << std::endl;
 }
 
 }

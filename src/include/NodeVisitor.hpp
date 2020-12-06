@@ -10,8 +10,6 @@ namespace nv{
 
 void print_ast(ast::AST *root);
 
-const char *tok_to_str(tk::Token *token);
-
 }
 
 #endif

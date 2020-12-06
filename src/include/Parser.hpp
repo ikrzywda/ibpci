@@ -7,6 +7,7 @@
 #include "NodeVisitor.hpp"
 #include <iostream>
 #include <string>
+#include <cstring>
 
 namespace prs{
 
@@ -15,23 +16,6 @@ class Parser{
         lxr::Lexer lex;
         tk::Token *current_token;
         void eat(int token_id);
-        ast::AST *block();
-        ast::AST *method();
-        ast::AST *statement();
-        ast::AST *input();
-        ast::AST *output();
-        ast::AST *if_statement();
-        ast::AST *loop();
-        ast::AST *loop_for();
-        ast::AST *loop_while();
-        ast::AST *return_statement();
-        ast::AST *method_call();
-        ast::AST *assignment();
-        ast::AST *array_initialization();
-        ast::AST *array_argument();
-        ast::AST *array_element();
-        ast::AST *comparison_list();
-        ast::AST *comparison();
         ast::AST *expr();
         ast::AST *term();
         ast::AST *factor();

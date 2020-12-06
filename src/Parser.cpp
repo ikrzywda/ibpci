@@ -20,263 +20,61 @@ void Parser::eat(int token_id){
 }
 
 ast::AST *Parser::parse(){
-    return NULL;
-}
-
-ast::AST *Parser::method(){
-    eat(tk::METHOD);
-    eat(tk::ID_METHOD);
-    eat(tk::LPAREN);
-    if(current_token->id == tk::ID_VAR){
-        eat(tk::ID_VAR);
-        while(current_token->id != tk::RPAREN){
-            eat(tk::COMMA);
-            eat(tk::ID_VAR);
-        }
-    }
-    eat(tk::RPAREN);
-    while(current_token->id != tk::END){
-        statement();
-    }
-    eat(tk::END);
-    eat(tk::METHOD);
-    return 0;
-}
-
-ast::AST *Parser::statement(){
-    switch(current_token->id){
-        case tk::ID_VAR: assignment(); break;
-        case tk::METHOD: method(); break;
-        case tk::INT: expr(); break;
-        case tk::FLOAT: expr(); break;
-        case tk::IF: if_statement(); break;
-        case tk::LOOP: loop(); break;
-        case tk::RETURN: return_statement(); break;
-        case tk::ID_METHOD: method_call(); break;
-        case tk::INPUT: input(); break;
-        case tk::OUTPUT: output(); break;
-        default: std::cout << "unexpected token: " <<
-                 *tk::id_to_str(current_token->id); 
-                 exit(1);
-    }
-    return 0;
-}
-
-ast::AST *Parser::input(){
-    eat(tk::INPUT);
-    eat(tk::ID_VAR);
-    return 0;
-}
-
-ast::AST *Parser::output(){
-    eat(tk::OUTPUT);
-    factor();
-    while(current_token->id == tk::COMMA){
-        eat(tk::COMMA);
-        factor();
-    }
-    return 0;
-}
-
-ast::AST *Parser::if_statement(){
-    eat(tk::IF);
-    comparison_list();
-    eat(tk::THEN);
-    while(current_token->id != tk::END){
-        if(current_token->id == tk::ELSE){
-            eat(tk::ELSE);
-            if(current_token->id == tk::IF){
-                eat(tk::IF);
-                comparison_list();
-                eat(tk::THEN);
-            }
-        }
-        statement();
-
-    }
-    eat(tk::END);
-    eat(tk::IF);
-    return 0;
-}
-
-ast::AST *Parser::loop(){
-    eat(tk::LOOP);
-    switch(current_token->id){
-        case tk::ID_VAR: loop_for(); break;
-        case tk::WHILE: loop_while(); break;
-    }
-    while(current_token->id != tk::END){
-        statement();
-    }
-    eat(tk::END);
-    eat(tk::LOOP);
-    return 0;
-}
-
-ast::AST *Parser::loop_for(){
-    eat(tk::ID_VAR);
-    eat(tk::FROM);
-    expr();
-    eat(tk::TO);
-    expr();
-    return 0;
-}
-
-ast::AST *Parser::loop_while(){
-    eat(tk::WHILE);
-    comparison_list();
-    return 0;
-}
-
-ast::AST *Parser::return_statement(){
-    eat(tk::RETURN);
-    expr();
-    return 0;
-}
-
-ast::AST *Parser::method_call(){
-    eat(tk::ID_METHOD);
-    eat(tk::LPAREN);
-    factor();
-    while(current_token->id != tk::RPAREN){
-        eat(tk::COMMA);
-        factor();
-    }
-    eat(tk::RPAREN);
-    return 0;
-}
-
-ast::AST *Parser::assignment(){
-    eat(tk::ID_VAR);
-    if(current_token->id == tk::LSQBR){
-        array_element();
-        if(current_token->id != tk::EQ){
-            return 0;
-        }
-    }
-    eat(tk::EQ);
-    if(current_token->id == tk::LSQBR){
-        array_initialization();
-    }else{
-        expr();
-    }
-    return 0;
-}
-
-ast::AST *Parser::array_initialization(){
-    array_argument();
-    while(current_token->id == tk::COMMA){
-        eat(tk::COMMA);
-        array_argument();
-    }
-    return 0; 
-}
-
-ast::AST *Parser::array_argument(){
-    switch(current_token->id){
-        case tk::INT: eat(tk::INT); break;
-        case tk::FLOAT: eat(tk::FLOAT); break;
-        case tk::STRING: eat(tk::STRING); break;
-        case tk::LSQBR:
-            eat(tk::LSQBR);
-            array_initialization(); 
-            eat(tk::RSQBR);
-            break;
-    }
-    return 0;
-}
-
-ast::AST *Parser::array_element(){
-    while(current_token->id == tk::LSQBR){
-        eat(tk::LSQBR);
-        factor();
-        eat(tk::RSQBR);
-    }
-    return 0; 
-}
-
-ast::AST *Parser::comparison_list(){
-    comparison();
-    while(current_token->id == tk::AND ||
-            current_token->id == tk::OR){
-        if(current_token->id == tk::AND){
-            eat(tk::AND);
-            comparison();
-        }else if(current_token->id == tk::OR){
-            eat(tk::OR);
-            comparison();
-        }
-    }
-   return 0; 
-}
-
-ast::AST *Parser::comparison(){
-    term();
-    if(current_token->id == tk::LT ||
-            current_token->id == tk::GT ||
-            current_token->id == tk::LEQ ||
-            current_token->id == tk::GEQ ||
-            current_token->id == tk::IS){
-        switch(current_token->id){
-            case tk::LT: eat(tk::LT); term(); break;
-            case tk::GT: eat(tk::GT); term(); break;
-            case tk::LEQ: eat(tk::LEQ); term(); break;
-            case tk::GEQ: eat(tk::GEQ); term(); break;
-            case tk::IS: eat(tk::IS); term(); break;
-        }
-    }
-    return 0;
+    return expr();
 }
 
 ast::AST *Parser::expr(){
-    ast::AST *node = term(), *node_out;
+    ast::AST *root, *new_node;
+    root = term();
     while(current_token->id == tk::PLUS 
             || current_token->id == tk::MINUS){
+        new_node = ast::NewNode(ast::BINOP, NULL);
+        new_node->op = current_token->id;
+        new_node->nodes.push_back(root);
+        root = new_node;
+        eat(current_token->id);
+        new_node->nodes.push_back(term());
     }
-    return node_out; 
+    return root;
 }
 
 ast::AST *Parser::term(){
-    ast::AST *node = factor(), *node_out;
+    ast::AST *subroot, *new_node;
+    subroot = factor();
     while(current_token->id == tk::MULT ||
             current_token->id == tk::DIV_WQ ||
             current_token->id == tk::DIV_WOQ ||
             current_token->id == tk::MOD){
+        new_node = ast::NewNode(ast::BINOP, NULL);
+        new_node->id = current_token->id;
+        new_node->nodes.push_back(subroot);
+        subroot = new_node;
         eat(current_token->id);
+        new_node->nodes.push_back(factor());
     }
-    return node_out;
+    return subroot;
 }
 
 ast::AST *Parser::factor(){
-    ast::AST *node;
+    ast::AST *new_node;
+    std::string attr_cpy = current_token->attr->c_str();
     switch(current_token->id){
         case tk::INT:
+            new_node = ast::NewNode(ast::NUM, attr_cpy.c_str());
             eat(tk::INT);
-            return node;
+            return new_node;
         case tk::FLOAT:
+            new_node = ast::NewNode(ast::NUM, attr_cpy.c_str());
             eat(tk::FLOAT);
-            return node;
+            return new_node;
         case tk::STRING:
             eat(tk::STRING);
-        case tk::ID_VAR:
-            eat(tk::ID_VAR);
-            if(current_token->id == tk::LSQBR){
-                array_element();
-            }else if(current_token->id == tk::DOT){
-                eat(tk::DOT);
-                eat(tk::STANDARD_METHOD);
-                eat(tk::LPAREN);
-                eat(tk::RPAREN);
-            }
-            break;
         case tk::LPAREN:
             eat(tk::LPAREN);
-            node = expr();
+            new_node = expr();
             eat(tk::RPAREN);
-            return node;
-        case tk::ID_METHOD:
-            method_call();
-            break;
+            return new_node;
+        case tk::END_FILE: std::cout << "END";
         default: break;
     }
     return 0; 

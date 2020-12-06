@@ -8,7 +8,7 @@
 
 namespace nv{
 
-void print_ast(ast::AST *root);
+float visit_expr(ast::AST *root);
 
 }
 

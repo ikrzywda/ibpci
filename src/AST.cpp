@@ -6,6 +6,7 @@ AST *NewNode(int node_id, const char *attr){
     AST *new_node = new AST;
     new_node->id = node_id;
     new_node->attr = attr;
+    new_node->op = 0;
     return new_node;
 }
 
@@ -27,7 +28,7 @@ void print_tree(AST *root){
     for(unsigned i = 0; i < root->nodes.size(); ++i){
         print_tree(root->nodes[i]);
     }
-    std::cout << root->id << std::endl;
+    std::cout << root->id << ", " << root->attr << ", " << root->op << std::endl;
 }
 
 }

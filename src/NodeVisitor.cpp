@@ -2,17 +2,25 @@
 
 namespace nv{
 
-void print_ast(ast::AST *root){
-    if(root == NULL) return;
-    switch(root->id){
-        case ast::BINOP:
-            print_ast(root->nodes.at(0)); 
-            print_ast(root->nodes.at(1));           
-            break;
-        case ast::NUM: 
-            std::cout << *tk::tok_to_str(root->token) << std::endl;
-            break;
+float visit_expr(ast::AST *root){
+    if(root == NULL) return 0;
+    if(root->id == ast::BINOP){
+        switch(root->op){
+            case tk::PLUS:
+                return visit_expr(root->nodes[0]) + visit_expr(root->nodes[1]);
+            case tk::MINUS:
+                return visit_expr(root->nodes[0]) - visit_expr(root->nodes[1]);
+            case tk::MULT:
+                return visit_expr(root->nodes[0]) * visit_expr(root->nodes[1]);
+            case tk::DIV_WOQ:
+                return visit_expr(root->nodes[0]) / visit_expr(root->nodes[1]);
+            case tk::MOD:
+                return (int)visit_expr(root->nodes[0]) % (int)visit_expr(root->nodes[1]);
+        }
+    }else if(root->id == ast::NUM){
+        return std::stod(root->attr);
     }
+    return 0;
 }
 
 }

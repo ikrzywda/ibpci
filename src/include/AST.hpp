@@ -8,8 +8,11 @@
 
 namespace ast{
 
-const int BINOP = 9;
-const int NUM = 10;
+enum ast_id{
+    ASSIGN,
+    BINOP,
+    NUM,
+};
 
 typedef struct AST AST;
 

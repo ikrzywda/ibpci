@@ -16,6 +16,7 @@ class Parser{
         lxr::Lexer lex;
         tk::Token *current_token;
         void eat(int token_id);
+        ast::AST *assign();
         ast::AST *expr();
         ast::AST *term();
         ast::AST *factor();

@@ -1,1 +1,1 @@
-An interpreter for IB pseudocode.
+IB pseudocode implementation in C++

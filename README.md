@@ -1,1 +1,1 @@
-IB pseudocode implementation in C++
+IB pseudocode implementation in C++ (in progress)

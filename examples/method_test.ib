@@ -1,0 +1,27 @@
+output "Hello world"
+A = [1,2,4,5,6,7]
+if I == 7 then
+    input A
+end if
+method testMethod(ARR, THIS, IS, OUT)
+    ARR = [[[1,2],[3]],[[4.3,5],[6.6]]]
+    LEN = ARR.length()
+    output "Hello", ARR, "hello"
+    STR_ARR_1 = [["hi","hello"],["this","that"]]
+    STR = "Hello"
+    A = ARR[0][12][12]
+    B = 4
+    C = (A * A) + (B * B)
+    loop I from 0 to 10
+        loop while (Z * Z) mod 4 > 10
+            if A < B then
+                B = A
+            end if
+        end loop
+    end loop
+    other_method(some_method(other_method()),Y,A)
+    return 
+end method
+
+testMethod(ARR)
+A = "hello"

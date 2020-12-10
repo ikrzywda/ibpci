@@ -14,8 +14,12 @@ namespace prs{
 class Parser{
     private:
         lxr::Lexer lex;
-        tk::Token *current_token;
+        tk::Token *tok_curr;
+        tk::Token *tok_prev;
+        tk::Token *lookahead();
         void eat(int token_id);
+        ast::AST *statement();
+        ast::AST *basic_statement();
         ast::AST *assign();
         ast::AST *expr();
         ast::AST *term();

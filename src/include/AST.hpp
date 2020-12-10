@@ -9,9 +9,11 @@
 namespace ast{
 
 enum ast_id{
+    START,
     ASSIGN,
     BINOP,
     NUM,
+    ID_VAR
 };
 
 typedef struct AST AST;

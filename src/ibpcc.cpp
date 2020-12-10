@@ -32,7 +32,7 @@ void test_parser(char *filename){
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
     ast::print_tree(root);
-    std::cout << nv::visit_expr(root);
+    //std::cout << nv::visit_expr(root);
 }
 
 }

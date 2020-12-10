@@ -2,12 +2,11 @@
 
 namespace prs{
     
-Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){
+Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){	
     tok_curr = lex.get_next_token();
 }
 
 void Parser::eat(int token_id){
-    std::cout << "current_tok: " << *tok_curr->attr << std::endl;
     if(tok_curr->id == token_id){
         tok_curr = lex.get_next_token();
     }else{
@@ -23,8 +22,6 @@ ast::AST *Parser::parse(){
     ast::AST *root = NewNode(ast::START, "0");
     while(tok_curr->id != tk::END_FILE){
         root->nodes.push_back(statement());
-        std::cout << "current_tok: " << *tok_curr->attr << std::endl;
-        eat(tok_curr->id);
     }
     return root;
 }
@@ -32,26 +29,14 @@ ast::AST *Parser::parse(){
 ast::AST *Parser::statement(){
     switch(tok_curr->id){
         case tk::ID_VAR:
-            return basic_statement();
+            return assign();
     }
     return NULL;
 }
 
-ast::AST *Parser::basic_statement(){
-    tok_prev = tok_curr;
-    std::cout << "prev token: " << tok_prev->attr->c_str();
-    eat(tk::ID_VAR);
-    std::cout << "prev token: " << tok_prev->attr->c_str();
-    if(tok_curr->id == tk::EQ){
-        return assign();
-    }else{
-        return expr();
-    }
-}
-
 ast::AST *Parser::assign(){
     ast::AST *root = ast::NewNode(ast::ASSIGN, "0");
-    root->nodes.push_back(ast::NewNode(ast::ID_VAR, tok_prev->attr->c_str()));
+    root->nodes.push_back(factor());
     root->op = tk::EQ;
     eat(tk::EQ);
     root->nodes.push_back(expr());

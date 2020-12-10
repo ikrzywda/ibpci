@@ -15,7 +15,7 @@ class Parser{
     private:
         lxr::Lexer lex;
         tk::Token *tok_curr;
-        tk::Token *tok_prev;
+        tk::Token tok_prev;
         tk::Token *lookahead();
         void eat(int token_id);
         ast::AST *statement();

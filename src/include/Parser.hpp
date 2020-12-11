@@ -7,7 +7,6 @@
 #include "NodeVisitor.hpp"
 #include <iostream>
 #include <string>
-#include <cstring>
 
 namespace prs{
 

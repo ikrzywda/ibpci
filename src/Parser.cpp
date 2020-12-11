@@ -35,7 +35,8 @@ ast::AST *Parser::statement(){
 }
 
 ast::AST *Parser::assign(){
-    ast::AST *root = ast::NewNode(ast::ASSIGN, "0");
+    std::cout << "assign\n";
+    ast::AST *root = ast::NewNode(ast::ASSIGN, "=");
     root->nodes.push_back(factor());
     root->op = tk::EQ;
     eat(tk::EQ);
@@ -44,11 +45,13 @@ ast::AST *Parser::assign(){
 }
 
 ast::AST *Parser::expr(){
+    std::cout << "expr\n";
     ast::AST *root, *new_node;
     root = term();
     while(tok_curr->id == tk::PLUS 
             || tok_curr->id == tk::MINUS){
-        new_node = ast::NewNode(ast::BINOP, "0");
+        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+        new_node = ast::NewNode(ast::BINOP, attr_cpy->c_str());
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(root);
         root = new_node;
@@ -59,13 +62,15 @@ ast::AST *Parser::expr(){
 }
 
 ast::AST *Parser::term(){
+    std::cout << "term\n";
     ast::AST *subroot, *new_node;
     subroot = factor();
     while(tok_curr->id == tk::MULT ||
             tok_curr->id == tk::DIV_WQ ||
             tok_curr->id == tk::DIV_WOQ ||
             tok_curr->id == tk::MOD){
-        new_node = ast::NewNode(ast::BINOP, "0");
+        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+        new_node = ast::NewNode(ast::BINOP, attr_cpy->c_str());
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(subroot);
         subroot = new_node;
@@ -76,6 +81,7 @@ ast::AST *Parser::term(){
 }
 
 ast::AST *Parser::factor(){
+    std::cout << "factor\n";
     ast::AST *new_node;
     std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
     switch(tok_curr->id){
@@ -97,7 +103,7 @@ ast::AST *Parser::factor(){
             eat(tk::RPAREN);
             return new_node;
         case tk::END_FILE: std::cout << "END";
-        default: break;
+        default: exit(1);
     }
     return 0; 
 }

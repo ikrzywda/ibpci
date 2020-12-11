@@ -31,7 +31,7 @@ void test_parser(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
-    ast::print_tree(root);
+    ast::print_tree(root, 0);
     //std::cout << nv::visit_expr(root);
 }
 

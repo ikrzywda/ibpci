@@ -3,6 +3,8 @@
 
 #include "Token.hpp"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -31,7 +33,7 @@ AST *populate_by_attr(AST *parent, int id, const char *attr);
 
 AST *populate_by_node(AST *parent, AST *child);
 
-void print_tree(AST *root);
+void print_tree(AST *root, int offset);
 
 }
 #endif

@@ -23,12 +23,12 @@ AST *populate_by_node(AST *parent, AST *child){
     return child;
 }
 
-void print_tree(AST *root){
+void print_tree(AST *root, int offset){
     if(root == NULL) return;
     for(unsigned i = 0; i < root->nodes.size(); ++i){
-        print_tree(root->nodes[i]);
+        print_tree(root->nodes[i], offset + 4);
     }
-    std::cout << root->id << ", " << root->attr << ", " << root->op << std::endl;
+    std::cout << root->attr << std::endl;
 }
 
 }

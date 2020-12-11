@@ -76,15 +76,15 @@ tk::Token *Lexer::op_eq(char ch){
     advance();
     if(c == '='){
         switch(ch){
-            case '=': advance(); return new tk::Token(tk::IS, &noattr);
-            case '<': advance(); return new tk::Token(tk::LEQ, &noattr);
-            case '>': advance(); return new tk::Token(tk::GEQ, &noattr);
+            case '=': advance(); noattr = "=="; return new tk::Token(tk::IS, &noattr);
+            case '<': advance(); noattr = "<="; return new tk::Token(tk::LEQ, &noattr);
+            case '>': advance(); noattr = ">="; return new tk::Token(tk::GEQ, &noattr);
         }
     }else{
         switch(ch){
-            case '=': return new tk::Token(tk::EQ, &noattr);
-            case '<': return new tk::Token(tk::LT, &noattr);
-            case '>': return new tk::Token(tk::GT, &noattr);
+            case '=': noattr = "="; return new tk::Token(tk::EQ, &noattr);
+            case '<': noattr = "<"; return new tk::Token(tk::LT, &noattr);
+            case '>': noattr = ">"; return new tk::Token(tk::GT, &noattr);
         }
     }
     return 0;
@@ -100,16 +100,16 @@ tk::Token *Lexer::get_next_token(){
             return id();
         }else{
             switch(c){
-                case '+': advance(); return new tk::Token(tk::PLUS, &noattr);
-                case '-': advance(); return new tk::Token(tk::MINUS, &noattr);
-                case '*': advance(); return new tk::Token(tk::MULT, &noattr);
-                case '%': advance(); return new tk::Token(tk::MOD, &noattr);
-                case '[': advance(); return new tk::Token(tk::LSQBR, &noattr);
-                case ']': advance(); return new tk::Token(tk::RSQBR, &noattr);
-                case '(': advance(); return new tk::Token(tk::LPAREN, &noattr);
-                case ')': advance(); return new tk::Token(tk::RPAREN, &noattr);
-                case '.': advance(); return new tk::Token(tk::DOT, &noattr);
-                case ',': advance(); return new tk::Token(tk::COMMA, &noattr);
+                case '+': advance(); noattr = "+"; return new tk::Token(tk::PLUS, &noattr);
+                case '-': advance(); noattr = "-"; return new tk::Token(tk::MINUS, &noattr);
+                case '*': advance(); noattr = "*"; return new tk::Token(tk::MULT, &noattr);
+                case '%': advance(); noattr = "%"; return new tk::Token(tk::MOD, &noattr);
+                case '[': advance(); noattr = "]"; return new tk::Token(tk::LSQBR, &noattr);
+                case ']': advance(); noattr = "]"; return new tk::Token(tk::RSQBR, &noattr);
+                case '(': advance(); noattr = "("; return new tk::Token(tk::LPAREN, &noattr);
+                case ')': advance(); noattr = ")"; return new tk::Token(tk::RPAREN, &noattr);
+                case '.': advance(); noattr = "."; return new tk::Token(tk::DOT, &noattr);
+                case ',': advance(); noattr = ","; return new tk::Token(tk::COMMA, &noattr);
                 case '\"': return string();
                 case '=': return op_eq('=');
                 case '>': return op_eq('>');
@@ -119,7 +119,7 @@ tk::Token *Lexer::get_next_token(){
                     if(c == '/'){ 
                         skip_comment();
                         break;   
-                    }else return new tk::Token(tk::DIV_WOQ, &noattr);
+                    }else{noattr = "/";return new tk::Token(tk::DIV_WOQ, &noattr);}
                 case EOF: return new tk::Token(tk::END_FILE, &noattr);
                 default:
                     std::cout << "\nunexpected character: '" << c << "'\n";

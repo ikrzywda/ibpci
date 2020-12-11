@@ -25,9 +25,12 @@ AST *populate_by_node(AST *parent, AST *child){
 
 void print_tree(AST *root, int offset){
     if(root == NULL) return;
-    std::cout << root->attr << std::endl;
+    std::cout << std::setw(offset);
+    std::cout << "\u2560";
+    std::cout << "\u2550\u2550";
+    std::cout << "[" << root->attr << "]" << std::endl;
     for(unsigned i = 0; i < root->nodes.size(); ++i){
-        print_tree(root->nodes[i], offset + 4);
+        print_tree(root->nodes[i], offset+4);
     }
 }
 

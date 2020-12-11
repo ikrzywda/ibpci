@@ -40,10 +40,17 @@ ast::AST *Parser::stmt(){
 
 ast::AST *Parser::if_stmt(){
     ast::AST *root = ast::NewNode(ast::IF, "if");
+    ast::AST *new_node = NULL;
     root->nodes.push_back(cond());
     eat(tk::THEN);
     while(tok_curr->id != tk::END){
-        root->nodes.push_back(stmt());
+        if(tok_curr->id == tk::ELSE){
+            new_node = ast::NewNode(ast::ELSE, "else");
+            eat(tk::ELSE);
+            new_node->nodes.push_back(stmt());
+        }
+        if(new_node != NULL) root->nodes.push_back(new_node);
+        else root->nodes.push_back(stmt());
     }
     eat(tk::END);
     eat(tk::IF);

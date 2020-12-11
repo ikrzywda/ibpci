@@ -23,6 +23,7 @@ enum id{
     GT,
     LEQ,
     GEQ,
+    DNEQ,
     EQ,
     IS,
     DOT,
@@ -46,9 +47,21 @@ enum id{
     ELSE,
     THEN,
     END,
+    NEW_ARR,
+    NEW_QUEUE,
+    NEW_STACK,
+    LENGTH,
+    ADD_ITEM,
+    GET_NEXT,
+    RESET_NEXT,
+    HAS_NEXT,
+    PUSH,
+    POP,
+    ENQUEUE,
+    DEQUEUE,
+    IS_EMPTY,
     OUTPUT,
-    INPUT,
-    STANDARD_METHOD
+    INPUT
 };
 
 class Token{
@@ -78,16 +91,19 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"end", END},
     {"output", OUTPUT},
     {"input", INPUT},
-    {"length", STANDARD_METHOD},
-    {"addItem", STANDARD_METHOD},
-    {"getNext", STANDARD_METHOD},
-    {"resetNext", STANDARD_METHOD},
-    {"hasNext", STANDARD_METHOD},
-    {"push",STANDARD_METHOD},
-    {"pop", STANDARD_METHOD},
-    {"enqueue", STANDARD_METHOD},
-    {"dequeue", STANDARD_METHOD},
-    {"isEmpty", STANDARD_METHOD},
+    {"length", LENGTH},
+    {"addItem", ADD_ITEM},
+    {"getNext", GET_NEXT},
+    {"resetNext", RESET_NEXT},
+    {"hasNext", HAS_NEXT},
+    {"push", PUSH},
+    {"pop", POP},
+    {"enqueue", ENQUEUE},
+    {"dequeue", DEQUEUE},
+    {"isEmpty", IS_EMPTY},
+    {"Array", NEW_ARR},
+    {"Stack", NEW_STACK},
+    {"Queue", NEW_QUEUE}
 };
 
 int lookup_keyword(std::string lexeme);

@@ -13,6 +13,8 @@ namespace ast{
 enum ast_id{
     START,
     METHOD,
+    RETURN,
+    METHOD_CALL,
     PARAMS,
     WHILE,
     FOR,
@@ -22,8 +24,18 @@ enum ast_id{
     CMP,
     ASSIGN,
     BINOP,
+    UN_MIN,
     NUM,
-    ID_VAR
+    STRING,
+    ID_VAR,
+    ARR,
+    ARR_DYN,
+    ARR_ACC,
+    STACK,
+    QUEUE,
+    STANDARD_METHOD,
+    INPUT,
+    OUTPUT
 };
 
 typedef struct AST AST;

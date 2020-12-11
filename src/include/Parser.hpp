@@ -19,15 +19,21 @@ class Parser{
         void eat(int token_id);
         ast::AST *stmt();
         ast::AST *method();
+        ast::AST *ret();
         ast::AST *loop_whl();
         ast::AST *loop_for();
         ast::AST *if_stmt();
         ast::AST *cond();
         ast::AST *cmp();
         ast::AST *assign();
+        ast::AST *method_call();
         ast::AST *expr();
         ast::AST *term();
         ast::AST *factor();
+        ast::AST *arr();
+        ast::AST *arr_dyn();
+        ast::AST *std_method();
+        ast::AST *in_out();
     public:
         Parser(const lxr::Lexer &lexer);
         ast::AST *parse();

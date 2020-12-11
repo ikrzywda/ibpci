@@ -79,6 +79,7 @@ tk::Token *Lexer::op_eq(char ch){
             case '=': advance(); noattr = "=="; return new tk::Token(tk::IS, &noattr);
             case '<': advance(); noattr = "<="; return new tk::Token(tk::LEQ, &noattr);
             case '>': advance(); noattr = ">="; return new tk::Token(tk::GEQ, &noattr);
+            case '!': advance(); noattr = "!="; return new tk::Token(tk::DNEQ, &noattr);
         }
     }else{
         switch(ch){
@@ -114,6 +115,7 @@ tk::Token *Lexer::get_next_token(){
                 case '=': return op_eq('=');
                 case '>': return op_eq('>');
                 case '<': return op_eq('<');
+                case '!': return op_eq('!');
                 case '/': 
                     advance();
                     if(c == '/'){ 

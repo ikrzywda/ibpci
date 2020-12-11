@@ -55,7 +55,6 @@ std::string *id_to_str(int id){
         case END: *out = "end"; break;
         case OUTPUT: *out = "output"; break;
         case INPUT: *out = "intput"; break;
-        case STANDARD_METHOD: *out = "standard method"; break;
         default: *out = "NULL"; break;
     }
     return out;

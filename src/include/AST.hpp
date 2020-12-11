@@ -12,6 +12,9 @@ namespace ast{
 
 enum ast_id{
     START,
+    IF,
+    COND,
+    CMP,
     ASSIGN,
     BINOP,
     NUM,

@@ -21,17 +21,68 @@ void Parser::eat(int token_id){
 ast::AST *Parser::parse(){
     ast::AST *root = NewNode(ast::START, "0");
     while(tok_curr->id != tk::END_FILE){
-        root->nodes.push_back(statement());
+        root->nodes.push_back(stmt());
     }
     return root;
 }
 
-ast::AST *Parser::statement(){
+ast::AST *Parser::stmt(){
     switch(tok_curr->id){
         case tk::ID_VAR:
             return assign();
+        case tk::IF:
+            eat(tk::IF);
+            return if_stmt();
+        default: exit(1);
     }
     return NULL;
+}
+
+ast::AST *Parser::if_stmt(){
+    ast::AST *root = ast::NewNode(ast::IF, "if");
+    root->nodes.push_back(cond());
+    eat(tk::THEN);
+    while(tok_curr->id != tk::END){
+        root->nodes.push_back(stmt());
+    }
+    eat(tk::END);
+    eat(tk::IF);
+    return root;
+}
+
+ast::AST *Parser::cond(){
+    ast::AST *root, *new_node;
+    root = cmp();
+    while(tok_curr->id == tk::AND
+            || tok_curr->id == tk::OR){
+        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+        new_node = ast::NewNode(ast::COND, attr_cpy->c_str());
+        new_node->op = tok_curr->id;
+        new_node->nodes.push_back(root);
+        root = new_node;
+        eat(tok_curr->id);
+        new_node->nodes.push_back(cmp());
+    }
+    return root;
+}
+
+ast::AST *Parser::cmp(){
+    ast::AST *root, *new_node;
+    root = factor();
+    if(tok_curr->id == tk::IS
+            || tok_curr->id == tk::LT
+            || tok_curr->id == tk::GT
+            || tok_curr->id == tk::GEQ
+            || tok_curr->id == tk::LEQ){
+        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+        new_node = NewNode(ast::CMP, attr_cpy->c_str());  
+        new_node->op = tok_curr->id;
+        new_node->nodes.push_back(root);
+        root = new_node;
+        eat(tok_curr->id);
+        new_node->nodes.push_back(expr());
+    }
+    return root;
 }
 
 ast::AST *Parser::assign(){

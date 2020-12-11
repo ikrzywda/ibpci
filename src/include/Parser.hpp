@@ -18,6 +18,9 @@ class Parser{
         tk::Token *lookahead();
         void eat(int token_id);
         ast::AST *stmt();
+        ast::AST *method();
+        ast::AST *loop_whl();
+        ast::AST *loop_for();
         ast::AST *if_stmt();
         ast::AST *cond();
         ast::AST *cmp();

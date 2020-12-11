@@ -12,6 +12,10 @@ namespace ast{
 
 enum ast_id{
     START,
+    METHOD,
+    PARAMS,
+    WHILE,
+    FOR,
     IF,
     ELSE,
     COND,

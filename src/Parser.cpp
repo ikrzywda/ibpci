@@ -30,12 +30,69 @@ ast::AST *Parser::stmt(){
     switch(tok_curr->id){
         case tk::ID_VAR:
             return assign();
+        case tk::METHOD:
+            return method();
         case tk::IF:
             eat(tk::IF);
             return if_stmt();
+        case tk::LOOP:
+            eat(tk::LOOP);
+            if(tok_curr->id == tk::WHILE) return loop_whl();
+            else if(tok_curr->id == tk::ID_VAR
+                    || tok_curr->id == tk::ID_METHOD) return loop_for();
         default: exit(1);
     }
     return NULL;
+}
+
+ast::AST *Parser::method(){
+    eat(tk::METHOD);
+    ast::AST *params = NULL;
+    std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+    ast::AST *root = NewNode(ast::METHOD, attr_cpy->c_str());
+    eat(tk::ID_METHOD);
+    eat(tk::LPAREN);
+    if(tok_curr->id == tk::ID_VAR){
+        params = ast::NewNode(ast::PARAMS, "params");
+        params->nodes.push_back(factor());
+        while(tok_curr->id != tk::RPAREN){
+            eat(tk::COMMA);
+            params->nodes.push_back(factor());
+        }
+    }
+    eat(tk::RPAREN);
+    if(params != NULL) root->nodes.push_back(params);
+    while(tok_curr->id != tk::END){
+        root->nodes.push_back(stmt());
+    }
+    eat(tk::END); eat(tk::METHOD);
+    return root;
+}   
+
+ast::AST *Parser::loop_whl(){
+    eat(tk::WHILE);
+    ast::AST *root = ast::NewNode(ast::WHILE, "while");
+    root->nodes.push_back(cond());
+    while(tok_curr->id != tk::END){
+        root->nodes.push_back(stmt());
+    }
+    eat(tk::END); eat(tk::LOOP);
+    return root;
+}
+
+ast::AST *Parser::loop_for(){
+    ast::AST *root = ast::NewNode(ast::FOR, "for");
+    ast::AST *loop_range = factor();
+    eat(tk::FROM);
+    loop_range->nodes.push_back(expr());
+    eat(tk::TO);
+    loop_range->nodes.push_back(expr());
+    root->nodes.push_back(loop_range);
+    while(tok_curr->id != tk::END){
+        root->nodes.push_back(stmt());
+    }
+    eat(tk::END); eat(tk::LOOP);
+    return root;
 }
 
 ast::AST *Parser::if_stmt(){
@@ -93,7 +150,6 @@ ast::AST *Parser::cmp(){
 }
 
 ast::AST *Parser::assign(){
-    std::cout << "assign\n";
     ast::AST *root = ast::NewNode(ast::ASSIGN, "=");
     root->nodes.push_back(factor());
     root->op = tk::EQ;
@@ -103,7 +159,6 @@ ast::AST *Parser::assign(){
 }
 
 ast::AST *Parser::expr(){
-    std::cout << "expr\n";
     ast::AST *root, *new_node;
     root = term();
     while(tok_curr->id == tk::PLUS 
@@ -120,7 +175,6 @@ ast::AST *Parser::expr(){
 }
 
 ast::AST *Parser::term(){
-    std::cout << "term\n";
     ast::AST *subroot, *new_node;
     subroot = factor();
     while(tok_curr->id == tk::MULT ||
@@ -139,7 +193,6 @@ ast::AST *Parser::term(){
 }
 
 ast::AST *Parser::factor(){
-    std::cout << "factor\n";
     ast::AST *new_node;
     std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
     switch(tok_curr->id){

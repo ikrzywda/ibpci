@@ -22,7 +22,7 @@ void test_lexer(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     tk::Token *token = lex.get_next_token();
     while(token->id != tk::END_FILE){
-        std::cout << *tok_to_str(token) << std::endl;
+        std::cout << *tok_to_str(token) << lex.line_num << std::endl;
         token = lex.get_next_token();
     }
 }

@@ -17,6 +17,7 @@ class Parser{
         tk::Token tok_prev;
         tk::Token *lookahead();
         void eat(int token_id);
+        void error(int token_id);
         ast::AST *stmt();
         ast::AST *method();
         ast::AST *ret();

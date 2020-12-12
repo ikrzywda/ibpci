@@ -17,6 +17,7 @@ class Lexer{
         std::string noattr = "0";
         int pos, len;
         char c;
+        void error();
         void advance();
         void skip_whitespace();
         void skip_comment();
@@ -26,6 +27,7 @@ class Lexer{
         tk::Token *op_eq(char ch);
     public:
         Lexer(std::string *buffer);
+        unsigned int line_num;
         tk::Token *get_next_token();
 };
 

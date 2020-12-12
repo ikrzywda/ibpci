@@ -7,15 +7,21 @@ Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){
 }
 
 void Parser::eat(int token_id){
-    if(tok_curr->id == token_id){
-        tok_curr = lex.get_next_token();
+    if(tok_curr->id == token_id) tok_curr = lex.get_next_token();
+    else error(token_id);
+}
+
+void Parser::error(int token_id){
+    if(token_id >= 0){
+        std::cout << "SYNTAX ERROR at line " << lex.line_num << 
+            ":\n\tunexpected token: " << *tk::id_to_str(tok_curr->id) <<
+            ", expected token: " << *tk::id_to_str(token_id) << std::endl;
     }else{
-        std::cout << "unexpected token: " << 
-            *tk::id_to_str(tok_curr->id) <<
-            ", expected token: " << *tk::id_to_str(token_id) <<
+        std::cout << "SYNTAX ERROR at line " << lex.line_num << 
+            ":\n\tunexpected token: " << *tk::id_to_str(tok_curr->id) <<
             std::endl;
-            exit(1);
-    }   
+    }
+    exit(1);
 }
 
 ast::AST *Parser::parse(){
@@ -40,11 +46,7 @@ ast::AST *Parser::stmt(){
                     || tok_curr->id == tk::ID_METHOD) return loop_for();
         case tk::INPUT: return in_out();
         case tk::OUTPUT: return in_out();
-        default:
-        std::cout << "unexpected token: " << 
-            *tk::id_to_str(tok_curr->id) <<
-            std::endl;
-        exit(1);
+        default: error(-1);
     }
     return NULL;
 }
@@ -280,7 +282,7 @@ ast::AST *Parser::factor(){
         case tk::INPUT: return in_out();
         case tk::OUTPUT: return in_out();
         case tk::END_FILE: std::cout << "END";
-        default: exit(1); 
+        default: error(-1);
     }
     return 0; 
 }

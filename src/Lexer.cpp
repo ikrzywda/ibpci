@@ -2,15 +2,22 @@
 
 namespace lxr{
 
-int is_upcase(char c){
-    return (c >= 'A' && c <= 'Z') || isdigit(c) || c == '_' ? 1 : 0;
-}
-
 Lexer::Lexer(std::string *buffer){
     Lexer::input_buffer = buffer;
     attr_buffer = new std::string;
     pos = 0, len = buffer->size();
     c = input_buffer->at(pos);
+    line_num = 1;
+}
+
+int is_upcase(char c){
+    return (c >= 'A' && c <= 'Z') || isdigit(c) || c == '_' ? 1 : 0;
+}
+
+void Lexer::error(){
+    std::cout << "LEXICAL ERROR at line " << line_num << 
+        ":\n\tunexpected character: " << c << std::endl;
+    exit(1);
 }
 
 void Lexer::advance(){
@@ -23,7 +30,10 @@ void Lexer::advance(){
 }
 
 void Lexer::skip_whitespace(){
-    while(std::isspace(c)){
+    while(c == ' '
+            || c == '\t'
+            || c == '\v'
+            || c == '\f'){
         advance();
     }
 }
@@ -122,11 +132,9 @@ tk::Token *Lexer::get_next_token(){
                         skip_comment();
                         break;   
                     }else{noattr = "/";return new tk::Token(tk::DIV_WOQ, &noattr);}
+                case '\n': advance(); ++line_num; break;
                 case EOF: return new tk::Token(tk::END_FILE, &noattr);
-                default:
-                    std::cout << "\nunexpected character: '" << c << "'\n";
-                    return new tk::Token(tk::END_FILE, &noattr);
-
+                default: error();
             }
         }
     }

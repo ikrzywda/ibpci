@@ -32,6 +32,7 @@ void test_parser(char *filename){
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
     ast::print_tree(root, 0);
+    pci::Interpreter interpreter = pci::Interpreter(root);
     //std::cout << nv::visit_expr(root);
 }
 

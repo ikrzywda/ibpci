@@ -4,7 +4,6 @@
 #include "Lexer.hpp"
 #include "AST.hpp"
 #include "Token.hpp"
-#include "NodeVisitor.hpp"
 #include <iostream>
 #include <string>
 

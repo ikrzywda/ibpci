@@ -2,6 +2,7 @@
 #define SYMTAB_HPP
 
 #include "Token.hpp"
+#include "AST.hpp"
 #include <map>
 #include <vector>
 #include <string>
@@ -10,28 +11,32 @@ namespace sym{
 
 enum symbol_type{
     METHOD,
-    VARIABLE,
+    VAR,
     ARRAY
 };
 
-typedef struct Symbol Symbol;
-struct Symbol{
+typedef struct Reference Reference;
+struct Reference{
     int type;
-    std::vector<tk::Token*> values;
+    ast::AST *root;
 };
 
 typedef struct Symtab Symtab;
 struct Symtab{
-    std::string *scope_name;
+    const char *scope_name;
     Symtab *parent_scope;
-    std::map<std::string*, Symbol*> symbols;
+    std::map<const char*, Reference*> symbols;
 };
 
-Symtab *NewSymtab(Symtab *parent_scope, std::string *name);
+Symtab *NewSymtab(Symtab *parent_scope, const char *name);
 
-void set_symbol(std::string id, int type);
+int does_sym_exit(Symtab *table, const char *key);
 
-void check_cast(std::string id, int new_type);
+void insert_symbol(Symtab *table, const char *key, Reference *ref);
+
+Reference *NewReference(int type, ast::AST *root);
+
+void print_symtab(Symtab *table);
 
 }
 

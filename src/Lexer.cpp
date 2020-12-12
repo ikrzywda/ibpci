@@ -60,6 +60,7 @@ tk::Token *Lexer::number(){
 tk::Token *Lexer::id(){
     int id = tk::ID_VAR;
     attr_buffer->push_back(c);
+    if(!is_upcase(c)) id = tk::ID_METHOD;
     advance();
     while(std::isalnum(c) || c == '_'){
         if(!is_upcase(c)) id = tk::ID_METHOD;

@@ -39,7 +39,14 @@ void test_parser(char *filename){
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
     ast::print_tree(root, 0);
-    pci::execute(root);
+    pci::interpret(root);
+}
+
+void tree(char *filename){
+    lxr::Lexer lex(get_buffer(filename));
+    prs::Parser parser(lex);
+    ast::AST *root = parser.parse();
+    ast::print_tree(root, 0);
 }
 
 }

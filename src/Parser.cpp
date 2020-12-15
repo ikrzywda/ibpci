@@ -115,20 +115,46 @@ ast::AST *Parser::loop_for(){
 ast::AST *Parser::if_stmt(){
     eat(tk::IF);
     ast::AST *root = ast::NewNode(ast::IF, "if");
-    ast::AST *new_node = NULL;
     root->nodes.push_back(cond());
     eat(tk::THEN);
     while(tok_curr->id != tk::END){
         if(tok_curr->id == tk::ELSE){
-            new_node = ast::NewNode(ast::ELSE, "else");
-            eat(tk::ELSE);
-            new_node->nodes.push_back(stmt());
+            root->nodes.push_back(else_stmt());
+        }else{
+            root->nodes.push_back(stmt());
         }
-        if(new_node != NULL) root->nodes.push_back(new_node);
-        else root->nodes.push_back(stmt());
     }
     eat(tk::END);
     eat(tk::IF);
+    return root;
+}
+
+ast::AST *Parser::else_stmt(){
+    eat(tk::ELSE);
+    ast::AST *root = ast::NewNode(ast::ELSE, "else");
+    if(tok_curr->id == tk::IF){
+        root->nodes.push_back(elif_stmt());
+        return root;
+        std::cout << "returned elif";
+    }else{
+        while(tok_curr->id != tk::END){
+            root->nodes.push_back(stmt());        
+        }
+    }
+    return root;
+}
+
+ast::AST *Parser::elif_stmt(){
+    eat(tk::IF);
+    ast::AST *root = ast::NewNode(ast::IF, "if");
+    root->nodes.push_back(cond());
+    eat(tk::THEN);
+    while(tok_curr->id != tk::END){
+        if(tok_curr->id == tk::ELSE){
+            return root;
+        }
+        root->nodes.push_back(stmt());
+    }
     return root;
 }
 

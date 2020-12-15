@@ -18,6 +18,8 @@ void test_lexer(char *filename);
 
 void test_parser(char *filename);
 
+void tree(char *filename);
+
 }
 
 #endif

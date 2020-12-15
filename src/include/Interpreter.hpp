@@ -24,13 +24,19 @@ public:
 };
 
 //typedef const std::map<const char*, ast::AST*> symbol_table;
+void interpret(ast::AST *root);
 void print_table();
 void insert_symbol();
 void assignment(ast::AST *root); 
 void output(ast::AST *root);
-float binop(ast::AST *root);
+double binop(ast::AST *root);
+ast::AST *variable(ast::AST *root);
 void execute(ast::AST *root);
-
+bool condition(ast::AST *root);
+void if_statement(ast::AST *root);
+bool else_statement(ast::AST *root);
+bool elif_statement(ast::AST *root);
+bool boolop(ast::AST *root);
 }
 
 #endif

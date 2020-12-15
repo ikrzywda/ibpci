@@ -24,6 +24,8 @@ class Parser{
         ast::AST *loop_whl();
         ast::AST *loop_for();
         ast::AST *if_stmt();
+        ast::AST *else_stmt();
+        ast::AST *elif_stmt();
         ast::AST *cond();
         ast::AST *cmp();
         ast::AST *assign();

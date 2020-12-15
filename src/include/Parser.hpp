@@ -17,6 +17,7 @@ class Parser{
         tk::Token *lookahead();
         void eat(int token_id);
         void error(int token_id);
+        const char *attr_cpy();
         ast::AST *stmt();
         ast::AST *method();
         ast::AST *ret();

@@ -7,21 +7,26 @@ Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){
 }
 
 void Parser::eat(int token_id){
-    if(tok_curr->id == token_id) tok_curr = lex.get_next_token();
-    else error(token_id);
+    if(tok_curr->id == token_id){
+        delete tok_curr;
+        tok_curr = lex.get_next_token();
+    }else error(token_id);
 }
 
 void Parser::error(int token_id){
-    if(token_id >= 0){
-        std::cout << "SYNTAX ERROR at line " << lex.line_num << 
-            ":\n\tunexpected token: " << *tk::id_to_str(tok_curr->id) <<
-            ", expected token: " << *tk::id_to_str(token_id) << std::endl;
-    }else{
-        std::cout << "SYNTAX ERROR at line " << lex.line_num << 
-            ":\n\tunexpected token: " << *tk::id_to_str(tok_curr->id) <<
-            std::endl;
-    }
+    std::cout << "SYNTAX ERROR at line " << lex.line_num << 
+        ":\n\tunexpected token: " << *tk::id_to_str(tok_curr->id);
+    if(token_id >= 0)
+        std::cout << ", expected token: " << *tk::id_to_str(token_id);
+    std::cout << std::endl;
     exit(1);
+}
+
+const char *Parser::attr_cpy(){
+    const char *out;
+    std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
+    out = attr_cpy->c_str();
+    return out;
 }
 
 ast::AST *Parser::parse(){
@@ -54,8 +59,7 @@ ast::AST *Parser::stmt(){
 ast::AST *Parser::method(){
     eat(tk::METHOD);
     ast::AST *params = NULL;
-    std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-    ast::AST *root = NewNode(ast::METHOD, attr_cpy->c_str());
+    ast::AST *root = NewNode(ast::METHOD, attr_cpy());
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(tok_curr->id == tk::ID_VAR){
@@ -133,8 +137,7 @@ ast::AST *Parser::cond(){
     root = cmp();
     while(tok_curr->id == tk::AND
             || tok_curr->id == tk::OR){
-        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-        new_node = ast::NewNode(ast::COND, attr_cpy->c_str());
+        new_node = ast::NewNode(ast::COND, attr_cpy());
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(root);
         root = new_node;
@@ -153,8 +156,7 @@ ast::AST *Parser::cmp(){
             || tok_curr->id == tk::DNEQ
             || tok_curr->id == tk::GEQ
             || tok_curr->id == tk::LEQ){
-        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-        new_node = NewNode(ast::CMP, attr_cpy->c_str());  
+        new_node = NewNode(ast::CMP, attr_cpy());  
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(root);
         root = new_node;
@@ -174,8 +176,7 @@ ast::AST *Parser::assign(){
 }
 
 ast::AST *Parser::method_call(){
-    std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-    ast::AST *root = ast::NewNode(ast::METHOD_CALL, attr_cpy->c_str()); 
+    ast::AST *root = ast::NewNode(ast::METHOD_CALL, attr_cpy()); 
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(tok_curr->id != tk::RPAREN){
@@ -194,8 +195,7 @@ ast::AST *Parser::expr(){
     root = term();
     while(tok_curr->id == tk::PLUS 
             || tok_curr->id == tk::MINUS){
-        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-        new_node = ast::NewNode(ast::BINOP, attr_cpy->c_str());
+        new_node = ast::NewNode(ast::BINOP, attr_cpy());
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(root);
         root = new_node;
@@ -212,8 +212,7 @@ ast::AST *Parser::term(){
             tok_curr->id == tk::DIV_WQ ||
             tok_curr->id == tk::DIV_WOQ ||
             tok_curr->id == tk::MOD){
-        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-        new_node = ast::NewNode(ast::BINOP, attr_cpy->c_str());
+        new_node = ast::NewNode(ast::BINOP, attr_cpy());
         new_node->op = tok_curr->id;
         new_node->nodes.push_back(subroot);
         subroot = new_node;
@@ -225,18 +224,17 @@ ast::AST *Parser::term(){
 
 ast::AST *Parser::factor(){
     ast::AST *new_node;
-    std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
     switch(tok_curr->id){
         case tk::INT:
-            new_node = ast::NewNode(ast::NUM, attr_cpy->c_str());
+            new_node = ast::NewNode(ast::NUM, attr_cpy());
             eat(tk::INT);
             return new_node;
         case tk::FLOAT:
-            new_node = ast::NewNode(ast::NUM, attr_cpy->c_str());
+            new_node = ast::NewNode(ast::NUM, attr_cpy());
             eat(tk::FLOAT);
             return new_node;
         case tk::MINUS:
-            new_node = ast::NewNode(ast::UN_MIN, attr_cpy->c_str());
+            new_node = ast::NewNode(ast::UN_MIN, attr_cpy());
             eat(tk::MINUS);
             if(tok_curr->id == tk::LPAREN){
             eat(tk::LPAREN);
@@ -245,11 +243,11 @@ ast::AST *Parser::factor(){
             }else new_node->nodes.push_back(factor());
             return new_node;
         case tk::STRING:
-            new_node = NewNode(ast::STRING, attr_cpy->c_str());
+            new_node = NewNode(ast::STRING, attr_cpy());
             eat(tk::STRING);
             return new_node;
         case tk::ID_VAR:
-            new_node = ast::NewNode(ast::ID_VAR, attr_cpy->c_str());
+            new_node = ast::NewNode(ast::ID_VAR, attr_cpy());
             eat(tk::ID_VAR);
             while(tok_curr->id == tk::LSQBR){
                 eat(tk::LSQBR);
@@ -332,8 +330,7 @@ ast::AST *Parser::std_method(){
             || tok_curr->id == tk::IS_EMPTY
             || tok_curr->id == tk::OUTPUT
             || tok_curr->id == tk::INPUT){
-        std::string *attr_cpy = new std::string(tok_curr->attr->c_str());
-        root = NewNode(ast::STANDARD_METHOD, attr_cpy->c_str());
+        root = NewNode(ast::STANDARD_METHOD, attr_cpy());
         eat(tok_curr->id);
         eat(tk::LPAREN);
         if(tok_curr->id != tk::RPAREN){

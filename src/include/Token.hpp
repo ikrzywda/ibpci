@@ -70,6 +70,7 @@ class Token{
         int id;
         Token(int id, std::string *attr);
         Token();
+        ~Token();
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {

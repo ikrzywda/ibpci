@@ -6,10 +6,9 @@ Token::Token(int id, std::string *attr){
     Token::id = id;
     Token::attr = attr;
 }
-
-
-
 Token::Token(){}
+
+Token::~Token(){}
 
 std::string *id_to_str(int id){
     std::string *out = new std::string;

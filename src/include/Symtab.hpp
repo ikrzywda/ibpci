@@ -30,7 +30,7 @@ struct Symtab{
 
 Symtab *NewSymtab(Symtab *parent_scope, const char *name);
 
-int does_sym_exit(Symtab *table, const char *key);
+int does_sym_exist(Symtab *table, const char *key);
 
 void insert_symbol(Symtab *table, const char *key, Reference *ref);
 

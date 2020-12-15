@@ -10,6 +10,11 @@ Lexer::Lexer(std::string *buffer){
     line_num = 1;
 }
 
+Lexer::~Lexer(){
+    //delete attr_buffer;
+    //delete input_buffer;
+}
+
 int is_upcase(char c){
     return (c >= 'A' && c <= 'Z') || isdigit(c) || c == '_' ? 1 : 0;
 }

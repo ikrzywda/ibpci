@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include "Token.hpp"
 
 namespace lxr{
@@ -27,6 +28,7 @@ class Lexer{
         tk::Token *op_eq(char ch);
     public:
         Lexer(std::string *buffer);
+        ~Lexer();
         unsigned int line_num;
         tk::Token *get_next_token();
 };

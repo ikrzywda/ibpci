@@ -8,7 +8,7 @@ Parser::Parser(const lxr::Lexer &lexer) : lex(lexer){
 
 void Parser::eat(int token_id){
     if(tok_curr->id == token_id){
-        delete tok_curr;
+        //delete tok_curr;
         tok_curr = lex.get_next_token();
     }else error(token_id);
 }

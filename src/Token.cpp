@@ -8,8 +8,6 @@ Token::Token(int id, std::string *attr){
 }
 Token::Token(){}
 
-Token::~Token(){}
-
 std::string *id_to_str(int id){
     std::string *out = new std::string;
     switch(id){
@@ -69,11 +67,13 @@ int lookup_keyword(std::string lexeme){
 
 std::string *tok_to_str(tk::Token *token){
     std::string *out = new std::string;
+    std::string *id = id_to_str(token->id);
     out->append("<{");
-    out->append(*id_to_str(token->id));
+    out->append(*id);
     out->append("},{");
     out->append(token->attr->c_str());
     out->append("}>\n");
+    delete id;
     return out;
 }
 

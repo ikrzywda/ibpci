@@ -19,12 +19,19 @@ void compile(char *filename){
 }
 
 void test_lexer(char *filename){
-    lxr::Lexer lex(get_buffer(filename));
+    std::string *buffer = get_buffer(filename);
+    std::string *out;
+    lxr::Lexer lex(buffer);
     tk::Token *token = lex.get_next_token();
     while(token->id != tk::END_FILE){
-        std::cout << *tok_to_str(token) << lex.line_num << std::endl;
+        out = tok_to_str(token);
+        std::cout << *out << lex.line_num << std::endl;
+        delete token;
+        delete out;
         token = lex.get_next_token();
     }
+    delete token;
+    //delete buffer;
 }
 
 void test_parser(char *filename){
@@ -32,8 +39,7 @@ void test_parser(char *filename){
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
     ast::print_tree(root, 0);
-    pci::Interpreter interpreter = pci::Interpreter(root);
-    //std::cout << nv::visit_expr(root);
+    pci::execute(root);
 }
 
 }

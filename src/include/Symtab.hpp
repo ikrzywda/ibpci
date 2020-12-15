@@ -21,22 +21,27 @@ struct Reference{
     ast::AST *root;
 };
 
-typedef struct Symtab Symtab;
-struct Symtab{
-    const char *scope_name;
-    Symtab *parent_scope;
-    std::map<const char*, Reference*> symbols;
+class Symtab{
+    public:
+        const char *scope_name;
+        Symtab *parent_scope;
+        std::map<const char*, Reference*> symbols;
+        Symtab(const char *name);
+        void insert_symbol(Symtab *table, const char *key, Reference *ref);
+        int does_sym_exist(Symtab *table, const char *key);
+        void print_symtab(Symtab *table);
 };
 
 Symtab *NewSymtab(Symtab *parent_scope, const char *name);
 
-int does_sym_exist(Symtab *table, const char *key);
 
-void insert_symbol(Symtab *table, const char *key, Reference *ref);
 
 Reference *NewReference(int type, ast::AST *root);
 
-void print_symtab(Symtab *table);
+
+ast::AST *get_root(Symtab *table, const char *key);
+
+void test(Symtab *table);
 
 }
 

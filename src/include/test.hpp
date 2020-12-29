@@ -1,14 +1,14 @@
-#ifndef IBPCC_HPP
-#define IBPCC_HPP
+#ifndef TEST_HPP
+#define TEST_HPP
 
 #include "Lexer.hpp"
 #include "Parser.hpp"
-#include "Interpreter.hpp"
 #include "AST.hpp"
+#include "Symtab.hpp"
 #include <fstream>
 #include <iostream>
 
-namespace ibpcc{
+namespace test{
 
 std::string *get_buffer(char *filename);
 

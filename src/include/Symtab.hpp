@@ -3,45 +3,77 @@
 
 #include "Token.hpp"
 #include "AST.hpp"
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
+#include <memory>
+#include <utility>
 
 namespace sym{
 
-enum symbol_type{
-    METHOD,
-    VAR,
-    ARRAY
+enum types{
+    INT, FLOAT, STRING,
+    ARR_N, ARR_STR, STACK, 
+    QUEUE, METHOD
 };
 
-typedef struct Reference Reference;
-struct Reference{
-    int type;
-    ast::AST *root;
+class Base{
+};
+
+template<class T>
+class Symbol : Base{
+private:
+
+public:
+    Symbol(){}
+
+    std::vector<unsigned> dimensions;
+    std::vector<T> contents;
+
+    void push_dimensions(unsigned d){
+        dimensions.push_back(d);
+    }
+
+    void push_contents(T c){
+        contents.push_back(c);
+    }
+
+    void print_symbol(){
+        std::cout << "\nDIMENSIONS:\n";
+        for (unsigned i = 0; i < dimensions.size(); ++i){
+            std::cout << dimensions[i] << " ";
+        }
+        std::cout << "\n\nCONTENTS:\n";
+        for (unsigned i = 0; i < contents.size(); ++i){
+            std::cout << contents[i] << " ";
+        }
+    }
 };
 
 class Symtab{
-    public:
-        const char *scope_name;
-        Symtab *parent_scope;
-        std::map<const char*, Reference*> symbols;
-        Symtab(const char *name);
-        void insert_symbol(Symtab *table, const char *key, Reference *ref);
-        int does_sym_exist(Symtab *table, const char *key);
-        void print_symtab(Symtab *table);
+private:
+    std::string scope_name; 
+    std::unordered_map<std::string, std::pair<int, std::unique_ptr<Base>>> table;
+public:
+    Symtab(std::string name);
+    
+    template<class T> 
+    T lookup(std::string){
+    }
+
+    template<class T> 
+    bool new_sym(std::string key, int type, std::unique_ptr<Symbol<T>> sym){
+        if(table.insert(key, std::make_pair(type, sym))){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    void print_table();
 };
 
-Symtab *NewSymtab(Symtab *parent_scope, const char *name);
-
-
-
-Reference *NewReference(int type, ast::AST *root);
-
-
-ast::AST *get_root(Symtab *table, const char *key);
-
-void test(Symtab *table);
+void test_table();
 
 }
 

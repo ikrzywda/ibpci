@@ -1,6 +1,6 @@
-#include "include/ibpcc.hpp"
+#include "include/test.hpp"
 
-namespace ibpcc{
+namespace test{
 
 std::string *get_buffer(char *filename){
     char c;
@@ -35,11 +35,11 @@ void test_lexer(char *filename){
 }
 
 void test_parser(char *filename){
-    lxr::Lexer lex(get_buffer(filename));
-    prs::Parser parser(lex);
-    ast::AST *root = parser.parse();
-    ast::print_tree(root, 0);
-    pci::interpret(root);
+    sym::test_table();
+    //lxr::Lexer lex(get_buffer(filename));
+    //prs::Parser parser(lex);
+    //ast::AST *root = parser.parse();
+    //ast::print_tree(root, 0);
 }
 
 void tree(char *filename){

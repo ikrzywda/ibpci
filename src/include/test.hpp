@@ -5,6 +5,7 @@
 #include "Parser.hpp"
 #include "AST.hpp"
 #include "Symtab.hpp"
+#include "ibpcc.hpp"
 #include <fstream>
 #include <iostream>
 

@@ -23,6 +23,14 @@ AST *populate_by_node(AST *parent, AST *child){
     return child;
 }
 
+void free_node(AST *node){
+    if(node == NULL) return; 
+    for(const auto &i : node->nodes){
+        free_node(i);
+        delete i;
+    }
+}   
+
 void print_tree(AST *root, int offset){
     if(root == NULL) return;
     std::cout << std::setw(offset);

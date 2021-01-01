@@ -53,6 +53,8 @@ AST *populate_by_attr(AST *parent, int id, const char *attr);
 
 AST *populate_by_node(AST *parent, AST *child);
 
+void free_node(AST *node);
+
 void print_tree(AST *root, int offset);
 
 }

@@ -35,7 +35,14 @@ void test_lexer(char *filename){
 }
 
 void test_parser(char *filename){
-    sym::test_table();
+    std::vector<int> t;
+    for(int i = 0; i < 10; ++i) t.push_back(i);
+    for(auto &a : t) std::cout << ", " << a;
+    t.erase(t.begin() + 3);
+    t.erase(t.begin() + 1);
+    t.erase(t.begin() + 7);
+    std::cout << "test:";
+    for(auto &a : t) std::cout << a;
     //lxr::Lexer lex(get_buffer(filename));
     //prs::Parser parser(lex);
     //ast::AST *root = parser.parse();
@@ -46,6 +53,9 @@ void tree(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     prs::Parser parser(lex);
     ast::AST *root = parser.parse();
+    ast::print_tree(root, 0);
+    ibpcc::IBPCC interpreter(root);
+    std::cout << "\n=============\n";
     ast::print_tree(root, 0);
 }
 

@@ -1,22 +1,69 @@
 #include "include/Symtab.hpp"
 namespace sym{
 
+// TO-DO:
+//  * insert symbols to symbol table
+//  * check for duplicates of symbols
+//  * check for duplicates of scopes (method names)
+
+Symtab::Symtab(){
+    scopes.insert(std::make_pair("GLOBAL", std::unique_ptr<symtab>(new symtab)));
+}
+
+void Symtab::new_scope(std::string name){
+    scopes.insert(std::make_pair(name, std::unique_ptr<symtab>(new symtab)));
+}
+
+void Symtab::insert(std::string scope, std::string key, ast::AST *root){
+    symtab *sm = scopes[scope].get();
+    symtab::iterator it_sm = sm->find(key);
+    if(it_sm == sm->end()){
+        sm->insert(std::make_pair(key, root));
+    }else{
+        std::cout << "Key exists\n";
+        exit(1);
+    }
+}
+
+void Symtab::print_symtab(){
+    symtab *sm;
+    scope::iterator it_sc;
+    symtab::iterator it_sm;
+    for(it_sc = scopes.begin(); it_sc != scopes.end(); ++it_sc){
+        std::cout << it_sc->first
+                  << " : "
+                  << &it_sc->second
+                  << std::endl;
+        sm = it_sc->second.get();
+        for(it_sm = sm->begin(); it_sm != sm->end(); ++it_sm){
+            std::cout << it_sm->first 
+                      << " : "
+                      << &it_sm->second
+                      << std::endl;
+        }
+    }
+}
+
+ast::AST *Symtab::lookup(std::string scope, std::string key){
+    symtab *sm = scopes[scope].get();
+    symtab::iterator it_sm = sm->find(key);
+    if(it_sm != sm->end()){
+        return it_sm->second;
+    }else{
+        std::cout << "Key does not exist\n";
+        exit(1);
+    }
+
+}
+
 void test_table(){
-    Symbol<std::string> sym_1 = Symbol<std::string>();
-    Symbol<int> sym_2 = Symbol<int>();
-    sym_1.push_dimensions(3);
-    sym_1.push_dimensions(10);
-    sym_1.push_contents("hello");
-    sym_1.push_contents("there");
-    sym_1.push_contents("this");
-    sym_1.push_contents("is me");
-    sym_2.push_dimensions(10);
-    sym_2.push_contents(123);
-    sym_2.push_contents(12321);
-    sym_2.push_contents(5345);
-    sym_2.push_contents(64564);
-    sym_1.print_symbol();
-    sym_2.print_symbol();
+    Symtab s;
+    s.new_scope("method1");
+    s.new_scope("method2");
+    s.new_scope("method3");
+    s.new_scope("method4");
+    s.insert("method1", "A", NULL);
+    s.print_symtab();
 }
 
 }

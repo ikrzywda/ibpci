@@ -1,10 +1,7 @@
 #include "include/Symtab.hpp"
 namespace sym{
 
-// TO-DO:
-//  * insert symbols to symbol table
-//  * check for duplicates of symbols
-//  * check for duplicates of scopes (method names)
+Reference::Reference(){}
 
 Reference::Reference(dimensions *d, data *dt){
     for(const auto &i : (*d)){
@@ -14,6 +11,18 @@ Reference::Reference(dimensions *d, data *dt){
         dat.push_back(i);
     }
     delete d; delete dt;
+}
+
+void Reference::push_dimension(int d){
+    dim.push_back(d);
+}
+
+void Reference::push_data(std::string d){
+    dat.push_back(d);
+}
+
+void Reference::set_type(int type){
+    Reference::type = type;
 }
 
 void Reference::print_reference(){
@@ -32,15 +41,15 @@ Symtab::Symtab(){
     scopes.insert(std::make_pair("GLOBAL", std::unique_ptr<symtab>(new symtab)));
 }
 
-void Symtab::new_scope(std::string name){
+void Symtab::new_scope(std::string name, ast::AST *root){
     scopes.insert(std::make_pair(name, std::unique_ptr<symtab>(new symtab)));
 }
 
-void Symtab::insert(std::string scope, std::string key, int type, dimensions *d, data *dt){
-    symtab *sm = scopes[scope].get();
+void Symtab::insert(std::string scope, std::string key, Reference *ref){
+    symtab *sm = scopes.at(scope).get();
     symtab::iterator it_sm = sm->find(key);
     if(it_sm == sm->end()){
-        sm->insert(std::make_pair(key, std::unique_ptr<Reference>(new Reference(d, dt))));
+        sm->insert(std::make_pair(key, std::unique_ptr<Reference>(ref)));
     }else{
         std::cout << "Key exists\n";
         exit(1);
@@ -66,7 +75,7 @@ void Symtab::print_symtab(){
 }
 
 Reference *Symtab::lookup(std::string scope, std::string key){
-    symtab *sm = scopes[scope].get();
+    symtab *sm = scopes.at(scope).get();
     symtab::iterator it_sm = sm->find(key);
     if(it_sm != sm->end()){
         return it_sm->second.get();
@@ -78,7 +87,7 @@ Reference *Symtab::lookup(std::string scope, std::string key){
 }
 
 bool Symtab::is_logged(std::string scope, std::string key){
-    symtab *sm = scopes[scope].get();
+    symtab *sm = scopes.at(scope).get();
     symtab::iterator it_sm = sm->find(key);
     if(it_sm != sm->end()){
         return true;
@@ -97,11 +106,6 @@ void test_table(){
     dt->push_back("Hello");
     dt->push_back("world");
     dt->push_back("!!!");
-    s.new_scope("method1");
-    s.new_scope("method2");
-    s.new_scope("method3");
-    s.new_scope("method4");
-    s.insert("method3", "ARR", ARR_STR, dm, dt);
     s.print_symtab();
 }
 

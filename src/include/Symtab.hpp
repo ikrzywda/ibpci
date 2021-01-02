@@ -12,18 +12,22 @@
 namespace sym{
 
 enum types{
-    INT, FLOAT, STRING,
+    NUM, STRING,
     ARR_N, ARR_STR, STACK, 
     QUEUE, METHOD, PARAM
 };
 
-typedef std::vector<int> dimensions;
+typedef std::vector<unsigned> dimensions;
 typedef std::vector<std::string> data;
 
 class Reference{
 private:
 public:
+    Reference();
     Reference(dimensions *d, data *dt);
+    void push_dimension(int d);
+    void push_data(std::string d);
+    void set_type(int type);
     void print_reference();
     int type;
     dimensions dim;
@@ -38,8 +42,8 @@ private:
     scope scopes;
 public:
     Symtab();
-    void new_scope(std::string name);
-    void insert(std::string scope, std::string key, int type, dimensions *d, data *dt);
+    void new_scope(std::string name, ast::AST *root);
+    void insert(std::string scope, std::string key, Reference *ref);
     Reference *lookup(std::string scope, std::string key);
     bool is_logged(std::string scope, std::string key);
     void print_symtab();

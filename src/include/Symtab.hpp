@@ -20,6 +20,7 @@ enum types{
 typedef std::vector<unsigned> dimensions;
 typedef std::vector<std::string> data;
 
+
 class Reference{
 private:
 public:
@@ -28,6 +29,7 @@ public:
     void push_dimension(int d);
     void push_data(std::string d);
     void set_type(int type);
+    std::string type_to_str();
     void print_reference();
     int type;
     dimensions dim;
@@ -35,7 +37,16 @@ public:
 };
 
 typedef std::unordered_map<std::string, std::unique_ptr<Reference>> symtab;
-typedef std::map<std::string, std::unique_ptr<symtab>> scope;
+
+typedef struct Scope_Reference Scope_Reference;
+struct Scope_Reference{
+public:
+    Scope_Reference(ast::AST *root);
+    ast::AST *scope_root;
+    symtab *sym_ptr;
+};
+
+typedef std::map<std::string, std::unique_ptr<Scope_Reference>> scope;
 
 class Symtab{
 private:

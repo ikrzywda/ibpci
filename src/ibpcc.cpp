@@ -100,7 +100,7 @@ void IBPCC::get_contents(ast::AST *root, unsigned nesting, sym::Reference *ref){
 }
 
 void IBPCC::log_method(ast::AST *root){
-
+    symtab.new_scope(root->attr, root); 
 }
 
 }

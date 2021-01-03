@@ -13,9 +13,10 @@ namespace ibpcc{
 class IBPCC{
 private:
     sym::Symtab symtab;
-    void populate_symtab(ast::AST *root);
-    bool log_assignment(std::string scope, ast::AST *root);
+    void populate_symtab(std::string scope_name, ast::AST *root);
+    bool log_assignment(std::string scope_name, ast::AST *root);
     void log_method(ast::AST *root);
+    void log_params(std::string scope_name, ast::AST *root);
     sym::Reference *populate_var(ast::AST *root, int type);
     sym::Reference *populate_arr(ast::AST *root);
     void get_array_template(ast::AST *root, sym::Reference *ref);

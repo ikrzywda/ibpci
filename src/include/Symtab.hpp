@@ -12,28 +12,31 @@
 namespace sym{
 
 enum types{
-    NUM, STRING,
-    ARR_N, ARR_STR, STACK, 
-    QUEUE, METHOD, PARAM
+    NUM, ARR_N, STACK_N, QUEUE_N, 
+    STRING, ARR_STR, STACK_STR, QUEUE_STR,
+    METHOD, PARAM
 };
 
 typedef std::vector<unsigned> dimensions;
-typedef std::vector<std::string> data;
-
+typedef std::vector<std::string> data_str;
+typedef std::vector<double> data_num;
 
 class Reference{
 private:
 public:
     Reference();
-    Reference(dimensions *d, data *dt);
+    Reference(dimensions *d, data_str *dt);
+    Reference(dimensions *d, data_num *dt);
     void push_dimension(int d);
     void push_data(std::string d);
     void set_type(int type);
     std::string type_to_str();
     void print_reference();
     int type;
+    bool is_num;
     dimensions dim;
-    data dat;
+    data_str d_str;
+    data_num d_num;
 };
 
 typedef std::unordered_map<std::string, std::unique_ptr<Reference>> symtab;
@@ -59,8 +62,6 @@ public:
     bool is_logged(std::string scope, std::string key);
     void print_symtab();
 };
-
-void test_table();
 
 }
 #endif

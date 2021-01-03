@@ -3,12 +3,22 @@ namespace sym{
 
 Reference::Reference(){}
 
-Reference::Reference(dimensions *d, data *dt){
+Reference::Reference(dimensions *d, data_str *dt){
     for(const auto &i : (*d)){
         dim.push_back(i);
     }
     for(const auto &i : (*dt)){
-        dat.push_back(i);
+        d_str.push_back(i);
+    }
+    delete d; delete dt;
+}
+
+Reference::Reference(dimensions *d, data_num *dt){
+    for(const auto &i : (*d)){
+        dim.push_back(i);
+    }
+    for(const auto &i : (*dt)){
+        d_num.push_back(i);
     }
     delete d; delete dt;
 }
@@ -18,10 +28,13 @@ void Reference::push_dimension(int d){
 }
 
 void Reference::push_data(std::string d){
-    dat.push_back(d);
+    if(is_num == false) d_str.push_back(d);
+    else d_num.push_back(std::atof(d.c_str()));
 }
 
 void Reference::set_type(int type){
+    if(type < STRING) is_num = true;
+    else if(type > QUEUE_N && type < METHOD) is_num = false;
     Reference::type = type;
 }
 
@@ -31,8 +44,10 @@ std::string Reference::type_to_str(){
         case STRING: return "STRING";
         case ARR_N: return "ARRAY OF NUMBERS";
         case ARR_STR: return "ARRAY OF STRINGS";
-        case STACK: return "STACK";
-        case QUEUE: return "QUEUE";
+        case STACK_N: return "STACK OF NUMBERS";
+        case STACK_STR: return "STACK OF STRINGS";
+        case QUEUE_N: return "QUEUE OF NUMBERS";
+        case QUEUE_STR: return "QUEUE OF STRINGS";
         case PARAM: return "METHOD PARAMETER";
     }   
     return "???";
@@ -43,9 +58,16 @@ void Reference::print_reference(){
     for(const auto &i : dim){
         std::cout << i << " ";
     }
-    std::cout << "\nCONTENTS: ";
-    for(const auto &i : dat){
-        std::cout << "|" << i;
+    if(is_num == true){
+        std::cout << "\nCONTENTS: ";
+        for(const auto &i : d_num){
+            std::cout << "|" << i;
+        }
+    }else{
+        std::cout << "\nCONTENTS: ";  // DRI!!!
+        for(const auto &i : d_str){
+            std::cout << "|" << i;
+        }
     }
     std::cout << "\nTYPE: " << type_to_str();
     std::cout << std::endl;
@@ -89,7 +111,7 @@ void Symtab::print_symtab(){
         for(it_sm = sm->begin(); it_sm != sm->end(); ++it_sm){
             std::cout << "SYMBOL : " << it_sm->first;
             it_sm->second.get()->print_reference();
-            std::cout << "-------------------------------------------\n";
+            std::cout << "---------------------------------------------\n";
         }
     }
 }
@@ -115,18 +137,6 @@ bool Symtab::is_logged(std::string scope, std::string key){
         return false;
     }
 
-}
-void test_table(){
-    Symtab s;
-    dimensions *dm = new dimensions;
-    data *dt = new data;
-    dm->push_back(1);
-    dm->push_back(2);
-    dm->push_back(5);
-    dt->push_back("Hello");
-    dt->push_back("world");
-    dt->push_back("!!!");
-    s.print_symtab();
 }
 
 }

@@ -1,6 +1,8 @@
 #ifndef TOKEN_HPP
 #define TOKEN_HPP
 
+#include <iostream>
+#include <memory>
 #include <string>
 #include <map>
 
@@ -8,68 +10,41 @@ namespace tk{
 
 enum id{
     END_FILE,
-    PLUS,
-    MINUS,
-    MULT,
-    DIV_WOQ,
-    DIV_WQ,
-    MOD,
-    LSQBR,
-    RSQBR,
-    LPAREN,
-    RPAREN,
-    QTMARK,
-    LT,
-    GT,
-    LEQ,
-    GEQ,
-    DNEQ,
-    EQ,
-    IS,
-    DOT,
-    COMMA,
-    INT,
-    FLOAT,
-    STRING,
-    ID_VAR,
-    ID_METHOD,
-    AND,
-    OR,
-    NOT,
-    METHOD,
-    RETURN,
-    LOOP,
-    FROM,
-    TO,
-    WHILE,
-    UNTIL,
-    IF,
-    ELSE,
-    THEN,
+    PLUS, MINUS, MULT, DIV_WOQ, DIV_WQ, MOD,
+    LSQBR, RSQBR, LPAREN, RPAREN, QTMARK,
+    LT, GT, LEQ, GEQ, DNEQ, EQ, IS,
+    DOT, COMMA,
+    INT, FLOAT, STRING,
+    ID_VAR, ID_METHOD,
+    AND, OR, NOT,
+    METHOD, RETURN,
+    LOOP, FROM, TO, WHILE, UNTIL,
+    IF, ELSE, THEN,
     END,
-    NEW_ARR,
-    NEW_QUEUE,
-    NEW_STACK,
+    NEW_ARR, NEW_QUEUE, NEW_STACK,
     LENGTH,
-    ADD_ITEM,
-    GET_NEXT,
-    RESET_NEXT,
-    HAS_NEXT,
-    PUSH,
-    POP,
-    ENQUEUE,
-    DEQUEUE,
+    ADD_ITEM, GET_NEXT, RESET_NEXT, HAS_NEXT,
+    PUSH, POP,
+    ENQUEUE, DEQUEUE,
     IS_EMPTY,
-    OUTPUT,
-    INPUT
+    OUTPUT, INPUT
 };
+
+typedef union TokenVal{
+    int i;
+    float f;
+    std::string *str;
+}TokenVal;
 
 class Token{
     public:
-        std::string *attr;
+        TokenVal val;
         int id;
-        Token(int id, std::string *attr);
-        Token();
+        void mutate(int id, std::string *val);
+        void mutate(int id, float val);
+        void mutate(int id, int val);
+        Token() = default;
+        ~Token();
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {
@@ -108,9 +83,9 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
 
 int lookup_keyword(std::string lexeme);
 
-std::string *tok_to_str(Token *token);
+void print_token(Token *token);
    
-std::string *id_to_str(int id);
+std::string id_to_str(int id);
 
 
 }

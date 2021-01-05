@@ -2,17 +2,11 @@
 
 namespace lxr{
 
-Lexer::Lexer(std::string *buffer){
-    Lexer::input_buffer = buffer;
-    attr_buffer = new std::string;
-    pos = 0, len = buffer->size();
-    c = input_buffer->at(pos);
+Lexer::Lexer(std::string&& buffer) :  input_buffer(buffer){
+    token = tk::Token();
+    pos = 0, len = buffer.size();
+    c = input_buffer.at(pos);
     line_num = 1;
-}
-
-Lexer::~Lexer(){
-    //delete attr_buffer;
-    //delete input_buffer;
 }
 
 int is_upcase(char c){
@@ -28,7 +22,7 @@ void Lexer::error(){
 void Lexer::advance(){
     pos++;
     if(pos < len - 1){ 
-        c = input_buffer->at(pos);
+        c = input_buffer.at(pos);
     }else{
         c = EOF;
     }
@@ -49,84 +43,86 @@ void Lexer::skip_comment(){
     }
 }
 
-tk::Token *Lexer::number(){
+tk::Token &Lexer::number(){
     int id = tk::INT;
-    attr_buffer->push_back(c);
+    std::string buffer;
+    buffer.push_back(c);
     advance();
     while(std::isdigit(c) || c =='.'){
         if(c == '.' && id == tk::FLOAT) break;
         if(c == '.') id = tk::FLOAT;
-        attr_buffer->push_back(c);
+        buffer.push_back(c);
         advance();
     }
-    return new tk::Token(id, attr_buffer);
+    if(id == tk::INT) token.mutate(id, std::stoi(buffer));
+    else token.mutate(id, std::stof(buffer));
+    return token;
 }   
 
-tk::Token *Lexer::id(){
+tk::Token &Lexer::id(){
     int id = tk::ID_VAR;
-    attr_buffer->push_back(c);
+    attr_buffer.push_back(c);
     if(!is_upcase(c)) id = tk::ID_METHOD;
     advance();
     while(std::isalnum(c) || c == '_'){
         if(!is_upcase(c)) id = tk::ID_METHOD;
-        attr_buffer->push_back(c);
+        attr_buffer.push_back(c);
         advance();
     }
-    if(tk::lookup_keyword(*attr_buffer) > 0){
-        id = tk::lookup_keyword(*attr_buffer); 
-    }
-    return new tk::Token(id, attr_buffer);
+    token.mutate(id, &attr_buffer);
+    return token;
 }   
 
-tk::Token *Lexer::string(){
+tk::Token &Lexer::string(){
     advance();
     while(c != '\"' && c != EOF){
-        attr_buffer->push_back(c);
+        attr_buffer.push_back(c);
         advance();
     }
     advance();
-    return new tk::Token(tk::STRING, attr_buffer);
+    token.mutate(tk::STRING, &attr_buffer);
+    return token;
 }
 
-tk::Token *Lexer::op_eq(char ch){
+tk::Token &Lexer::op_eq(char ch){
     advance();
     if(c == '='){
         switch(ch){
-            case '=': advance(); noattr = "=="; return new tk::Token(tk::IS, &noattr);
-            case '<': advance(); noattr = "<="; return new tk::Token(tk::LEQ, &noattr);
-            case '>': advance(); noattr = ">="; return new tk::Token(tk::GEQ, &noattr);
-            case '!': advance(); noattr = "!="; return new tk::Token(tk::DNEQ, &noattr);
+            case '=': advance(); attr_buffer = "=="; token.mutate(tk::IS, &attr_buffer); return token;
+            case '<': advance(); attr_buffer = "<="; token.mutate(tk::LEQ, &attr_buffer); return token;
+            case '>': advance(); attr_buffer = ">="; token.mutate(tk::GEQ, &attr_buffer); return token;
+            case '!': advance(); attr_buffer = "!="; token.mutate(tk::DNEQ, &attr_buffer); return token;
         }
     }else{
         switch(ch){
-            case '=': noattr = "="; return new tk::Token(tk::EQ, &noattr);
-            case '<': noattr = "<"; return new tk::Token(tk::LT, &noattr);
-            case '>': noattr = ">"; return new tk::Token(tk::GT, &noattr);
+            case '=': attr_buffer = "="; token.mutate(tk::EQ, &attr_buffer); return token;
+            case '<': attr_buffer = "<"; token.mutate(tk::LT, &attr_buffer); return token;
+            case '>': attr_buffer = ">"; token.mutate(tk::GT, &attr_buffer); return token;
         }
     }
-    return 0;
+    return token;
 }
 
-tk::Token *Lexer::get_next_token(){
+tk::Token &Lexer::get_next_token(){
     while(1){
         skip_whitespace();
-        attr_buffer->clear();
+        attr_buffer.clear();
         if(std::isdigit(c)){
             return number();
         }else if(std::isalnum(c)){
             return id();
         }else{
             switch(c){
-                case '+': advance(); noattr = "+"; return new tk::Token(tk::PLUS, &noattr);
-                case '-': advance(); noattr = "-"; return new tk::Token(tk::MINUS, &noattr);
-                case '*': advance(); noattr = "*"; return new tk::Token(tk::MULT, &noattr);
-                case '%': advance(); noattr = "%"; return new tk::Token(tk::MOD, &noattr);
-                case '[': advance(); noattr = "]"; return new tk::Token(tk::LSQBR, &noattr);
-                case ']': advance(); noattr = "]"; return new tk::Token(tk::RSQBR, &noattr);
-                case '(': advance(); noattr = "("; return new tk::Token(tk::LPAREN, &noattr);
-                case ')': advance(); noattr = ")"; return new tk::Token(tk::RPAREN, &noattr);
-                case '.': advance(); noattr = "."; return new tk::Token(tk::DOT, &noattr);
-                case ',': advance(); noattr = ","; return new tk::Token(tk::COMMA, &noattr);
+                case '+': advance(); attr_buffer = "+"; token.mutate(tk::PLUS, &attr_buffer); return token;
+                case '-': advance(); attr_buffer = "-"; token.mutate(tk::MINUS, &attr_buffer); return token;
+                case '*': advance(); attr_buffer = "*"; token.mutate(tk::MULT, &attr_buffer); return token;
+                case '%': advance(); attr_buffer = "%"; token.mutate(tk::MOD, &attr_buffer); return token;
+                case '[': advance(); attr_buffer = "]"; token.mutate(tk::LSQBR, &attr_buffer); return token;
+                case ']': advance(); attr_buffer = "]"; token.mutate(tk::RSQBR, &attr_buffer); return token;
+                case '(': advance(); attr_buffer = "("; token.mutate(tk::LPAREN, &attr_buffer); return token;
+                case ')': advance(); attr_buffer = ")"; token.mutate(tk::RPAREN, &attr_buffer); return token;
+                case '.': advance(); attr_buffer = "."; token.mutate(tk::DOT, &attr_buffer); return token;
+                case ',': advance(); attr_buffer = ","; token.mutate(tk::COMMA, &attr_buffer); return token;
                 case '\"': return string();
                 case '=': return op_eq('=');
                 case '>': return op_eq('>');
@@ -137,14 +133,14 @@ tk::Token *Lexer::get_next_token(){
                     if(c == '/'){ 
                         skip_comment();
                         break;   
-                    }else{noattr = "/";return new tk::Token(tk::DIV_WOQ, &noattr);}
+                    }else{attr_buffer = "/"; token.mutate(tk::DIV_WOQ, &attr_buffer); return token;}
                 case '\n': advance(); ++line_num; break;
-                case EOF: return new tk::Token(tk::END_FILE, &noattr);
+                case EOF: attr_buffer = "EOF"; token.mutate(tk::END_FILE, &attr_buffer); return token;
                 default: error();
             }
         }
     }
-    return new tk::Token(tk::END_FILE, &noattr);
+    return token;
 }
 
 }

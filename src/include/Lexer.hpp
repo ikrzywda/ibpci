@@ -10,27 +10,28 @@
 namespace lxr{
 
 int is_upcase();
+const std::string noattr = "0";
 
 class Lexer{
     private:
-        std::string *input_buffer;
-        std::string *attr_buffer;
-        std::string noattr = "0";
+        tk::Token token;
+        std::string input_buffer;
+        std::string attr_buffer;
         int pos, len;
         char c;
         void error();
         void advance();
         void skip_whitespace();
         void skip_comment();
-        tk::Token *number();
-        tk::Token *id();
-        tk::Token *string();
-        tk::Token *op_eq(char ch);
+        tk::Token &number();
+        tk::Token &id();
+        tk::Token &string();
+        tk::Token &op_eq(char ch);
     public:
-        Lexer(std::string *buffer);
-        ~Lexer();
+        Lexer(std::string&& buffer);
+        ~Lexer() = default;
         unsigned int line_num;
-        tk::Token *get_next_token();
+        tk::Token &get_next_token();
 };
 
 }

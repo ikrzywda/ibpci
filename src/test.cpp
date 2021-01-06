@@ -25,6 +25,11 @@ void test_lexer(char *filename){
     }
 }
 
-
+void test_parser(char *filename){
+    prs::Parser parser(lxr::Lexer(get_buffer(filename))); 
+    ast::AST *root = parser.parse();
+    ast::print_tree(root, 0);
+    ast::delete_tree(root);
+}
 
 }

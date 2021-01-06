@@ -30,7 +30,7 @@ enum id{
     OUTPUT, INPUT
 };
 
-typedef union TokenVal{
+typedef union Value{
     int i;
     float f;
     std::string *str;
@@ -38,7 +38,7 @@ typedef union TokenVal{
 
 class Token{
     public:
-        TokenVal val;
+        Value val;
         int id;
         void mutate(int id, std::string *val);
         void mutate(int id, float val);

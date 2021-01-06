@@ -73,12 +73,12 @@ void print_token(Token *token){
     std::cout << "<" << id_to_str(token->id) << ",";
         if(token->id == tk::INT) std::cout << token->val.i;
         else if(token->id == tk::FLOAT) std::cout << token->val.f;
-        else std::cout << *&*token->val.str;
+        else std::cout << *token->val.str;
     std::cout << ">" << std::endl;
 }
 
 int lookup_keyword(std::string lexeme){
-    if(RESERVED_KEYWORDS.at(lexeme) > 0){
+    if(RESERVED_KEYWORDS.find(lexeme) != RESERVED_KEYWORDS.end()){
         return RESERVED_KEYWORDS.at(lexeme);
     }else{
         return 0;

@@ -14,8 +14,8 @@ int is_upcase(char c){
 }
 
 void Lexer::error(){
-    std::cout << "LEXICAL ERROR at line " << line_num << 
-        ":\n\tunexpected character: " << c << std::endl;
+    std::cout << "Unexpected character at line " << line_num << ": '"
+        << c << "'\n";
     exit(1);
 }
 
@@ -69,6 +69,8 @@ tk::Token &Lexer::id(){
         attr_buffer.push_back(c);
         advance();
     }
+    if(tk::lookup_keyword(attr_buffer) > 0)
+        id = tk::lookup_keyword(attr_buffer);
     token.mutate(id, &attr_buffer);
     return token;
 }   

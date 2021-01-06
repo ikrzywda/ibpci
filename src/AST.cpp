@@ -56,9 +56,9 @@ std::string id_to_str(int id){
         case ELSE:  out = "else"; return out;
         case COND:  out = "cond"; return out;
         case CMP: out = "cmp"; return out;
-        case ASSIGN: out = "assign"; return out;
+        case ASSIGN: out = "="; return out;
         case BINOP:  out = "binop"; return out;
-        case UN_MIN: out = "un_min"; return out;
+        case UN_MIN: out = "-"; return out;
         case INT:  out = "int"; return out;
         case FLOAT:  out = "float"; return out;
         case STRING:  out = "string"; return out;

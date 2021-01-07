@@ -17,6 +17,8 @@ private:
 public:
     void push(std::string key, double val);
     void push(std::string key, std::string val);
+    double peek_for_num(std::string key, ast::AST *leaf);
+    std::string peek_for_str(std::string key, ast::AST *leaf);
     bool empty();
     void test();
     CallStack(ast::AST *tree);

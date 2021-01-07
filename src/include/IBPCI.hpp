@@ -20,6 +20,7 @@ class Interpreter{
 private:
     cstk::CallStack call_stack;
     ast::AST *tree;
+    void error(std::string message, ast::AST *leaf);
     double binop(ast::AST *root);
     double unary_min(ast::AST *root);
     std::string concatenation(ast::AST *root);

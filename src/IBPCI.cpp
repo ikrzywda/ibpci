@@ -30,12 +30,20 @@ void Interpreter::execute(){
     call_stack.test();
 }   
 
+void Interpreter::error(std::string message, ast::AST *leaf){
+    std::cout << "SEMANTIC ERROR at line " << leaf->line_num
+        << ": " << message << std::endl;
+    exit(1);
+}
+
 double Interpreter::binop(ast::AST *root){
+    double check;
     if(root == NULL) return 0; 
     switch(root->id){
         case ast::NUM: return root->val_num;
+        case ast::ID: return call_stack.peek_for_num(root->val_str, root);
         case ast::UN_MIN: return -(binop(root->children[0]));
-        case ast::STRING: exit(1);
+        case ast::STRING: error("incompatible type STRING, should be NUM", root);
         case ast::BINOP:
             switch(root->op){
                 case tk::PLUS: 
@@ -44,10 +52,12 @@ double Interpreter::binop(ast::AST *root){
                     return binop(root->children[0]) - binop(root->children[1]);
                 case tk::MULT: 
                     return binop(root->children[0]) * binop(root->children[1]);
-                case tk::DIV_WQ: 
-                    return binop(root->children[0]) / binop(root->children[1]);
+                case tk::DIV_WQ:
+                    if((check = binop(root->children[1])) == 0) error("cannot divide by 0", root->children[1]);
+                    else return binop(root->children[0]) / check;
                 case tk::DIV_WOQ: 
-                    return (long)binop(root->children[0]) / (long)binop(root->children[1]);
+                    if((check = binop(root->children[1])) == 0) error("cannot divide by 0", root->children[1]);
+                    else return (long)binop(root->children[0]) / (long)binop(root->children[1]);
                 case tk::MOD: 
                     return (long)binop(root->children[0]) % (long)binop(root->children[1]);
             }
@@ -59,16 +69,17 @@ std::string Interpreter::concatenation(ast::AST *root){
     if(root == NULL) return "";
     if(root->id == ast::STRING){ 
         return root->val_str;
+    }else if(root->id == ast::ID){ 
+        return call_stack.peek_for_str(root->val_str, root);
     }else if(root->id == ast::BINOP){
         if(root->op == tk::PLUS){ 
             return concatenation(root->children[0]) + concatenation(root->children[1]);
         }else{
-            std::cout << "wrong op";
-            exit(1);
+            error("Illegal operation on string, concatenation (+) is legal only", root);
         }
     }else{ 
-        std::cout << "wrong type";
-        exit(1);
+        error("incompatible type numerical, should be string", root);
+
     }
     return "";
 }
@@ -89,7 +100,7 @@ void Interpreter::assign(ast::AST *root){
             break;
         case ast::BINOP:
             if(rn->op == tk::PLUS){
-                if(scout_type(rn) == ast::STRING){ 
+                if(scout_type(rn) == ast::STRING || scout_type(rn) == ast::ID){ 
                     concatenation(rn);
                     call_stack.push(var_name, concatenation(rn));
                 }else call_stack.push(var_name, binop(rn));
@@ -100,7 +111,9 @@ void Interpreter::assign(ast::AST *root){
 
 int Interpreter::scout_type(ast::AST *root){
     while(root != NULL){ 
-        if(root->id == ast::NUM || root->id == ast::STRING)
+        if(root->id == ast::NUM 
+                || root->id == ast::STRING 
+                || root->id == ast::ID)
             return root->id;
         else
             root = root->children[0];

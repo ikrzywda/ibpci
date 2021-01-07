@@ -22,6 +22,9 @@ public:
     Reference(std::string val);
     void set_value(double val);
     void set_value(std::string val);
+    double get_num();
+    std::string get_str();
+    int get_type();
     void print();
 };
 
@@ -34,8 +37,12 @@ private:
     std::string name;
 public:
     AR(std::string name, ast::AST *root);
+    void error_uref(std::string key, ast::AST *leaf);
+    void error_itp(std::string key, int type, ast::AST *leaf);
     void insert(std::string key, double val);
     void insert(std::string key, std::string val);
+    double lookup_num(std::string key, ast::AST *leaf);
+    std::string lookup_str(std::string key, ast::AST *leaf);
     void print();
 };
 

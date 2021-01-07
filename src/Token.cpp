@@ -2,22 +2,14 @@
 
 namespace tk{
 
-void Token::mutate(int id, std::string *val){
+void Token::mutate(int id, std::string val){
     Token::id = id;
-    Token::val.str = val;
+    Token::val_str = val;
 }
 
-void Token::mutate(int id, int val){
+void Token::mutate(int id, double val){
     Token::id = id;
-    Token::val.i = val;
-}
-
-void Token::mutate(int id, float val){
-    Token::id = id;
-    Token::val.f = val;
-}
-
-Token::~Token(){
+    Token::val_num = val;
 }
 
 std::string id_to_str(int id){
@@ -43,8 +35,7 @@ std::string id_to_str(int id){
         case IS: out = "=="; break;
         case DOT: out = "."; break;
         case COMMA: out = ","; break;
-        case INT: out = "INT"; break;
-        case FLOAT: out = "FLOAT"; break;
+        case NUM: out = "NUM"; break;
         case STRING: out = "STRING"; break;
         case ID_VAR: out = "ID_VAR"; break;
         case ID_METHOD: out = "ID_METHOD"; break;
@@ -71,9 +62,8 @@ std::string id_to_str(int id){
 
 void print_token(Token *token){
     std::cout << "<" << id_to_str(token->id) << ",";
-        if(token->id == tk::INT) std::cout << token->val.i;
-        else if(token->id == tk::FLOAT) std::cout << token->val.f;
-        else std::cout << *token->val.str;
+        if(token->id == tk::NUM) std::cout << token->val_num;
+        else std::cout << token->val_str;
     std::cout << ">" << std::endl;
 }
 

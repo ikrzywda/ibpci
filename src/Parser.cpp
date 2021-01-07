@@ -238,13 +238,9 @@ ast::AST *Parser::term(){
 ast::AST *Parser::factor(){
     ast::AST *new_node;
     switch(token.id){
-        case tk::INT:
-            new_node = new ast::AST(token, ast::INT, lex.line_num);
-            eat(tk::INT);
-            return new_node;
-        case tk::FLOAT:
-            new_node = new ast::AST(token, ast::FLOAT, lex.line_num);
-            eat(tk::FLOAT);
+        case tk::NUM:
+            new_node = new ast::AST(token, ast::NUM, lex.line_num);
+            eat(tk::NUM);
             return new_node;
         case tk::MINUS:
             new_node = new ast::AST(token, ast::UN_MIN, lex.line_num);
@@ -253,7 +249,7 @@ ast::AST *Parser::factor(){
             eat(tk::LPAREN);
             new_node->push_child(expr());
             eat(tk::RPAREN);
-            }else new_node->push_child(factor());
+        }else new_node->push_child(factor());
             return new_node;
         case tk::STRING:
             new_node = new ast::AST(token, ast::STRING, lex.line_num);
@@ -301,8 +297,7 @@ ast::AST *Parser::factor(){
 ast::AST *Parser::arr(){
     ast::AST *root = new ast::AST(token, ast::ARR, lex.line_num);
     eat(tk::LSQBR);
-    if(token.id == tk::INT
-            || token.id == tk::FLOAT
+    if(token.id == tk::NUM
             || token.id == tk::STRING
             || token.id == tk::LSQBR){
         root->push_child(factor());

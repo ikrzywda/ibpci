@@ -32,4 +32,12 @@ void test_parser(char *filename){
     ast::delete_tree(root);
 }
 
+void test_interpreter(){
+    ar::AR record("test", NULL); 
+    record.insert("VAR_A", 100);
+    record.insert("VAR_B", 3.14);
+    record.insert("VAR_C", "Hello world!");
+    record.print();
+}
+
 }

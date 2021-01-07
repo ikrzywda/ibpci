@@ -5,11 +5,10 @@ namespace ast{
 AST::AST(tk::Token &token, int node_id, unsigned ln){
     id = node_id;
     line_num = ln;
-    switch(token.id){
-        case tk::INT: val.i = token.val.i; break;
-        case tk::FLOAT: val.f = token.val.f; break;
-        default: val_str = *token.val.str;
-    }
+    if(token.id == tk::NUM)
+        val_num = token.val_num;
+    else
+        val_str = token.val_str;
 }
 
 AST::AST(int node_id){ id = node_id; val_str = id_to_str(node_id);}
@@ -23,11 +22,10 @@ void print_tree(AST *root, int offset){
     std::cout << std::setw(offset); 
     std::cout << "\u2560";
     std::cout << "\u2550\u2550[";
-    switch(root->id){
-        case ast::INT: std::cout << root->val.i; break;
-        case ast::FLOAT: std::cout << root->val.f; break;
-        default: std::cout << root->val_str; break;
-    }
+    if(root->id == ast::NUM)
+        std::cout << root->val_num; 
+    else
+        std::cout << root->val_str; 
     std::cout << "]\n";
     for(auto *a : root->children){
         print_tree(a, offset+4);
@@ -59,8 +57,7 @@ std::string id_to_str(int id){
         case ASSIGN: out = "="; return out;
         case BINOP:  out = "binop"; return out;
         case UN_MIN: out = "-"; return out;
-        case INT:  out = "int"; return out;
-        case FLOAT:  out = "float"; return out;
+        case NUM:  out = "numerical"; return out;
         case STRING:  out = "string"; return out;
         case ID: out = "id"; return out;
         case ARR:  out = "arr"; return out;

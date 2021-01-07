@@ -4,6 +4,7 @@
 #include "Lexer.hpp"
 #include "Parser.hpp"
 #include "AST.hpp"
+#include "ActivationRecord.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -14,6 +15,8 @@ std::string get_buffer(char *filename);
 void test_lexer(char *filename);
 
 void test_parser(char *filename);
+
+void test_interpreter();
 }
 
 #endif

@@ -14,7 +14,7 @@ enum id{
     LSQBR, RSQBR, LPAREN, RPAREN, QTMARK,
     LT, GT, LEQ, GEQ, DNEQ, EQ, IS,
     DOT, COMMA,
-    INT, FLOAT, STRING,
+    INT, FLOAT, NUM, STRING,
     ID_VAR, ID_METHOD,
     AND, OR, NOT,
     METHOD, RETURN,
@@ -30,21 +30,15 @@ enum id{
     OUTPUT, INPUT
 };
 
-typedef union Value{
-    int i;
-    float f;
-    std::string *str;
-}TokenVal;
-
 class Token{
     public:
-        Value val;
+        double val_num;
+        std::string val_str;
         int id;
-        void mutate(int id, std::string *val);
-        void mutate(int id, float val);
-        void mutate(int id, int val);
+        void mutate(int id, std::string val);
+        void mutate(int id, double val);
         Token() = default;
-        ~Token();
+        ~Token() = default;
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {

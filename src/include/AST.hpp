@@ -17,23 +17,18 @@ enum ast_id{
     IF, ELSE, COND, CMP,
     ASSIGN,
     BINOP, UN_MIN,
-    INT, FLOAT, STRING, 
+    NUM, STRING, 
     ID,
     ARR, ARR_DYN, ARR_ACC,
     STACK, QUEUE,
     STANDARD_METHOD, INPUT, OUTPUT
 };
 
-typedef union Value{
-    int i;
-    float f;
-}Value; 
-
 class AST{
 public:
     int id;
     unsigned line_num;
-    ast::Value val;
+    double val_num;
     std::string val_str;
     std::list<AST*> children;
     AST(tk::Token &token, int node_id, unsigned ln);

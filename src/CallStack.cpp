@@ -22,6 +22,10 @@ std::string CallStack::peek_for_str(std::string key, ast::AST *leaf){
     return call_stack.top().get()->lookup_str(key, leaf);
 }
 
+int CallStack::peek_for_type(std::string key, ast::AST *leaf){
+    return call_stack.top().get()->lookup_type(key, leaf);
+}
+
 bool CallStack::empty(){
     return call_stack.empty();
 }

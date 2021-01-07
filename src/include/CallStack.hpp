@@ -19,6 +19,7 @@ public:
     void push(std::string key, std::string val);
     double peek_for_num(std::string key, ast::AST *leaf);
     std::string peek_for_str(std::string key, ast::AST *leaf);
+    int peek_for_type(std::string key, ast::AST *leaf);
     bool empty();
     void test();
     CallStack(ast::AST *tree);

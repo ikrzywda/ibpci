@@ -25,6 +25,7 @@ private:
     double unary_min(ast::AST *root);
     std::string concatenation(ast::AST *root);
     void assign(ast::AST *root);
+    void output(ast::AST *root);
     int scout_type(ast::AST *root);
 public:
     Interpreter(ast::AST *tree);

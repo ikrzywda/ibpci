@@ -102,6 +102,17 @@ std::string AR::lookup_str(std::string key, ast::AST *leaf){
     return 0;
 }
 
+int AR::lookup_type(std::string key, ast::AST *leaf){
+    data::iterator it = contents.find(key);
+    if(it != contents.end()){
+            return it->second.get()->get_type();
+    }else{
+        error_uref(key, leaf);
+    }
+    return 0;
+    
+}
+
 void AR::print(){
     std::cout << name << "\n======================================\n";
     for(auto &a : contents){

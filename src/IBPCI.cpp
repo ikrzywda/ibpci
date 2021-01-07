@@ -23,7 +23,7 @@ void Interpreter::execute(){
             case ast::RETURN: break;
             case ast::STANDARD_METHOD: break;
             case ast::INPUT: break;
-            case ast::OUTPUT: break;
+            case ast::OUTPUT: output(a);
         }
     }
     ast::delete_tree(tree);
@@ -106,6 +106,33 @@ void Interpreter::assign(ast::AST *root){
                 }else call_stack.push(var_name, binop(rn));
             }else call_stack.push(var_name, binop(rn));
             break;
+    }
+}
+
+void Interpreter::output(ast::AST *root){
+    for(auto &a : root->children){
+        switch(a->id){
+            case ast::NUM:
+                std::cout << a->val_num << std::endl; break;
+            case ast::STRING:
+                std::cout << a->val_str << std::endl; break;
+            case ast::ID:
+                if(call_stack.peek_for_type(a->val_str, a) == ast::NUM){
+                    std::cout << call_stack.peek_for_num(a->val_str, a) << std::endl;
+                }else{
+                    std::cout << call_stack.peek_for_str(a->val_str, a) << std::endl;
+                }
+                break;
+            case ast::BINOP:
+                if(a->op == tk::PLUS){
+                    if(scout_type(a->children[1]) == ast::STRING || scout_type(a->children[1]) == ast::ID){ 
+                        concatenation(a->children[1]);
+                        std::cout << concatenation(a->children[1]) << std::endl; 
+                    }else std::cout << binop(a->children[1]) << std::endl; 
+                }else std::cout << binop(a->children[1]) << std::endl;
+                break;
+            default: error(("cannot output " + ast::id_to_str(a->id)), a); break;
+        }
     }
 }
 

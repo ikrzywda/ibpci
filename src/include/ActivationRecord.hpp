@@ -43,6 +43,7 @@ public:
     void insert(std::string key, std::string val);
     double lookup_num(std::string key, ast::AST *leaf);
     std::string lookup_str(std::string key, ast::AST *leaf);
+    int lookup_type(std::string key, ast::AST *leaf);
     void print();
 };
 

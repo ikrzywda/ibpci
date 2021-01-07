@@ -12,8 +12,11 @@ namespace ar{
 class Reference{
 private:
     int type;
+    std::vector<int> size;
     double val_num;
+    std::vector<double> container_num;
     std::string val_str;
+    std::vector<std::string> container_str;
 public:
     Reference(double val);
     Reference(std::string val);

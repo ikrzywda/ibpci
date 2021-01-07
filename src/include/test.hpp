@@ -5,6 +5,7 @@
 #include "Parser.hpp"
 #include "AST.hpp"
 #include "ActivationRecord.hpp"
+#include "IBPCI.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -16,7 +17,7 @@ void test_lexer(char *filename);
 
 void test_parser(char *filename);
 
-void test_interpreter();
+void test_interpreter(char *filename);
 }
 
 #endif

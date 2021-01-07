@@ -7,5 +7,5 @@ int main(int argc, char **argv){
     else if(flag == "-p")
         test::test_parser(argv[2]);
     else if(flag == "-i")
-        test::test_interpreter();
+        test::test_interpreter(argv[2]);
 }

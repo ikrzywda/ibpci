@@ -32,12 +32,11 @@ void test_parser(char *filename){
     ast::delete_tree(root);
 }
 
-void test_interpreter(){
-    ar::AR record("test", NULL); 
-    record.insert("VAR_A", 100);
-    record.insert("VAR_B", 3.14);
-    record.insert("VAR_C", "Hello world!");
-    record.print();
+void test_interpreter(char *filename){
+    prs::Parser parser(lxr::Lexer(get_buffer(filename))); 
+    ast::AST *root = parser.parse();
+    IBPCI::Interpreter ibpci(root);
+    ibpci.execute();
 }
 
 }

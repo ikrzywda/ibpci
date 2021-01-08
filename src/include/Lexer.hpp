@@ -29,6 +29,7 @@ class Lexer{
         tk::Token &op_eq(char ch);
     public:
         Lexer(std::string&& buffer);
+        Lexer() = default;
         ~Lexer() = default;
         unsigned int line_num;
         tk::Token &get_next_token();

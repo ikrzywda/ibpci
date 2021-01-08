@@ -2,7 +2,8 @@
 
 namespace prs{
     
-Parser::Parser(lxr::Lexer &&lexer) : lex(std::move(lexer)){	
+Parser::Parser(std::string &&buffer){
+    lex = lxr::Lexer(std::move(buffer));
     token = lex.get_next_token();
 }
 

@@ -38,7 +38,7 @@ class Parser{
         ast::AST *std_method();
         ast::AST *in_out();
     public:
-        Parser(lxr::Lexer &&lexer);
+        Parser(std::string &&buffer);
         ast::AST *parse();
 };
 

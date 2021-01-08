@@ -2,6 +2,13 @@
 
 namespace tk{
 
+Token::Token(Token &tok) : id(tok.id){
+    if(id == tk::NUM) 
+        val_num = tok.val_num;
+    else
+        val_num = tok.val_num;
+}
+
 void Token::mutate(int id, std::string val){
     Token::id = id;
     Token::val_str = val;

@@ -18,7 +18,7 @@ void Interpreter::interpret(){
             case ast::METHOD_CALL: break;
             case ast::RETURN: break;
             case ast::STANDARD_METHOD: break;
-            case ast::INPUT: break;
+            case ast::INPUT: input(a);
             case ast::OUTPUT: output(a); break;
         }
     }
@@ -34,6 +34,7 @@ void Interpreter::error(std::string message, ast::AST *leaf){
 
 double Interpreter::binop(ast::AST *root){
     double check;
+    tk::Token input_token;
     if(root == NULL) return 0; 
     switch(root->id){
         case ast::NUM: return root->val_num;
@@ -59,6 +60,23 @@ double Interpreter::binop(ast::AST *root){
             }
     }
     return 0;
+}
+
+std::string Interpreter::concatenation(ast::AST *root){
+    tk::Token input_token;
+    if(root == NULL) return "";
+    switch(root->id){ 
+        case ast::STRING: return root->val_str;
+        case ast::ID: return call_stack.peek_for_str(root->val_str, root);
+        case ast::BINOP:
+            if(root->op == tk::PLUS) 
+                return concatenation(root->children[0]) + concatenation(root->children[1]);
+            else
+                error("Illegal operation on string, concatenation (+) is legal only", root);
+        case ast::NUM: error("incompatible type numerical, should be string", root);
+
+    }
+    return "";
 }
 
 bool Interpreter::condition(ast::AST *root){
@@ -104,25 +122,6 @@ bool Interpreter::cmp_str(ast::AST *root){
     return concatenation(root->children[0]) == concatenation(root->children[1]);
 }
 
-std::string Interpreter::concatenation(ast::AST *root){
-    if(root == NULL) return "";
-    if(root->id == ast::STRING){ 
-        return root->val_str;
-    }else if(root->id == ast::ID){ 
-        return call_stack.peek_for_str(root->val_str, root);
-    }else if(root->id == ast::BINOP){
-        if(root->op == tk::PLUS){ 
-            return concatenation(root->children[0]) + concatenation(root->children[1]);
-        }else{
-            error("Illegal operation on string, concatenation (+) is legal only", root);
-        }
-    }else{ 
-        error("incompatible type numerical, should be string", root);
-
-    }
-    return "";
-}
-
 void Interpreter::exec_block(ast::AST *root){
     for(auto &a : root->children){
         switch(a->id){        
@@ -134,7 +133,7 @@ void Interpreter::exec_block(ast::AST *root){
             case ast::METHOD_CALL: break;
             case ast::RETURN: break;
             case ast::STANDARD_METHOD: break;
-            case ast::INPUT: break;
+            case ast::INPUT: input(a); break;
             case ast::OUTPUT: output(a); break;
             default: return;
         }
@@ -144,6 +143,7 @@ void Interpreter::exec_block(ast::AST *root){
 
 void Interpreter::assign(ast::AST *root){  
     std::string var_name = root->children[0]->val_str;
+    tk::Token input_token;
     ast::AST *rn = root->children[1]; 
     variant_type vt;
     switch(rn->id){
@@ -159,6 +159,11 @@ void Interpreter::assign(ast::AST *root){
             break;
         case ast::UN_MIN:
             call_stack.push(var_name, -(binop(rn->children[0])));
+            break;
+        case ast::INPUT:
+            if((input_token = input(rn)).id == tk::STRING)
+                call_stack.push(var_name, input_token.val_str); 
+            else call_stack.push(var_name, input_token.val_num); 
             break;
         case ast::STRING:
             call_stack.push(var_name, rn->val_str);
@@ -218,30 +223,46 @@ void Interpreter::exec_for(ast::AST *root){
 }
 
 void Interpreter::output(ast::AST *root){
+    tk::Token input_token;
     for(auto &a : root->children){
         switch(a->id){
             case ast::NUM:
-                std::cout << a->val_num << std::endl; break;
+                std::cout << a->val_num; break;
             case ast::STRING:
-                std::cout << a->val_str << std::endl; break;
+                std::cout << a->val_str; break;
             case ast::ID:
                 if(call_stack.peek_for_type(a->val_str, a) == ast::NUM){
-                    std::cout << call_stack.peek_for_num(a->val_str, a) << std::endl;
+                    std::cout << call_stack.peek_for_num(a->val_str, a);
                 }else{
-                    std::cout << call_stack.peek_for_str(a->val_str, a) << std::endl;
+                    std::cout << call_stack.peek_for_str(a->val_str, a);
                 }
+                break;
+            case ast::INPUT:
+                if((input_token = input(a)).id == tk::STRING)
+                    std::cout << input_token.val_str; 
+                else std::cout << input_token.val_num; 
                 break;
             case ast::BINOP:
                 if(a->op == tk::PLUS){
-                    if(scout_type(a->children[1]) == ast::STRING){
-                        concatenation(a->children[1]);
-                        std::cout << concatenation(a->children[1]) << std::endl; 
-                    }else std::cout << binop(a->children[1]) << std::endl; 
-                }else std::cout << binop(a->children[1]) << std::endl;
+                    if(scout_type(a) == ast::STRING){
+                        std::cout << concatenation(a); 
+                    }else std::cout << binop(a); 
+                }else std::cout << binop(a);
                 break;
             default: error(("cannot output " + ast::id_to_str(a->id)), a); break;
         }
+        std::cout << std::endl;
     }
+}
+
+tk::Token &Interpreter::input(ast::AST *root){
+    std::cout << root->children[0]->val_str;
+    std::string buffer;
+    std::cin >> buffer;
+    buffer.push_back('\0');
+    std::cout << std::endl;
+    lxr::Lexer lex(std::move(buffer)); 
+    return lex.get_next_token();
 }
 
 int Interpreter::scout_type(ast::AST *root){

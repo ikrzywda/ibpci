@@ -38,6 +38,7 @@ class Token{
         void mutate(int id, std::string val);
         void mutate(int id, double val);
         Token() = default;
+        Token(Token &tok);
         ~Token() = default;
 };
 

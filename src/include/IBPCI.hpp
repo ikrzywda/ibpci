@@ -28,7 +28,6 @@ private:
     ast::AST *tree;
     method_map methods;
     computed_params cp;
-    return_ref *rr;
     void error(std::string message, ast::AST *leaf);
     void method_decl(ast::AST *root);
     return_ref method_call(ast::AST *root);

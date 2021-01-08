@@ -11,7 +11,7 @@
 namespace ast{
 
 enum ast_id{
-    START,
+    START, BLOCK,
     METHOD, METHOD_CALL, PARAM, RETURN,
     WHILE, FOR,
     IF, ELSE, 

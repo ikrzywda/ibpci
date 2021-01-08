@@ -48,6 +48,27 @@ ast::AST *Parser::stmt(){
     return NULL;
 }
 
+ast::AST *Parser::block(){
+    ast::AST *root = new ast::AST(ast::BLOCK);
+    while(token.id != tk::END){
+        root->push_child(stmt());
+    }
+    eat(tk::END);
+    return root;
+}
+
+ast::AST *Parser::if_block(){
+    ast::AST *root = new ast::AST(ast::BLOCK);
+    while(token.id != tk::END){
+        if(token.id == tk::ELSE){
+            return root;
+        }else{
+            root->push_child(stmt());
+        }
+    }
+    return root;
+}
+
 ast::AST *Parser::method(){
     eat(tk::METHOD);
     ast::AST *params = NULL;
@@ -64,10 +85,8 @@ ast::AST *Parser::method(){
     }
     eat(tk::RPAREN);
     if(params != NULL) root->push_child(params);
-    while(token.id != tk::END){
-        root->push_child(stmt());
-    }
-    eat(tk::END); eat(tk::METHOD);
+    root->push_child(block());
+    eat(tk::METHOD);
     return root;
 }   
 
@@ -82,10 +101,8 @@ ast::AST *Parser::loop_whl(){
     ast::AST *root = new ast::AST(token, ast::WHILE, lex.line_num);
     eat(tk::WHILE);
     root->push_child(cond());
-    while(token.id != tk::END){
-        root->push_child(stmt());
-    }
-    eat(tk::END); eat(tk::LOOP);
+    root->push_child(block());
+    eat(tk::LOOP);
     return root;
 }
 
@@ -97,10 +114,8 @@ ast::AST *Parser::loop_for(){
     eat(tk::TO);
     loop_range->push_child(expr());
     root->push_child(loop_range);
-    while(token.id != tk::END){
-        root->push_child(stmt());
-    }
-    eat(tk::END); eat(tk::LOOP);
+    root->push_child(block());
+    eat(tk::LOOP);
     return root;
 }
 
@@ -109,15 +124,11 @@ ast::AST *Parser::if_stmt(){
     eat(tk::IF);
     root->push_child(cond());
     eat(tk::THEN);
-    while(token.id != tk::END){
-        if(token.id == tk::ELSE){
-            root->push_child(else_stmt());
-        }else{
-            root->push_child(stmt());
-        }
+    root->push_child(if_block());
+    while(token.id == tk::ELSE){
+        root->push_child(else_stmt());
     }
-    eat(tk::END);
-    eat(tk::IF);
+    eat(tk::END); eat(tk::IF);
     return root;
 }
 
@@ -127,11 +138,8 @@ ast::AST *Parser::else_stmt(){
     if(token.id == tk::IF){
         root->push_child(elif_stmt());
         return root;
-        std::cout << "returned elif";
     }else{
-        while(token.id != tk::END){
-            root->push_child(stmt());        
-        }
+        root->push_child(if_block());
     }
     return root;
 }
@@ -141,12 +149,7 @@ ast::AST *Parser::elif_stmt(){
     ast::AST *root = new ast::AST(token, ast::IF, lex.line_num);
     root->push_child(cond());
     eat(tk::THEN);
-    while(token.id != tk::END){
-        if(token.id == tk::ELSE){
-            return root;
-        }
-        root->push_child(stmt());
-    }
+    root->push_child(if_block());
     return root;
 }
 

@@ -32,6 +32,7 @@ std::string id_to_str(int id){
         case LEQ: out = "<="; break;
         case GEQ: out = ">="; break;
         case EQ: out = "="; break;
+        case DNEQ: out = "!="; break;
         case IS: out = "=="; break;
         case DOT: out = "."; break;
         case COMMA: out = ","; break;
@@ -41,7 +42,6 @@ std::string id_to_str(int id){
         case ID_METHOD: out = "ID_METHOD"; break;
         case AND: out = "AND"; break;
         case OR: out = "OR"; break;
-        case NOT: out = "NOT"; break;
         case METHOD: out = "method"; break;
         case RETURN: out = "return"; break;
         case LOOP: out = "loop"; break;

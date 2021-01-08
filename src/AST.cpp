@@ -48,6 +48,7 @@ std::string id_to_str(int id){
     std::string out;
     switch(id){
         case START: out = "start"; return out;
+        case BLOCK: out = "block"; return out;
         case METHOD: out = "method"; return out;
         case METHOD_CALL: out = "method call"; return out;
         case PARAM: out = "param"; return out;

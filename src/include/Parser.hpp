@@ -17,6 +17,8 @@ class Parser{
         void eat(int token_id);
         void error(int token_id);
         ast::AST *stmt();
+        ast::AST *block();
+        ast::AST *if_block();
         ast::AST *method();
         ast::AST *ret();
         ast::AST *loop_whl();

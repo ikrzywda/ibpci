@@ -16,7 +16,7 @@ void Interpreter::interpret(){
             case ast::FOR: exec_for(a); break;
             case ast::METHOD: method_decl(a); break;
             case ast::METHOD_CALL: method_call(a); break;
-            case ast::RETURN: break;
+            case ast::RETURN: ret(a);
             case ast::STANDARD_METHOD: break;
             case ast::INPUT: input(a);
             case ast::OUTPUT: output(a); break;
@@ -41,11 +41,56 @@ void Interpreter::method_decl(ast::AST *root){
     }
 }
 
-void Interpreter::method_call(ast::AST *root){
+return_ref Interpreter::method_call(ast::AST *root){
     std::string method_name = root->val_str;
     collect_params(root);
     call_stack.push_AR(method_name, lookup_method(method_name, root));
     init_record(root);
+    return_ref ret(std::move(exec_block(call_stack.peek_for_root()->children[1])));
+    return ret;
+}
+
+return_ref Interpreter::ret(ast::AST *root){
+    tk::Token input_token;
+    return_ref r;
+    ast::AST *n = root->children[0];
+    if(n->id == ast::METHOD_CALL){
+        return method_call(n);
+    }else{
+        switch(n->id){
+            case ast::NUM:
+                r = std::make_unique<ar::Reference>(n->val_num);
+                break;
+            case ast::ID:
+                if(call_stack.peek_for_type(n->val_str, n) == ast::NUM){
+                    r = std::make_unique<ar::Reference>(call_stack.peek_for_num(n->val_str, n));
+                }else{
+                    r = std::make_unique<ar::Reference>(call_stack.peek_for_str(n->val_str, n));
+                }
+                break;
+            case ast::UN_MIN:
+                r = std::make_unique<ar::Reference>(binop(n->children[0]));
+                break;
+            case ast::INPUT:
+                if((input_token = input(n)).id == tk::STRING)
+                    r = std::make_unique<ar::Reference>(input_token.val_str); 
+                else r = std::make_unique<ar::Reference>(input_token.val_num); 
+                break;
+            case ast::STRING:
+                r = std::make_unique<ar::Reference>(n->val_str);
+            case ast::BINOP:
+                if(n->op == tk::PLUS){
+                    if(scout_type(n) == ast::STRING){
+                        r = std::make_unique<ar::Reference>(concatenation(n));
+                    }else r = std::make_unique<ar::Reference>(binop(n));
+        
+                }else r = std::make_unique<ar::Reference>(binop(n));
+                break;
+        }
+        call_stack.pop();
+        return r;
+    }
+    return NULL;
 }
 
 double Interpreter::binop(ast::AST *root){
@@ -57,6 +102,11 @@ double Interpreter::binop(ast::AST *root){
         case ast::ID: return call_stack.peek_for_num(root->val_str, root);
         case ast::UN_MIN: return -(binop(root->children[0]));
         case ast::STRING: error("incompatible type STRING, should be NUM", root);
+        case ast::METHOD_CALL:{
+            return_ref rr(std::move(method_call(root)));
+            if(rr.get()->get_type() == ast::NUM){ return rr.get()->get_num();
+            }else error("incompatible type STRING, should be NUM", root);
+            }
         case ast::BINOP:
             switch(root->op){
                 case tk::PLUS: 
@@ -84,6 +134,11 @@ std::string Interpreter::concatenation(ast::AST *root){
     switch(root->id){ 
         case ast::STRING: return root->val_str;
         case ast::ID: return call_stack.peek_for_str(root->val_str, root);
+        case ast::METHOD_CALL:{
+            return_ref rr(std::move(method_call(root)));
+            if(rr.get()->get_type() == ast::STRING){ return rr.get()->get_str();
+            }else error("incompatible type numerical, should be string", root);
+            }
         case ast::BINOP:
             if(root->op == tk::PLUS) 
                 return concatenation(root->children[0]) + concatenation(root->children[1]);
@@ -138,23 +193,22 @@ bool Interpreter::cmp_str(ast::AST *root){
     return concatenation(root->children[0]) == concatenation(root->children[1]);
 }
 
-void Interpreter::exec_block(ast::AST *root){
+return_ref Interpreter::exec_block(ast::AST *root){
     for(auto &a : root->children){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
             case ast::IF: exec_if(a); break;
             case ast::WHILE: exec_whl(a); break;
             case ast::FOR: exec_for(a); break;
-            case ast::METHOD: break;
-            case ast::METHOD_CALL: break;
-            case ast::RETURN: break;
+            case ast::METHOD_CALL: method_call(a);
+            case ast::RETURN: return ret(a);
             case ast::STANDARD_METHOD: break;
             case ast::INPUT: input(a); break;
             case ast::OUTPUT: output(a); break;
-            default: return;
+            default: return NULL;
         }
     }
-    return;
+    return NULL;
 }
 
 void Interpreter::assign(ast::AST *root){  
@@ -184,6 +238,14 @@ void Interpreter::assign(ast::AST *root){
         case ast::STRING:
             call_stack.push(var_name, rn->val_str);
             break;
+        case ast::METHOD_CALL:{
+            return_ref rr(std::move(method_call(root)));
+            if(rr.get()->get_type() == ast::NUM){ 
+                call_stack.push(var_name, rr.get()->get_num());
+            }else{
+                call_stack.push(var_name, rr.get()->get_str());
+            }
+            }
         case ast::BINOP:
             if(rn->op == tk::PLUS){
                 if(scout_type(rn) == ast::STRING){
@@ -361,7 +423,7 @@ int Interpreter::scout_type(ast::AST *root){
 void Interpreter::print_methods(){
     std::cout << "METHODS" << "\n==============================\n";
     for(auto &a : methods){
-        std::cout << a.first << " : " << a.second;
+        std::cout << a.first << " : " << a.second << std::endl;
     }
 }
 

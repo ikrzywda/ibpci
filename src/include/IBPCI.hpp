@@ -14,6 +14,7 @@ namespace IBPCI{
 
 typedef std::map<std::string, ast::AST*> method_map;
 typedef std::vector<std::unique_ptr<ar::Reference>> computed_params;
+typedef std::unique_ptr<ar::Reference> return_ref;
 
 struct variant_type{
     int active_type;
@@ -27,16 +28,18 @@ private:
     ast::AST *tree;
     method_map methods;
     computed_params cp;
+    return_ref *rr;
     void error(std::string message, ast::AST *leaf);
     void method_decl(ast::AST *root);
-    void method_call(ast::AST *root);
+    return_ref method_call(ast::AST *root);
+    return_ref ret(ast::AST *root);
     double binop(ast::AST *root);
     std::string concatenation(ast::AST *root);
     double unary_min(ast::AST *root);
     bool condition(ast::AST *root);
     bool cmp(ast::AST *root);
     bool cmp_str(ast::AST *root);
-    void exec_block(ast::AST *root);
+    return_ref exec_block(ast::AST *root);
     void assign(ast::AST *root);
     void exec_if(ast::AST *root);
     void exec_whl(ast::AST *root);

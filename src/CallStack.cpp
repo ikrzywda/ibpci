@@ -6,6 +6,10 @@ CallStack::CallStack(ast::AST *tree){
     call_stack.push(std::make_unique<ar::AR>("main", tree));
 }
 
+void CallStack::pop(){
+    call_stack.pop();
+}
+
 void CallStack::push_AR(std::string name, ast::AST *root){
     call_stack.push(std::make_unique<ar::AR>(name, root));
 }

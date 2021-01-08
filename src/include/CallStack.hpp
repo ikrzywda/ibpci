@@ -15,6 +15,7 @@ class CallStack{
 private:
     c_stck call_stack;
 public:
+    void pop();
     void push_AR(std::string name, ast::AST *root);
     void push(std::string key, double val);
     void push(std::string key, std::string val);

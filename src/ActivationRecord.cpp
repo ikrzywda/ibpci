@@ -76,6 +76,14 @@ void AR::insert(std::string key, std::string val){
     }
 }
 
+ast::AST *AR::lookup_root(){
+    return root;
+}
+
+std::string AR::lookup_name(){
+    return name;
+}
+
 double AR::lookup_num(std::string key, ast::AST *leaf){
     data::iterator it = contents.find(key);
     if(it != contents.end()){

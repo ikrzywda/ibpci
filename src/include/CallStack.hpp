@@ -15,8 +15,11 @@ class CallStack{
 private:
     c_stck call_stack;
 public:
+    void push_AR(std::string name, ast::AST *root);
     void push(std::string key, double val);
     void push(std::string key, std::string val);
+    ast::AST *peek_for_root();
+    std::string peek_for_name();
     double peek_for_num(std::string key, ast::AST *leaf);
     std::string peek_for_str(std::string key, ast::AST *leaf);
     int peek_for_type(std::string key, ast::AST *leaf);

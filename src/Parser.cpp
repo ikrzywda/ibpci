@@ -72,12 +72,12 @@ ast::AST *Parser::if_block(){
 
 ast::AST *Parser::method(){
     eat(tk::METHOD);
-    ast::AST *params = NULL;
+    ast::AST *params;
     ast::AST *root = new ast::AST(token, ast::METHOD, lex.line_num);
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(token.id == tk::ID_VAR){
-        params = new ast::AST(token, ast::PARAM, lex.line_num);
+        params = new ast::AST(ast::PARAM);
         params->push_child(factor());
         while(token.id != tk::RPAREN){
             eat(tk::COMMA);
@@ -197,16 +197,19 @@ ast::AST *Parser::assign(){
 
 ast::AST *Parser::method_call(){
     ast::AST *root = new ast::AST(token, ast::METHOD_CALL, lex.line_num); 
+    ast::AST *params;
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(token.id != tk::RPAREN){
-        root->push_child(expr());
+        params = new ast::AST(ast::PARAM);
+        params->push_child(expr());
         while(token.id != tk::RPAREN){
             eat(tk::COMMA);
-            root->push_child(expr());
+            params->push_child(expr());
         }
     }
     eat(tk::RPAREN);
+    root->push_child(params);
     return root;
 }
 

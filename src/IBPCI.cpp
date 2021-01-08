@@ -14,8 +14,8 @@ void Interpreter::interpret(){
             case ast::IF: exec_if(a); break;
             case ast::WHILE: exec_whl(a); break;
             case ast::FOR: exec_for(a); break;
-            case ast::METHOD: break;
-            case ast::METHOD_CALL: break;
+            case ast::METHOD: method_decl(a); break;
+            case ast::METHOD_CALL: method_call(a); break;
             case ast::RETURN: break;
             case ast::STANDARD_METHOD: break;
             case ast::INPUT: input(a);
@@ -24,12 +24,28 @@ void Interpreter::interpret(){
     }
     ast::delete_tree(tree);
     call_stack.test();
+    print_methods();
 }   
 
 void Interpreter::error(std::string message, ast::AST *leaf){
     std::cout << "SEMANTIC ERROR at line " << leaf->line_num
         << ": " << message << std::endl;
     exit(1);
+}
+
+void Interpreter::method_decl(ast::AST *root){
+    if(methods.find(root->val_str) == methods.end()){
+        methods.insert(std::make_pair(root->val_str, root));
+    }else{
+        error("Duplicate method declaration", root);
+    }
+}
+
+void Interpreter::method_call(ast::AST *root){
+    std::string method_name = root->val_str;
+    collect_params(root);
+    call_stack.push_AR(method_name, lookup_method(method_name, root));
+    init_record(root);
 }
 
 double Interpreter::binop(ast::AST *root){
@@ -265,6 +281,69 @@ tk::Token &Interpreter::input(ast::AST *root){
     return lex.get_next_token();
 }
 
+ast::AST *Interpreter::lookup_method(std::string key, ast::AST *leaf){
+    method_map::iterator it;
+    if((it = methods.find(key)) != methods.end()){
+        return it->second;
+    }else{
+        error(("Undefined reference to method " + key), leaf);
+    }
+    return NULL;
+}
+
+void Interpreter::collect_params(ast::AST *root){
+    tk::Token input_token;
+    for(auto &a : root->children[0]->children){
+        switch(a->id){
+            case ast::ID:
+                if(call_stack.peek_for_type(a->val_str, a) == ast::NUM){
+                    cp.push_back(std::make_unique<ar::Reference>(call_stack.peek_for_num(a->val_str, a)));
+                }else{
+                    cp.push_back(std::make_unique<ar::Reference>(call_stack.peek_for_str(a->val_str, a)));
+                }
+                break;
+            case ast::INPUT:
+                if((input_token = input(a)).id == tk::STRING)
+                    cp.push_back(std::make_unique<ar::Reference>(input_token.val_str));
+                else
+                    cp.push_back(std::make_unique<ar::Reference>(input_token.val_num));
+                break;
+            case ast::NUM:
+                cp.push_back(std::make_unique<ar::Reference>(a->val_num));
+                break;
+            case ast::STRING:
+                cp.push_back(std::make_unique<ar::Reference>(a->val_str));
+                break;
+            case ast::BINOP:
+                if(a->op == tk::PLUS){
+                    if(scout_type(a) == ast::STRING){
+                        concatenation(a);
+                        cp.push_back(std::make_unique<ar::Reference>(concatenation(a)));
+                    }else cp.push_back(std::make_unique<ar::Reference>(binop(a)));
+                }else cp.push_back(std::make_unique<ar::Reference>(binop(a)));
+                break;
+            }
+    }
+}
+
+void Interpreter::init_record(ast::AST *root){
+    ast::AST *param_proto = call_stack.peek_for_root()->children[0];
+    std::string param_name;
+    if(cp.size() == param_proto->children.size()){
+        for(unsigned i = 0; i < cp.size(); ++i){
+            param_name = param_proto->children[i]->val_str;
+            if(cp[i].get()->get_type() == ast::NUM)
+                call_stack.push(param_name, cp[i].get()->get_num());
+            else
+                call_stack.push(param_name, cp[i].get()->get_str());
+        }
+    }else{
+        error(("Incorrect number of arguments in the call of function " 
+                    + call_stack.peek_for_name()), root); 
+    }
+    cp.clear();
+}
+
 int Interpreter::scout_type(ast::AST *root){
     while(root != NULL){ 
         if(root->id == ast::NUM 
@@ -277,6 +356,13 @@ int Interpreter::scout_type(ast::AST *root){
         }
     }
     return -1;
+}
+
+void Interpreter::print_methods(){
+    std::cout << "METHODS" << "\n==============================\n";
+    for(auto &a : methods){
+        std::cout << a.first << " : " << a.second;
+    }
 }
 
 };

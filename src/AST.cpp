@@ -55,6 +55,7 @@ std::string id_to_str(int id){
         case RETURN: out = "return"; return out;
         case WHILE: out = "while"; return out;
         case FOR: out = "for"; return out;
+        case RANGE: out = "range"; return out;
         case IF: out = "if"; return out;
         case ELSE:  out = "else"; return out;
         case COND:  out = "cond"; return out;

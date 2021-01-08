@@ -12,8 +12,8 @@ void Interpreter::interpret(){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
             case ast::IF: exec_if(a); break;
-            case ast::WHILE: break;
-            case ast::FOR: break;
+            case ast::WHILE: exec_whl(a); break;
+            case ast::FOR: exec_for(a); break;
             case ast::METHOD: break;
             case ast::METHOD_CALL: break;
             case ast::RETURN: break;
@@ -128,8 +128,8 @@ void Interpreter::exec_block(ast::AST *root){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
             case ast::IF: exec_if(a); break;
-            case ast::WHILE: break;
-            case ast::FOR: break;
+            case ast::WHILE: exec_whl(a); break;
+            case ast::FOR: exec_for(a); break;
             case ast::METHOD: break;
             case ast::METHOD_CALL: break;
             case ast::RETURN: break;
@@ -188,6 +188,31 @@ void Interpreter::exec_if(ast::AST *root){
                     exec_block(n->children[0]);
                 }
             }
+        }
+    }
+}
+
+void Interpreter::exec_whl(ast::AST *root){
+    while(condition(root->children[0])){
+        exec_block(root->children[1]);
+    }
+}
+
+void Interpreter::exec_for(ast::AST *root){
+    ast::AST *rng = root->children[0];
+    ast::AST *block = root->children[1];
+    int from = binop(rng->children[1]);
+    int to = binop(rng->children[2]);
+    call_stack.push(rng->children[0]->val_str, from);
+    if(from < to){
+        for(; from <= to; ++from){
+            call_stack.push(rng->children[0]->val_str, from);
+            exec_block(block);
+        }
+    }else{
+        for(; from >= to; --from){
+            call_stack.push(rng->children[0]->val_str, from);
+            exec_block(block);
         }
     }
 }

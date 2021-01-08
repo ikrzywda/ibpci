@@ -98,7 +98,7 @@ ast::AST *Parser::ret(){
 }
 
 ast::AST *Parser::loop_whl(){
-    ast::AST *root = new ast::AST(token, ast::WHILE, lex.line_num);
+    ast::AST *root = new ast::AST(ast::WHILE);
     eat(tk::WHILE);
     root->push_child(cond());
     root->push_child(block());
@@ -107,8 +107,9 @@ ast::AST *Parser::loop_whl(){
 }
 
 ast::AST *Parser::loop_for(){
-    ast::AST *root = new ast::AST(token, ast::FOR, lex.line_num);
-    ast::AST *loop_range = factor();
+    ast::AST *root = new ast::AST(ast::FOR);
+    ast::AST *loop_range = new ast::AST(ast::RANGE);
+    loop_range->push_child(factor());
     eat(tk::FROM);
     loop_range->push_child(expr());
     eat(tk::TO);

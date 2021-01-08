@@ -30,6 +30,8 @@ private:
     void exec_block(ast::AST *root);
     void assign(ast::AST *root);
     void exec_if(ast::AST *root);
+    void exec_whl(ast::AST *root);
+    void exec_for(ast::AST *root);
     void output(ast::AST *root);
     int scout_type(ast::AST *root);
 public:

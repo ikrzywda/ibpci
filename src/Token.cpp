@@ -2,21 +2,43 @@
 
 namespace tk{
 
-Token::Token(Token &tok) : id(tok.id){
-    if(id == tk::NUM) 
+Token::Token(Token &tok) : id(tok.id), line(tok.line){
+    if(id == NUM) 
         val_num = tok.val_num;
+    else if(id >= PLUS && id <= COMMA)
+        op = id;
     else
-        val_num = tok.val_num;
+        val_str = tok.val_str;
 }
 
-void Token::mutate(int id, std::string val){
-    Token::id = id;
-    Token::val_str = val;
+Token::Token(Token *tok) : id(tok->id), line(tok->line){
+    if(id == NUM) 
+        val_num = tok->val_num;
+    else if(id >= PLUS && id <= COMMA)
+        op = id;
+    else
+        val_str = tok->val_str;
 }
 
-void Token::mutate(int id, double val){
-    Token::id = id;
-    Token::val_num = val;
+void Token::mutate(int id, std::string val, unsigned ln){
+    this->id = id;
+    val_str = val;
+    line = ln;
+}
+
+void Token::mutate(int id, double val, unsigned ln){
+    this->id = id;
+    val_num = val;
+    line = ln;
+}
+
+void Token::print(){
+    if(id == NUM)
+        std::cout << val_num;
+    else if(id >= tk::PLUS && id <= tk::COMMA)
+        std::cout << id_to_str(id);
+    else
+        std::cout << val_str;
 }
 
 std::string id_to_str(int id){

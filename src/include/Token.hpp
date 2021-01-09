@@ -15,7 +15,7 @@ enum id{
     LT, GT, LEQ, GEQ, DNEQ, EQ, IS,
     AND, OR, 
     DOT, COMMA,
-    INT, FLOAT, NUM, STRING,
+    INT, FLOAT, NUM, STRING, BOOL,
     ID_VAR, ID_METHOD,
     METHOD, RETURN,
     LOOP, FROM, TO, WHILE, UNTIL,
@@ -32,13 +32,16 @@ enum id{
 
 class Token{
     public:
+        int id, op;
         double val_num;
         std::string val_str;
-        int id;
-        void mutate(int id, std::string val);
-        void mutate(int id, double val);
+        unsigned line;
+        void mutate(int id, std::string val, unsigned ln);
+        void mutate(int id, double val, unsigned ln);
+        void print();
         Token() = default;
         Token(Token &tok);
+        Token(Token *tok);
         ~Token() = default;
 };
 

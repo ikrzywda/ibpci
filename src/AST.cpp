@@ -2,18 +2,15 @@
 
 namespace ast{
 
-AST::AST(tk::Token &token, int node_id, unsigned ln){
+AST::AST(tk::Token &token, int node_id) : token(token){
     id = node_id;
-    line_num = ln;
-    if(token.id == tk::NUM)
-        val_num = token.val_num;
-    else if(token.id >= tk::PLUS && token.id <= tk::COMMA)
-        op = token.id;
-    else
-        val_str = token.val_str;
+    is_terminal = true;
 }
 
-AST::AST(int node_id){ id = node_id; val_str = id_to_str(node_id);}
+AST::AST(int node_id){ 
+    id = node_id; 
+    is_terminal = false;
+}
 
 void AST::push_child(AST *child){
     children.push_back(child);
@@ -24,12 +21,8 @@ void print_tree(AST *root, int offset){
     std::cout << std::setw(offset); 
     std::cout << "\u2560";
     std::cout << "\u2550\u2550[";
-    if(root->id == ast::NUM)
-        std::cout << root->val_num; 
-    else if(root->id >= ast::BINOP && root->id <= ast::CMP)
-        std::cout << tk::id_to_str(root->op);
-    else
-        std::cout << root->val_str; 
+    if(root->is_terminal) root->token.print();
+    else std::cout << id_to_str(root->id);
     std::cout << "]\n";
     for(auto *a : root->children){
         print_tree(a, offset+4);

@@ -47,6 +47,7 @@ return_ref Interpreter::method_call(ast::AST *root){
     call_stack.push_AR(method_name, lookup_method(method_name, root));
     init_record(root);
     return_ref ret(std::move(exec_block(call_stack.peek_for_root()->children[1])));
+    call_stack.pop();
     return ret;
 }
 
@@ -59,35 +60,34 @@ return_ref Interpreter::ret(ast::AST *root){
     }else{
         switch(n->id){
             case ast::NUM:
-                r = std::make_unique<ar::Reference>(n->val_num);
+                r = std::make_unique<rf::Reference>(n->val_num);
                 break;
             case ast::ID:
                 if(call_stack.peek_for_type(n->val_str, n) == ast::NUM){
-                    r = std::make_unique<ar::Reference>(call_stack.peek_for_num(n->val_str, n));
+                    r = std::make_unique<rf::Reference>(call_stack.peek_for_num(n->val_str, n));
                 }else{
-                    r = std::make_unique<ar::Reference>(call_stack.peek_for_str(n->val_str, n));
+                    r = std::make_unique<rf::Reference>(call_stack.peek_for_str(n->val_str, n));
                 }
                 break;
             case ast::UN_MIN:
-                r = std::make_unique<ar::Reference>(binop(n->children[0]));
+                r = std::make_unique<rf::Reference>(binop(n->children[0]));
                 break;
             case ast::INPUT:
                 if((input_token = input(n)).id == tk::STRING)
-                    r = std::make_unique<ar::Reference>(input_token.val_str); 
-                else r = std::make_unique<ar::Reference>(input_token.val_num); 
+                    r = std::make_unique<rf::Reference>(input_token.val_str); 
+                else r = std::make_unique<rf::Reference>(input_token.val_num); 
                 break;
             case ast::STRING:
-                r = std::make_unique<ar::Reference>(n->val_str);
+                r = std::make_unique<rf::Reference>(n->val_str);
             case ast::BINOP:
                 if(n->op == tk::PLUS){
                     if(scout_type(n) == ast::STRING){
-                        r = std::make_unique<ar::Reference>(concatenation(n));
-                    }else r = std::make_unique<ar::Reference>(binop(n));
+                        r = std::make_unique<rf::Reference>(concatenation(n));
+                    }else r = std::make_unique<rf::Reference>(binop(n));
         
-                }else r = std::make_unique<ar::Reference>(binop(n));
+                }else r = std::make_unique<rf::Reference>(binop(n));
                 break;
         }
-        call_stack.pop();
         return r;
     }
     return NULL;
@@ -215,7 +215,6 @@ void Interpreter::assign(ast::AST *root){
     std::string var_name = root->children[0]->val_str;
     tk::Token input_token;
     ast::AST *rn = root->children[1]; 
-    variant_type vt;
     switch(rn->id){
         case ast::NUM:
             call_stack.push(var_name, rn->val_num);
@@ -249,7 +248,6 @@ void Interpreter::assign(ast::AST *root){
         case ast::BINOP:
             if(rn->op == tk::PLUS){
                 if(scout_type(rn) == ast::STRING){
-                    concatenation(rn);
                     call_stack.push(var_name, concatenation(rn));
                 }else call_stack.push(var_name, binop(rn));
             }else call_stack.push(var_name, binop(rn));
@@ -359,30 +357,30 @@ void Interpreter::collect_params(ast::AST *root){
         switch(a->id){
             case ast::ID:
                 if(call_stack.peek_for_type(a->val_str, a) == ast::NUM){
-                    cp.push_back(std::make_unique<ar::Reference>(call_stack.peek_for_num(a->val_str, a)));
+                    cp.push_back(std::make_unique<rf::Reference>(call_stack.peek_for_num(a->val_str, a)));
                 }else{
-                    cp.push_back(std::make_unique<ar::Reference>(call_stack.peek_for_str(a->val_str, a)));
+                    cp.push_back(std::make_unique<rf::Reference>(call_stack.peek_for_str(a->val_str, a)));
                 }
                 break;
             case ast::INPUT:
                 if((input_token = input(a)).id == tk::STRING)
-                    cp.push_back(std::make_unique<ar::Reference>(input_token.val_str));
+                    cp.push_back(std::make_unique<rf::Reference>(input_token.val_str));
                 else
-                    cp.push_back(std::make_unique<ar::Reference>(input_token.val_num));
+                    cp.push_back(std::make_unique<rf::Reference>(input_token.val_num));
                 break;
             case ast::NUM:
-                cp.push_back(std::make_unique<ar::Reference>(a->val_num));
+                cp.push_back(std::make_unique<rf::Reference>(a->val_num));
                 break;
             case ast::STRING:
-                cp.push_back(std::make_unique<ar::Reference>(a->val_str));
+                cp.push_back(std::make_unique<rf::Reference>(a->val_str));
                 break;
             case ast::BINOP:
                 if(a->op == tk::PLUS){
                     if(scout_type(a) == ast::STRING){
                         concatenation(a);
-                        cp.push_back(std::make_unique<ar::Reference>(concatenation(a)));
-                    }else cp.push_back(std::make_unique<ar::Reference>(binop(a)));
-                }else cp.push_back(std::make_unique<ar::Reference>(binop(a)));
+                        cp.push_back(std::make_unique<rf::Reference>(concatenation(a)));
+                    }else cp.push_back(std::make_unique<rf::Reference>(binop(a)));
+                }else cp.push_back(std::make_unique<rf::Reference>(binop(a)));
                 break;
             }
     }
@@ -418,6 +416,10 @@ int Interpreter::scout_type(ast::AST *root){
         }
     }
     return -1;
+}
+
+int Interpreter::scout_return_type(int type){
+    return type; 
 }
 
 void Interpreter::print_methods(){

@@ -5,7 +5,6 @@
 #include "CallStack.hpp"
 #include "Token.hpp"
 #include "Lexer.hpp"
-#include <stack>
 #include <map>
 #include <memory>
 #include <utility>
@@ -13,14 +12,8 @@
 namespace IBPCI{
 
 typedef std::map<std::string, ast::AST*> method_map;
-typedef std::vector<std::unique_ptr<ar::Reference>> computed_params;
-typedef std::unique_ptr<ar::Reference> return_ref;
-
-struct variant_type{
-    int active_type;
-    double val_num;
-    std::string val_str;
-};
+typedef std::vector<std::unique_ptr<rf::Reference>> computed_params;
+typedef std::unique_ptr<rf::Reference> return_ref;
 
 class Interpreter{
 private:
@@ -49,6 +42,7 @@ private:
     void collect_params(ast::AST *root);
     void init_record(ast::AST *root);
     int scout_type(ast::AST *root);
+    int scout_return_type(int type);
     void print_methods();
 public:
     Interpreter(ast::AST *tree);

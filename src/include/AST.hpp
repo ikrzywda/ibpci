@@ -27,12 +27,11 @@ enum ast_id{
 class AST{
 public:
     int id;
-    int op;
-    unsigned line_num;
-    double val_num;
-    std::string val_str;
+    tk::Token token;
+    bool is_terminal;
+    std::string non_terminal;
     std::vector<AST*> children;
-    AST(tk::Token &token, int node_id, unsigned ln);
+    AST(tk::Token &token, int node_id);
     AST(int node_id);
     void push_child(AST *child);
 };

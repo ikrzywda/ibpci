@@ -35,8 +35,8 @@ void test_parser(char *filename){
 void test_interpreter(char *filename){
     prs::Parser parser(get_buffer(filename)); 
     ast::AST *root = parser.parse();
-    IBPCI::Interpreter ibpci(root);
-    ibpci.interpret();
+    //IBPCI::Interpreter ibpci(root);
+    //ibpci.interpret();
 }
 
 }

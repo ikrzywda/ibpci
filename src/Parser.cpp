@@ -73,7 +73,7 @@ ast::AST *Parser::if_block(){
 ast::AST *Parser::method(){
     eat(tk::METHOD);
     ast::AST *params;
-    ast::AST *root = new ast::AST(token, ast::METHOD, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::METHOD);
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(token.id == tk::ID_VAR){
@@ -92,7 +92,7 @@ ast::AST *Parser::method(){
 }   
 
 ast::AST *Parser::ret(){
-    ast::AST *root = new ast::AST(token, ast::RETURN, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::RETURN);
     eat(tk::RETURN);
     root->push_child(expr());
     return root;
@@ -122,7 +122,7 @@ ast::AST *Parser::loop_for(){
 }
 
 ast::AST *Parser::if_stmt(){
-    ast::AST *root = new ast::AST(token, ast::IF, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::IF);
     eat(tk::IF);
     root->push_child(cond());
     eat(tk::THEN);
@@ -135,7 +135,7 @@ ast::AST *Parser::if_stmt(){
 }
 
 ast::AST *Parser::else_stmt(){
-    ast::AST *root = new ast::AST(token, ast::ELSE, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::ELSE);
     eat(tk::ELSE);
     if(token.id == tk::IF){
         root->push_child(elif_stmt());
@@ -148,7 +148,7 @@ ast::AST *Parser::else_stmt(){
 
 ast::AST *Parser::elif_stmt(){
     eat(tk::IF);
-    ast::AST *root = new ast::AST(token, ast::IF, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::IF);
     root->push_child(cond());
     eat(tk::THEN);
     root->push_child(if_block());
@@ -160,7 +160,7 @@ ast::AST *Parser::cond(){
     root = cmp();
     while(token.id == tk::AND
             || token.id == tk::OR){
-        new_node = new ast::AST(token, ast::COND, lex.line_num);
+        new_node = new ast::AST(token, ast::COND);
         new_node->push_child(root);
         root = new_node;
         eat(token.id);
@@ -178,7 +178,7 @@ ast::AST *Parser::cmp(){
             || token.id == tk::DNEQ
             || token.id == tk::GEQ
             || token.id == tk::LEQ){
-        new_node = new ast::AST(token, ast::CMP, lex.line_num);  
+        new_node = new ast::AST(token, ast::CMP);  
         new_node->push_child(root);
         root = new_node;
         eat(token.id);
@@ -196,7 +196,7 @@ ast::AST *Parser::assign(){
 }
 
 ast::AST *Parser::method_call(){
-    ast::AST *root = new ast::AST(token, ast::METHOD_CALL, lex.line_num); 
+    ast::AST *root = new ast::AST(token, ast::METHOD_CALL); 
     ast::AST *params;
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
@@ -218,7 +218,7 @@ ast::AST *Parser::expr(){
     root = term();
     while(token.id == tk::PLUS 
             || token.id == tk::MINUS){
-        new_node = new ast::AST(token, ast::BINOP, lex.line_num);
+        new_node = new ast::AST(token, ast::BINOP);
         new_node->push_child(root);
         root = new_node;
         eat(token.id);
@@ -234,7 +234,7 @@ ast::AST *Parser::term(){
             token.id == tk::DIV_WQ ||
             token.id == tk::DIV_WOQ ||
             token.id == tk::MOD){
-        new_node = new ast::AST(token, ast::BINOP, lex.line_num);
+        new_node = new ast::AST(token, ast::BINOP);
         new_node->push_child(subroot);
         subroot = new_node;
         eat(token.id);
@@ -247,11 +247,11 @@ ast::AST *Parser::factor(){
     ast::AST *new_node;
     switch(token.id){
         case tk::NUM:
-            new_node = new ast::AST(token, ast::NUM, lex.line_num);
+            new_node = new ast::AST(token, ast::NUM);
             eat(tk::NUM);
             return new_node;
         case tk::MINUS:
-            new_node = new ast::AST(token, ast::UN_MIN, lex.line_num);
+            new_node = new ast::AST(token, ast::UN_MIN);
             eat(tk::MINUS);
             if(token.id == tk::LPAREN){
             eat(tk::LPAREN);
@@ -260,11 +260,11 @@ ast::AST *Parser::factor(){
         }else new_node->push_child(factor());
             return new_node;
         case tk::STRING:
-            new_node = new ast::AST(token, ast::STRING, lex.line_num);
+            new_node = new ast::AST(token, ast::STRING);
             eat(tk::STRING);
             return new_node;
         case tk::ID_VAR:
-            new_node = new ast::AST(token, ast::ID, lex.line_num);
+            new_node = new ast::AST(token, ast::ID);
             eat(tk::ID_VAR);
             while(token.id == tk::LSQBR){
                 eat(tk::LSQBR);
@@ -288,11 +288,11 @@ ast::AST *Parser::factor(){
         case tk::NEW_ARR: return arr_dyn();
         case tk::NEW_STACK: 
             eat(tk::NEW_STACK); eat(tk::LPAREN); eat(tk::RPAREN);
-            new_node = new ast::AST(token, ast::STACK, lex.line_num);
+            new_node = new ast::AST(token, ast::STACK);
             return new_node;
         case tk::NEW_QUEUE:
             eat(tk::NEW_QUEUE); eat(tk::LPAREN); eat(tk::RPAREN);
-            new_node = new ast::AST(token, ast::QUEUE, lex.line_num);
+            new_node = new ast::AST(token, ast::QUEUE);
             return new_node;
         case tk::INPUT: return in_out();
         case tk::OUTPUT: return in_out();
@@ -303,7 +303,7 @@ ast::AST *Parser::factor(){
 }
 
 ast::AST *Parser::arr(){
-    ast::AST *root = new ast::AST(token, ast::ARR, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::ARR);
     eat(tk::LSQBR);
     if(token.id == tk::NUM
             || token.id == tk::STRING
@@ -320,7 +320,7 @@ ast::AST *Parser::arr(){
 
 ast::AST *Parser::arr_dyn(){
     eat(tk::NEW_ARR);
-    ast::AST *root = new ast::AST(token, ast::ARR_DYN, lex.line_num);
+    ast::AST *root = new ast::AST(token, ast::ARR_DYN);
     eat(tk::LPAREN);
     root->push_child(expr());
     while(token.id != tk::RPAREN){
@@ -346,7 +346,7 @@ ast::AST *Parser::std_method(){
             || token.id == tk::IS_EMPTY
             || token.id == tk::OUTPUT
             || token.id == tk::INPUT){
-        root = new ast::AST(token, ast::STANDARD_METHOD, lex.line_num);
+        root = new ast::AST(token, ast::STANDARD_METHOD);
         eat(token.id);
         eat(tk::LPAREN);
         if(token.id != tk::RPAREN){
@@ -363,8 +363,8 @@ ast::AST *Parser::std_method(){
 
 ast::AST *Parser::in_out(){
     ast::AST *root;
-    if(token.id == tk::INPUT) root = new ast::AST(token, ast::INPUT, lex.line_num);
-    else if(token.id == tk::OUTPUT) root = new ast::AST(token, ast::OUTPUT, lex.line_num);
+    if(token.id == tk::INPUT) root = new ast::AST(token, ast::INPUT);
+    else if(token.id == tk::OUTPUT) root = new ast::AST(token, ast::OUTPUT);
     eat(token.id); eat(tk::LPAREN);
     root->push_child(expr());
     while(token.id != tk::RPAREN){

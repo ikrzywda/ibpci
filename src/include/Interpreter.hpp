@@ -26,15 +26,15 @@ private:
     void method_decl(ast::AST *root);
     tk::Token *method_call(ast::AST *root);
     void assign(ast::AST *root);
-    tk::Token *binop(ast::AST *root);
+    tk::Token *compute(ast::AST *root);
+    tk::Token *binop(tk::Token *l, tk::Token *r, int op);
     bool check_types(tk::Token *l, tk::Token *r);
     tk::Token *add(tk::Token *l, tk::Token *r);
-    tk::Token *subtract(tk::Token *l, tk::Token *r);
-    tk::Token *multiply(tk::Token *l, tk::Token *r);
-    tk::Token *divide(tk::Token *l, tk::Token *r);
-    tk::Token *int_div(tk::Token *l, tk::Token *r);
-    tk::Token *modulo(tk::Token *l, tk::Token *r);
+    tk::Token *divide(tk::Token *l, tk::Token *r, int op);
     tk::Token *negative(tk::Token *val);
+    bool condition(ast::AST *root);
+    bool numerical_comparison(tk::Token *l, tk::Token *r, int op);
+    bool equal(tk::Token *l, tk::Token *r);
 public:
     Interpreter(ast::AST *tree);
     void interpret();

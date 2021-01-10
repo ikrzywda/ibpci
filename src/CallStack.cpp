@@ -14,12 +14,8 @@ void CallStack::push_AR(std::string name, ast::AST *root){
     call_stack.push(std::make_unique<ar::AR>(name, root));
 }
 
-void CallStack::push(std::string key, double val){
-    call_stack.top().get()->insert(key, val);
-}
-
-void CallStack::push(std::string key, std::string val){
-    call_stack.top().get()->insert(key, val);
+void CallStack::push(std::string key, tk::Token *terminal){
+    call_stack.top().get()->insert(key, terminal);
 }
 
 ast::AST *CallStack::peek_for_root(){
@@ -30,16 +26,8 @@ std::string CallStack::peek_for_name(){
     return call_stack.top().get()->lookup_name();
 }
 
-double CallStack::peek_for_num(std::string key, ast::AST *leaf){
-    return call_stack.top().get()->lookup_num(key, leaf);
-}
-
-std::string CallStack::peek_for_str(std::string key, ast::AST *leaf){
-    return call_stack.top().get()->lookup_str(key, leaf);
-}
-
-int CallStack::peek_for_type(std::string key, ast::AST *leaf){
-    return call_stack.top().get()->lookup_type(key, leaf);
+tk::Token *CallStack::peek(std::string key, ast::AST *leaf){
+    return call_stack.top().get()->lookup(key, leaf);
 }
 
 bool CallStack::empty(){

@@ -20,6 +20,16 @@ Token::Token(Token *tok) : id(tok->id), line(tok->line){
         val_str = tok->val_str;
 }
 
+Token::Token(std::string val){
+    id = tk::STRING;
+    val_str = val;
+}
+
+Token::Token(double val){
+    id = tk::NUM;
+    val_num = val;
+}
+
 void Token::mutate(int id, std::string val, unsigned ln){
     this->id = id;
     val_str = val;
@@ -39,6 +49,7 @@ void Token::print(){
         std::cout << id_to_str(id);
     else
         std::cout << val_str;
+    std::cout << std::endl;
 }
 
 std::string id_to_str(int id){

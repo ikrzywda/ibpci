@@ -1,0 +1,4 @@
+A = "Hello"
+B = 10
+C = 10 + 10
+D = "Hello " + "world"

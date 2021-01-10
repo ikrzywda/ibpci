@@ -5,7 +5,7 @@
 #include "Parser.hpp"
 #include "AST.hpp"
 #include "ActivationRecord.hpp"
-#include "IBPCI.hpp"
+#include "Interpreter.hpp"
 #include <fstream>
 #include <iostream>
 

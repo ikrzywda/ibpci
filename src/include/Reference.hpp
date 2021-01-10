@@ -15,11 +15,9 @@ private:
     tk::Token token;
 public:
     Reference(ast::AST *terminal);
-    Reference() = default;
-    ~Reference() = default;
-    Reference(const Reference&) = default;
-    Reference(Reference&&) = default;
+    Reference(tk::Token *terminal);
     void set_value(ast::AST *terminal);
+    void set_value(tk::Token *terminal);
     tk::Token *get_token();
     void print();
 };

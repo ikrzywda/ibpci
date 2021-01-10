@@ -3,6 +3,7 @@
 
 #include "ActivationRecord.hpp"
 #include "AST.hpp"
+#include "Token.hpp"
 #include <stack>
 #include <memory>
 #include <string>
@@ -17,13 +18,10 @@ private:
 public:
     void pop();
     void push_AR(std::string name, ast::AST *root);
-    void push(std::string key, double val);
-    void push(std::string key, std::string val);
+    void push(std::string key, tk::Token *terminal);
     ast::AST *peek_for_root();
     std::string peek_for_name();
-    double peek_for_num(std::string key, ast::AST *leaf);
-    std::string peek_for_str(std::string key, ast::AST *leaf);
-    int peek_for_type(std::string key, ast::AST *leaf);
+    tk::Token *peek(std::string key, ast::AST *leaf);
     bool empty();
     void test();
     CallStack(ast::AST *tree);

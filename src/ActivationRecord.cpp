@@ -2,7 +2,6 @@
 
 namespace ar{
 
-
 AR::AR(std::string name, ast::AST *root){
     this->name = name; 
     this->root = root;
@@ -26,9 +25,17 @@ void AR::error_itp(std::string key, int type, ast::AST *leaf){
 
 void AR::insert(std::string key, ast::AST *root){
     if(contents.find(key) == contents.end()){
-        contents[key] = std::make_unique<rf::Reference>(rf::Reference(root));
+        contents[key] = std::make_unique<rf::Reference>(root);
     }else{
         contents[key].get()->set_value(root);
+    }
+}
+
+void AR::insert(std::string key, tk::Token *terminal){
+    if(contents.find(key) == contents.end()){
+        contents[key] = std::make_unique<rf::Reference>(terminal);
+    }else{
+        contents[key].get()->set_value(terminal);
     }
 }
 

@@ -39,9 +39,11 @@ class Token{
         void mutate(int id, std::string val, unsigned ln);
         void mutate(int id, double val, unsigned ln);
         void print();
-        Token() = default;
+        Token(std::string val);
+        Token(double val);
         Token(Token &tok);
         Token(Token *tok);
+        Token() = default;
         ~Token() = default;
 };
 

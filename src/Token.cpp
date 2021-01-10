@@ -49,7 +49,6 @@ void Token::print(){
         std::cout << id_to_str(id);
     else
         std::cout << val_str;
-    std::cout << std::endl;
 }
 
 std::string id_to_str(int id){

@@ -60,8 +60,8 @@ void AR::print(){
     for(auto &a : contents){
         std::cout << a.first << " : "; 
         a.second.get()->print();
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
 }
 
 }

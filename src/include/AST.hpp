@@ -21,7 +21,7 @@ enum ast_id{
     ID,
     ARR, ARR_DYN, ARR_ACC,
     STACK, QUEUE,
-    STANDARD_METHOD, INPUT, OUTPUT
+    STD_RETURN, STD_VOID, INPUT, OUTPUT
 };
 
 class AST{

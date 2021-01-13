@@ -190,8 +190,13 @@ ast::AST *Parser::cmp(){
 ast::AST *Parser::assign(){
     ast::AST *root = new ast::AST(ast::ASSIGN);
     root->push_child(factor());
-    eat(tk::EQ);
-    root->push_child(expr());
+    if(root->children[0]->id == ast::STD_VOID){ 
+        root->id = ast::STD_VOID;
+        return root;
+    }else{
+        eat(tk::EQ);
+        root->push_child(expr());
+    }
     return root;
 }
 
@@ -266,16 +271,19 @@ ast::AST *Parser::factor(){
         case tk::ID_VAR:
             new_node = new ast::AST(token, ast::ID);
             eat(tk::ID_VAR);
-            while(token.id == tk::LSQBR){
-                eat(tk::LSQBR);
-                new_node->push_child(expr());
-                eat(tk::RSQBR);
+            if(token.id == tk::LSQBR){
+                while(token.id == tk::LSQBR){
+                    eat(tk::LSQBR);
+                    new_node->push_child(expr());
+                    eat(tk::RSQBR);
+                }
+                if(!new_node->children.empty()) new_node->id = ast::ARR_ACC;
             }
             if(token.id == tk::DOT){ 
                 new_node->push_child(std_method());
+                new_node->id = new_node->children[0]->id;
                 return new_node;
             }
-            if(!new_node->children.empty()) new_node->id = ast::ARR_ACC;
             return new_node;
         case tk::ID_METHOD:
             return method_call();
@@ -335,29 +343,29 @@ ast::AST *Parser::std_method(){
     eat(tk::DOT);
     ast::AST *root;
     if(token.id == tk::LENGTH
-            || token.id == tk::ADD_ITEM
             || token.id == tk::GET_NEXT
-            || token.id == tk::RESET_NEXT
             || token.id == tk::HAS_NEXT
-            || token.id == tk::PUSH
             || token.id == tk::POP
-            || token.id == tk::ENQUEUE
             || token.id == tk::DEQUEUE
             || token.id == tk::IS_EMPTY
-            || token.id == tk::OUTPUT
             || token.id == tk::INPUT){
-        root = new ast::AST(token, ast::STANDARD_METHOD);
+        root = new ast::AST(token, ast::STD_RETURN);
         eat(token.id);
-        eat(tk::LPAREN);
-        if(token.id != tk::RPAREN){
-            root->push_child(expr());
-            while(token.id != tk::RPAREN){
-                eat(tk::COMMA);
-                root->push_child(expr());
-            }
-        }
-        eat(tk::RPAREN);
+    }else if(token.id == tk::GET_NEXT 
+            || token.id == tk::PUSH 
+            || token.id == tk::ENQUEUE){
+        root = new ast::AST(token, ast::STD_VOID);
+        eat(token.id);
     }
+    eat(tk::LPAREN);
+    if(token.id != tk::RPAREN){
+        root->push_child(expr());
+        while(token.id != tk::RPAREN){
+            eat(tk::COMMA);
+            root->push_child(expr());
+        }
+    }
+    eat(tk::RPAREN);
     return root;
 }
 

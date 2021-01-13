@@ -94,6 +94,14 @@ std::string id_to_str(int id){
         case END: out = "end"; break;
         case OUTPUT: out = "output"; break;
         case INPUT: out = "intput"; break;
+        case LENGTH: out = "length"; break;
+        case GET_NEXT : out = "get_next"; break;
+        case POP : out = "pop"; break;
+        case DEQUEUE : out = "dequeue"; break;
+        case HAS_NEXT : out = "has_next"; break;
+        case PUSH : out = "push"; break;
+        case ENQUEUE : out = "enqueue"; break;
+        case IS_EMPTY: out = "is_empty"; break;
         default: out = "NULL"; break;
     }
     return out;

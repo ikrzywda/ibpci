@@ -36,6 +36,7 @@ class Parser{
         ast::AST *arr();
         ast::AST *arr_dyn();
         ast::AST *std_method();
+        ast::AST *std_void();
         ast::AST *in_out();
     public:
         Parser(std::string &&buffer);

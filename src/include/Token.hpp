@@ -22,11 +22,8 @@ enum id{
     IF, ELSE, THEN,
     END,
     NEW_ARR, NEW_QUEUE, NEW_STACK,
-    LENGTH,
-    ADD_ITEM, GET_NEXT, RESET_NEXT, HAS_NEXT,
-    PUSH, POP,
-    ENQUEUE, DEQUEUE,
-    IS_EMPTY,
+    LENGTH, GET_NEXT, POP, DEQUEUE, 
+    HAS_NEXT, PUSH, ENQUEUE, IS_EMPTY,
     OUTPUT, INPUT
 };
 
@@ -66,9 +63,7 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"output", OUTPUT},
     {"input", INPUT},
     {"length", LENGTH},
-    {"addItem", ADD_ITEM},
     {"getNext", GET_NEXT},
-    {"resetNext", RESET_NEXT},
     {"hasNext", HAS_NEXT},
     {"push", PUSH},
     {"pop", POP},

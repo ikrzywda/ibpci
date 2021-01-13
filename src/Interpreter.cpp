@@ -11,6 +11,7 @@ void Interpreter::interpret(){
     for(auto *a : tree->children){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
+            case ast::STD_VOID: std_void(a); break;
         }
     }
     ast::delete_tree(tree);
@@ -58,9 +59,12 @@ rf::Reference *Interpreter::compute(ast::AST *root){
         case ast::STRING: return new rf::Reference(&root->token);
         case ast::ID: return new rf::Reference(call_stack.peek(root->token.val_str, root));
         case ast::UN_MIN: return negative(compute(root->children[0]));
+        case ast::STACK: return new rf::Reference(ast::STACK);
+        case ast::QUEUE: return new rf::Reference(ast::QUEUE);
         case ast::ARR: return make_array(root);
         case ast::ARR_ACC: return access_array(root);
         case ast::ARR_DYN: return declare_empty_array(root);
+        case ast::STD_RETURN: return std_return(root);
         case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
     }
     return nullptr;
@@ -181,7 +185,7 @@ rf::Reference *Interpreter::declare_empty_array(ast::AST *root){
     for(unsigned i = 0; i < size; ++i){
         arr->push_zero();
     }
-    arr->type = rf::ARRAY;
+    arr->type = ast::ARR;
     return arr;
 }
 
@@ -189,7 +193,7 @@ rf::Reference *Interpreter::make_array(ast::AST *root){
     rf::Reference *arr = new rf::Reference;
     get_dimensions(root, arr);
     get_contents(root, arr, 0); 
-    arr->type = rf::ARRAY;
+    arr->type = ast::ARR;
     return arr;
 }
 
@@ -232,6 +236,97 @@ unsigned Interpreter::compute_key(ast::AST *accessor, rf::Reference *arr){
         addr += accessor->children[nod - 1]->token.val_num;
     }
     return addr;
+}
+
+void Interpreter::std_void(ast::AST *root){
+    switch(root->children[0]->children[0]->token.id){
+        case tk::PUSH: push(root->children[0]); break;
+        case tk::ENQUEUE: enqueue(root->children[0]); break;
+    }
+}
+
+void Interpreter::push(ast::AST *root){
+    rf::Reference *ref = call_stack.peek(root->token.val_str, root);
+    if(ref->type == ast::STACK){
+        ref->push_contents(compute(root->children[0]->children[0]));
+        ref->s[0] += 1;
+    }else{
+        error("'push' can only be done on a stack", root);
+    }
+}
+
+void Interpreter::enqueue(ast::AST *root){
+    rf::Reference *ref = call_stack.peek(root->token.val_str, root);
+    if(ref->type == ast::QUEUE){
+        ref->push_contents(compute(root->children[0]->children[0]));
+        ref->s[0] += 1;
+    }else{
+        error("'enqueue' can only be done on a queue", root);
+    }
+}
+
+rf::Reference *Interpreter::std_return(ast::AST *root){
+    switch(root->children[0]->token.id){
+        case tk::LENGTH: return length(root); 
+        case tk::POP: return pop(root);
+        case tk::DEQUEUE: return dequeue(root);
+        case tk::GET_NEXT: return get_next(root);
+        case tk::IS_EMPTY: return empty(root);
+    }
+    return nullptr;
+}
+
+rf::Reference *Interpreter::length(ast::AST *root){
+    rf::Reference *arr = call_stack.peek(root->token.val_str, root);
+    double len = 1;
+    for(auto &a : arr->s){
+        len *= a;
+    }
+    return new rf::Reference(len);
+}
+
+rf::Reference *Interpreter::pop(ast::AST *root){
+    rf::Reference *stk = call_stack.peek(root->token.val_str, root);
+    if(stk->type != ast::STACK) error("'pop' can only be performed on stacks", root);
+    if(!stk->adt.empty()){
+        return stk->pop();
+    }else{
+        error("Cannot perform 'pop' on an empty stack", root);
+    }
+    return nullptr;
+}
+
+rf::Reference *Interpreter::dequeue(ast::AST *root){
+    rf::Reference *que = call_stack.peek(root->token.val_str, root);
+    if(que->type != ast::QUEUE) error("'dequeue' can only be performed on queues", root);
+    if(!que->adt.empty()){
+        return que->dequeue();
+    }else{
+        error("Cannot perform 'pop' on an empty stack", root);
+    }
+    return nullptr;
+}
+
+rf::Reference *Interpreter::get_next(ast::AST *root){ 
+    rf::Reference *ref = call_stack.peek(root->token.val_str, root);
+    if(!ref->adt.empty()){
+        if(ref->type == ast::STACK){
+            return new rf::Reference(ref->adt.front());
+        }else if(ref->type == ast::QUEUE){
+            return new rf::Reference(ref->adt.back());
+        }else{
+            error("'getNext()' can only be perfromed on a stack or a queue", root);
+        }
+    }else{
+        error("cannot perform 'getNext()' on an empty container", root);
+    }
+    return nullptr;
+}   
+
+rf::Reference *Interpreter::empty(ast::AST *root){
+    rf::Reference *ref = call_stack.peek(root->token.val_str, root);
+    if(ref->adt.empty()) return new rf::Reference(1.f);
+    else return new rf::Reference(0.f);
 }
 
 }

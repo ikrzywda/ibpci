@@ -22,6 +22,11 @@ Reference::Reference(tk::Token *t) : token(t){
     type = t->id;
 }
 
+Reference::Reference(int id){
+    s.push_back(0);
+    type = id;
+}
+
 Reference::Reference(ast::AST *root) : token(&root->token){
     type = root->token.id;
 }
@@ -30,8 +35,7 @@ Reference::~Reference(){
     while(!adt.empty()){
         delete adt.back();
         adt.pop_back();
-    }
-}
+    } }
 
 void Reference::set_value(ast::AST *terminal){
     switch(terminal->id){
@@ -79,6 +83,22 @@ void Reference::push_zero(){
 
 void Reference::push_dimension(unsigned d){
     s.push_back(d);
+}
+
+Reference *Reference::pop(){
+    Reference *out = new Reference(adt.front());
+    s[0] -= 1;
+    delete adt.front();
+    adt.erase(adt.begin());
+    return out;
+}
+
+Reference *Reference::dequeue(){
+    Reference *out = new Reference(adt.back());
+    s[0] -= 1;
+    delete adt.back();
+    adt.pop_back();
+    return out;
 }
 
 void Reference::print(){

@@ -11,10 +11,6 @@ namespace rf{
 
 typedef std::vector<unsigned> size;
 
-enum types{
-    ARRAY, STACK, QUEUE
-};
-
 class Reference{
 private:
 public:
@@ -27,7 +23,8 @@ public:
     Reference(Reference *ref);
     Reference(double value);
     Reference(std::string value);
-    Reference(tk::Token  *t);
+    Reference(tk::Token *t);
+    Reference(int id);
     Reference(ast::AST *root);
     Reference() = default;
     ~Reference();
@@ -41,6 +38,8 @@ public:
     void push_contents(rf::Reference *element);
     void push_zero();
     void push_dimension(unsigned d);
+    Reference *pop();
+    Reference *dequeue();
     void print();
     int id_to_ref_id(int id);
 };

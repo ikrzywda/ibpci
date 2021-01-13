@@ -64,7 +64,8 @@ std::string id_to_str(int id){
         case ARR_ACC: out = "arr_acc"; return out;
         case STACK:  out = "stack"; return out;
         case QUEUE: out = "queue"; return out;
-        case STANDARD_METHOD:  out = "standard_method"; return out;
+        case STD_RETURN:  out = "std return"; return out;
+        case STD_VOID:  out = "std void"; return out;
         case INPUT:  out = "input"; return out;
         case OUTPUT: out = "output"; return out;
     }   

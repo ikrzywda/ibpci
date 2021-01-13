@@ -41,6 +41,15 @@ private:
     void get_dimensions(ast::AST *root, rf::Reference *arr);
     rf::Reference *access_array(ast::AST *root);
     unsigned compute_key(ast::AST *accessor, rf::Reference *arr);
+    void std_void(ast::AST *root);
+    void push(ast::AST *root);
+    void enqueue(ast::AST *root);
+    rf::Reference *std_return(ast::AST *root);
+    rf::Reference *length(ast::AST *root);
+    rf::Reference *pop(ast::AST *root);
+    rf::Reference *dequeue(ast::AST *root);
+    rf::Reference *get_next(ast::AST *root);
+    rf::Reference *empty(ast::AST *root);
 public:
     Interpreter(ast::AST *tree);
     void interpret();

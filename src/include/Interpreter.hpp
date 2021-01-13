@@ -35,9 +35,11 @@ private:
     bool condition(ast::AST *root);
     bool numerical_comparison(rf::Reference *l, rf::Reference *r, int op);
     bool equal(rf::Reference *l, rf::Reference *r);
+    rf::Reference *declare_empty_array(ast::AST *root);
     rf::Reference *make_array(ast::AST *root);
     void get_contents(ast::AST *root, rf::Reference *arr, unsigned nesting);
     void get_dimensions(ast::AST *root, rf::Reference *arr);
+    rf::Reference *access_array(ast::AST *root);
     unsigned compute_key(ast::AST *accessor, rf::Reference *arr);
 public:
     Interpreter(ast::AST *tree);

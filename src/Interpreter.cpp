@@ -45,7 +45,7 @@ void Interpreter::assign(ast::AST *root){
         if(root->children[0]->id != ast::ARR_ACC){
         call_stack.push(var_name, in);
     }else{
-        unsigned address = compute_key(root->children[0], call_stack.peek(var_name, root));
+        unsigned address = compute_key(root->children[0], call_stack.peek(var_name, rn));
         call_stack.push(var_name, address, in);
     }
     delete in;
@@ -59,6 +59,8 @@ rf::Reference *Interpreter::compute(ast::AST *root){
         case ast::ID: return new rf::Reference(call_stack.peek(root->token.val_str, root));
         case ast::UN_MIN: return negative(compute(root->children[0]));
         case ast::ARR: return make_array(root);
+        case ast::ARR_ACC: return access_array(root);
+        case ast::ARR_DYN: return declare_empty_array(root);
         case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
     }
     return nullptr;
@@ -74,7 +76,7 @@ rf::Reference *Interpreter::binop(rf::Reference *l, rf::Reference *r, int op){
             delete l;
             error("cannot make this type of comparison on strings", r);
         }
-    }else if(type == tk::MINUS || type == tk::MULT || type == tk::PLUS){
+    }else if(op == tk::MINUS || op == tk::MULT || op == tk::PLUS){
         switch(op){
             case tk::PLUS: out = add(l, r); break;
             case tk::MINUS: out = new rf::Reference(l->token.val_num - r->token.val_num); break; 
@@ -163,16 +165,31 @@ bool Interpreter::numerical_comparison(rf::Reference *l, rf::Reference *r, int o
 
 bool Interpreter::equal(rf::Reference *l, rf::Reference *r){
     bool out;
-    if(l->type == rf::STRING) out = l->token.val_str == r->token.val_str;
-    else if(l->type == rf::NUM) out = l->token.val_num == r->token.val_num;
+    if(l->type == tk::STRING) out = l->token.val_str == r->token.val_str;
+    else if(l->type == tk::NUM) out = l->token.val_num == r->token.val_num;
     delete l; delete r;
     return out;
+}
+
+rf::Reference *Interpreter::declare_empty_array(ast::AST *root){
+    rf::Reference *arr = new rf::Reference;
+    unsigned size = 1;
+    for(auto &a : root->children){
+        size *= a->token.val_num;
+        arr->push_dimension(a->token.val_num);
+    }
+    for(unsigned i = 0; i < size; ++i){
+        arr->push_zero();
+    }
+    arr->type = rf::ARRAY;
+    return arr;
 }
 
 rf::Reference *Interpreter::make_array(ast::AST *root){
     rf::Reference *arr = new rf::Reference;
     get_dimensions(root, arr);
     get_contents(root, arr, 0); 
+    arr->type = rf::ARRAY;
     return arr;
 }
 
@@ -199,18 +216,21 @@ void Interpreter::get_dimensions(ast::AST *root, rf::Reference *arr){
     }
 }
 
+rf::Reference *Interpreter::access_array(ast::AST *root){
+    rf::Reference *arr = call_stack.peek(root->token.val_str, root);
+    unsigned addr = compute_key(root, arr);
+    return new rf::Reference(arr->get_array_element(addr));
+}
+
 unsigned Interpreter::compute_key(ast::AST *accessor, rf::Reference *arr){
     unsigned addr = 0, nod; // number of dimensions
     if((nod = accessor->children.size()) == arr->s.size()){
         for(unsigned i = 0; i < nod - 1; ++i){
             addr = 1;
-            std::cout << arr->s[i] << "x";
             addr *= (accessor->children[i]->token.val_num * arr->s[i]); 
         }
-        std::cout << '\n' << arr->s[nod - 1] << "x";
         addr += accessor->children[nod - 1]->token.val_num;
     }
-    std::cout << "\ncomputed address: " << addr << std::endl;
     return addr;
 }
 

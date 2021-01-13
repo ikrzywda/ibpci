@@ -4,6 +4,7 @@ namespace rf{
 
 Reference::Reference(Reference *ref) : token(ref->token){
     s = ref->s;
+    type = ref->type;
     for(auto &a : ref->adt){
         adt.push_back(new tk::Token(a));
     }
@@ -40,10 +41,7 @@ void Reference::set_value(ast::AST *terminal){
 }
 
 void Reference::set_value(tk::Token *terminal){
-    switch(terminal->id){
-        case ast::ARR: break;
-        default: token = terminal;
-    }
+    token = terminal;
 }
 
 void Reference::set_value(Reference *ref){
@@ -53,24 +51,30 @@ void Reference::set_value(Reference *ref){
 }
 
 void Reference::mutate_array(unsigned address, rf::Reference *terminal){
-    std::cout << "mutating!";
     delete adt[address];
     adt[address] = new tk::Token(terminal->token);
 }
 
-int Reference::get_type(){
-    return type;
-}   
+tk::Token *Reference::get_array_element(unsigned address){
+    return adt[address];
+}
 
 tk::Token *Reference::get_token(){
     return &token;
 }
 
+
+int Reference::get_type(){
+    return type;
+}   
+
 void Reference::push_contents(rf::Reference *element){
-    std::cout << adt.size();
     adt.push_back(new tk::Token(element->token));
-    std::cout << adt.size();
     delete element;
+}
+
+void Reference::push_zero(){
+    adt.push_back(new tk::Token(0.f));
 }
 
 void Reference::push_dimension(unsigned d){

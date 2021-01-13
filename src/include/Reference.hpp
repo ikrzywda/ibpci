@@ -12,8 +12,7 @@ namespace rf{
 typedef std::vector<unsigned> size;
 
 enum types{
-    NUM, STRING, ARRAY,
-    STACK, QUEUE
+    ARRAY, STACK, QUEUE
 };
 
 class Reference{
@@ -36,11 +35,14 @@ public:
     void set_value(tk::Token *terminal);
     void set_value(Reference *ref);
     void mutate_array(unsigned address, rf::Reference *terminal);
+    tk::Token *get_array_element(unsigned address);
     tk::Token *get_token();
     int get_type();
     void push_contents(rf::Reference *element);
+    void push_zero();
     void push_dimension(unsigned d);
     void print();
+    int id_to_ref_id(int id);
 };
 
 }

@@ -8,13 +8,13 @@ AR::AR(std::string name, ast::AST *root){
 }
 
 void AR::error_uref(std::string key, ast::AST *leaf){
-    std::cout << "SEMANTIC ERROR at line " << leaf->token.line
+    std::cout << "RUN-TIME error at line " << leaf->token.line
         << ": undefined reference to variable " << key << std::endl;
     exit(1);
 }
 
 void AR::error_itp(std::string key, int type, ast::AST *leaf){
-    std::cout << "SEMANTIC ERROR at line " << leaf->token.line
+    std::cout << "RUN-TIME error at line " << leaf->token.line
         << ": variable " << key 
         << " is of incompatible type " 
         << ast::id_to_str(type) << ", should be "
@@ -51,8 +51,8 @@ void AR::mutate_array(std::string key, unsigned address, rf::Reference *terminal
     if(contents.find(key) != contents.end()){
         contents[key].get()->mutate_array(address, terminal);
     }else{
+        exit(1);
     }
-    
 }
 
 ast::AST *AR::lookup_root(){

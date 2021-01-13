@@ -40,17 +40,14 @@ void Interpreter::method_decl(ast::AST *root){
 
 void Interpreter::assign(ast::AST *root){
     std::string var_name = root->children[0]->token.val_str;
-    rf::Reference *in;
     ast::AST *rn = root->children[1]; 
-    switch(rn->id){
-        case ast::NUM: in = compute(rn); break;
-        case ast::STRING: in = compute(rn); break;
-        case ast::ID: in = compute(rn); break;
-        case ast::UN_MIN: in = compute(rn); break;
-        case ast::ARR: in = compute(rn); break;
-        case ast::BINOP: in = compute(rn); break;
+    rf::Reference *in = compute(rn);
+        if(root->children[0]->id != ast::ARR_ACC){
+        call_stack.push(var_name, in);
+    }else{
+        unsigned address = compute_key(root->children[0], call_stack.peek(var_name, root));
+        call_stack.push(var_name, address, in);
     }
-    call_stack.push(var_name, in);
     delete in;
 }
 
@@ -200,6 +197,21 @@ void Interpreter::get_dimensions(ast::AST *root, rf::Reference *arr){
         arr->push_dimension(root->children.size());
         root = root->children[0];
     }
+}
+
+unsigned Interpreter::compute_key(ast::AST *accessor, rf::Reference *arr){
+    unsigned addr = 0, nod; // number of dimensions
+    if((nod = accessor->children.size()) == arr->s.size()){
+        for(unsigned i = 0; i < nod - 1; ++i){
+            addr = 1;
+            std::cout << arr->s[i] << "x";
+            addr *= (accessor->children[i]->token.val_num * arr->s[i]); 
+        }
+        std::cout << '\n' << arr->s[nod - 1] << "x";
+        addr += accessor->children[nod - 1]->token.val_num;
+    }
+    std::cout << "\ncomputed address: " << addr << std::endl;
+    return addr;
 }
 
 }

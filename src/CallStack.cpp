@@ -21,6 +21,10 @@ void CallStack::push(std::string key, tk::Token *terminal){
 void CallStack::push(std::string key, rf::Reference *terminal){
     call_stack.top().get()->insert(key, terminal);
 }
+    
+void CallStack::push(std::string key, unsigned address, rf::Reference *terminal){
+    call_stack.top().get()->mutate_array(key, address, terminal);
+}
 
 
 ast::AST *CallStack::peek_for_root(){

@@ -38,6 +38,7 @@ private:
     rf::Reference *make_array(ast::AST *root);
     void get_contents(ast::AST *root, rf::Reference *arr, unsigned nesting);
     void get_dimensions(ast::AST *root, rf::Reference *arr);
+    unsigned compute_key(ast::AST *accessor, rf::Reference *arr);
 public:
     Interpreter(ast::AST *tree);
     void interpret();

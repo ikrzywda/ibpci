@@ -52,6 +52,12 @@ void Reference::set_value(Reference *ref){
     token = ref->token;
 }
 
+void Reference::mutate_array(unsigned address, rf::Reference *terminal){
+    std::cout << "mutating!";
+    delete adt[address];
+    adt[address] = new tk::Token(terminal->token);
+}
+
 int Reference::get_type(){
     return type;
 }   

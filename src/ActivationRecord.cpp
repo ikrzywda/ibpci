@@ -47,6 +47,13 @@ void AR::insert(std::string key, rf::Reference *terminal){
     }
 }
 
+void AR::mutate_array(std::string key, unsigned address, rf::Reference *terminal){
+    if(contents.find(key) != contents.end()){
+        contents[key].get()->mutate_array(address, terminal);
+    }else{
+    }
+    
+}
 
 ast::AST *AR::lookup_root(){
     return root;

@@ -35,6 +35,7 @@ public:
     void set_value(ast::AST *terminal);
     void set_value(tk::Token *terminal);
     void set_value(Reference *ref);
+    void mutate_array(unsigned address, rf::Reference *terminal);
     tk::Token *get_token();
     int get_type();
     void push_contents(rf::Reference *element);

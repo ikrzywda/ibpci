@@ -27,6 +27,7 @@ public:
     void insert(std::string key, rf::Reference *terminal);
     void insert(std::string key, ast::AST *root);
     void insert(std::string key, tk::Token *terminal);
+    void mutate_array(std::string key, unsigned address, rf::Reference *terminal);
     rf::Reference *lookup(std::string key, ast::AST *leaf);
     ast::AST *lookup_root();
     std::string lookup_name();

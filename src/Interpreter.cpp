@@ -23,8 +23,8 @@ void Interpreter::error(std::string message, ast::AST *leaf){
     exit(1);
 }
 
-void Interpreter::error(std::string message, tk::Token *token){
-    std::cout << "RUN-TIME error at line " << token->line
+void Interpreter::error(std::string message, rf::Reference *token){
+    std::cout << "RUN-TIME error at line " << token->get_token()->line
         << ": " << message << std::endl;
     delete token;
     exit(1);
@@ -40,46 +40,48 @@ void Interpreter::method_decl(ast::AST *root){
 
 void Interpreter::assign(ast::AST *root){
     std::string var_name = root->children[0]->token.val_str;
-    tk::Token *in;
+    rf::Reference *in;
     ast::AST *rn = root->children[1]; 
     switch(rn->id){
         case ast::NUM: in = compute(rn); break;
         case ast::STRING: in = compute(rn); break;
         case ast::ID: in = compute(rn); break;
         case ast::UN_MIN: in = compute(rn); break;
+        case ast::ARR: in = compute(rn); break;
         case ast::BINOP: in = compute(rn); break;
     }
     call_stack.push(var_name, in);
     delete in;
 }
 
-tk::Token *Interpreter::compute(ast::AST *root){
+rf::Reference *Interpreter::compute(ast::AST *root){
     if(root == nullptr) return nullptr;
     switch(root->id){
-        case ast::NUM: return new tk::Token(root->token);
-        case ast::STRING: return new tk::Token(root->token);
-        case ast::ID: return new tk::Token(call_stack.peek(root->token.val_str, root));
+        case ast::NUM: return new rf::Reference(&root->token);
+        case ast::STRING: return new rf::Reference(&root->token);
+        case ast::ID: return new rf::Reference(call_stack.peek(root->token.val_str, root));
         case ast::UN_MIN: return negative(compute(root->children[0]));
+        case ast::ARR: return make_array(root);
         case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
     }
     return nullptr;
 }
 
-tk::Token *Interpreter::binop(tk::Token *l, tk::Token *r, int op){
-    check_types(l, r);
-    tk::Token *out;
-    if(l->id == tk::STRING){
+rf::Reference *Interpreter::binop(rf::Reference *l, rf::Reference *r, int op){
+    int type = check_types(l, r);
+    rf::Reference *out;
+    if(type == tk::STRING){
         if(op == tk::PLUS){ 
             out = add(l, r);
         }else{ 
             delete l;
             error("cannot make this type of comparison on strings", r);
         }
-    }else if(op == tk::MINUS || op == tk::MULT || op == tk::PLUS){
+    }else if(type == tk::MINUS || type == tk::MULT || type == tk::PLUS){
         switch(op){
             case tk::PLUS: out = add(l, r); break;
-            case tk::MINUS: out = new tk::Token(l->val_num - r->val_num); break; 
-            case tk::MULT: out = new tk::Token(l->val_num * r->val_num); break;
+            case tk::MINUS: out = new rf::Reference(l->token.val_num - r->token.val_num); break; 
+            case tk::MULT: out = new rf::Reference(l->token.val_num * r->token.val_num); break;
         }
     }else{
         out = divide(l, r, op);
@@ -88,44 +90,44 @@ tk::Token *Interpreter::binop(tk::Token *l, tk::Token *r, int op){
     return out;
 }
 
-tk::Token *Interpreter::add(tk::Token *l, tk::Token *r){
-    if(l->id == tk::STRING){
-        return new tk::Token(l->val_str + r->val_str);
+rf::Reference *Interpreter::add(rf::Reference *l, rf::Reference *r){
+    if(l->type == tk::STRING){
+        return new rf::Reference(l->token.val_str + r->token.val_str);
     }else{
-        return new tk::Token(l->val_num + r->val_num);
+        return new rf::Reference(l->token.val_num + r->token.val_num);
     }
     return nullptr;
 }
 
-tk::Token *Interpreter::divide(tk::Token *l, tk::Token *r, int op){
-    if(r->val_num == 0){
+rf::Reference *Interpreter::divide(rf::Reference *l, rf::Reference *r, int op){
+    if(r->token.val_num == 0){
         delete l; 
         error("Division by 0 is illegal", r);
     }
     switch(op){
-        case tk::DIV_WOQ: return new tk::Token(l->val_num / r->val_num);
-        case tk::DIV_WQ: return new tk::Token((int)l->val_num / (int)r->val_num);
-        case tk::MOD: return new tk::Token((int)l->val_num % (int)r->val_num);
+        case tk::DIV_WOQ: return new rf::Reference(l->token.val_num / r->token.val_num);
+        case tk::DIV_WQ: return new rf::Reference((int)l->token.val_num / (int)r->token.val_num);
+        case tk::MOD: return new rf::Reference((int)l->token.val_num % (int)r->token.val_num);
     }
     return nullptr;
 }
 
 
-bool Interpreter::check_types(tk::Token *l, tk::Token *r){
+int Interpreter::check_types(rf::Reference *l, rf::Reference *r){
     std::string error_message;
-    if(l->id == r->id) return true;
+    if(l->get_type() == r->get_type()) return l->get_type();
     else{
-        error_message = ("Incompatible types: " + tk::id_to_str(l->id) + 
-            " and " + tk::id_to_str(r->id));
+        error_message = ("Incompatible types: " + tk::id_to_str(l->get_type()) + 
+            " and " + tk::id_to_str(r->get_type()));
         delete l; error(error_message, r);
     }
     return false;
 }
 
 
-tk::Token *Interpreter::negative(tk::Token *val){
-    if(val->id != tk::NUM) error(("Cannot make negative value from " + tk::id_to_str(val->id)), val);
-    tk::Token *out = new tk::Token(-(val->val_num));
+rf::Reference *Interpreter::negative(rf::Reference *val){
+    if(val->type != tk::NUM) error(("Cannot make negative value from " + tk::id_to_str(val->token.id)), val);
+    rf::Reference *out = new rf::Reference(-(val->token.val_num));
     delete val;
     return out;
 }
@@ -141,10 +143,10 @@ bool Interpreter::condition(ast::AST *root){
     return false;
 }
 
-bool Interpreter::numerical_comparison(tk::Token *l, tk::Token *r, int op){
-    check_types(l, r);
+bool Interpreter::numerical_comparison(rf::Reference *l, rf::Reference *r, int op){
+    int type = check_types(l, r);
     bool out;
-    if(l->id == tk::STRING){
+    if(type == tk::STRING){
         if(op == tk::IS) return equal(l, r);
         else{ 
             delete l;
@@ -152,22 +154,52 @@ bool Interpreter::numerical_comparison(tk::Token *l, tk::Token *r, int op){
         }
     }
     switch(op){
-        case tk::LT: out = l->val_num < r->val_num; 
-        case tk::GT: out = l->val_num > r->val_num;
-        case tk::LEQ: out = l->val_num <= r->val_num;
-        case tk::GEQ: out = l->val_num >= r->val_num;
-        case tk::DNEQ: out = l->val_num != r->val_num;
+        case tk::LT: out = l->token.val_num < r->token.val_num; 
+        case tk::GT: out = l->token.val_num > r->token.val_num;
+        case tk::LEQ: out = l->token.val_num <= r->token.val_num;
+        case tk::GEQ: out = l->token.val_num >= r->token.val_num;
+        case tk::DNEQ: out = l->token.val_num != r->token.val_num;
     }
     delete l; delete r;
     return out;
 }
 
-bool Interpreter::equal(tk::Token *l, tk::Token *r){
+bool Interpreter::equal(rf::Reference *l, rf::Reference *r){
     bool out;
-    if(l->id == tk::STRING) out = l->val_str == r->val_str;
-    else if(l->id == tk::NUM) out = l->val_num == r->val_num;
+    if(l->type == rf::STRING) out = l->token.val_str == r->token.val_str;
+    else if(l->type == rf::NUM) out = l->token.val_num == r->token.val_num;
     delete l; delete r;
     return out;
+}
+
+rf::Reference *Interpreter::make_array(ast::AST *root){
+    rf::Reference *arr = new rf::Reference;
+    get_dimensions(root, arr);
+    get_contents(root, arr, 0); 
+    return arr;
+}
+
+void Interpreter::get_contents(ast::AST *root, rf::Reference *arr, unsigned nesting){
+    if(root == nullptr) return;
+    if(root->children.size() != arr->s[nesting]){ 
+        error("ragged array", root);
+    }
+    for(auto &a : root->children){
+        if(a->id == ast::ARR){
+            get_contents(a, arr, nesting + 1);
+        }else if(nesting == arr->s.size() - 1){
+            arr->push_contents(compute(a));
+        }else{
+            error("inconsistent array nesting", root);
+        }
+    }
+}
+
+void Interpreter::get_dimensions(ast::AST *root, rf::Reference *arr){
+    while(root->id == ast::ARR){
+        arr->push_dimension(root->children.size());
+        root = root->children[0];
+    }
 }
 
 }

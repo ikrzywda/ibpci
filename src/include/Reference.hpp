@@ -9,16 +9,36 @@
 
 namespace rf{
 
+typedef std::vector<unsigned> size;
+
+enum types{
+    NUM, STRING, ARRAY,
+    STACK, QUEUE
+};
+
 class Reference{
 private:
-    unsigned size;
-    tk::Token token;
 public:
-    Reference(ast::AST *terminal);
-    Reference(tk::Token *terminal);
+    // contents
+    int type;
+    size s;
+    tk::Token token;
+    std::vector<tk::Token*> adt;
+    // methods
+    Reference(Reference *ref);
+    Reference(double value);
+    Reference(std::string value);
+    Reference(tk::Token  *t);
+    Reference(ast::AST *root);
+    Reference() = default;
+    ~Reference();
     void set_value(ast::AST *terminal);
     void set_value(tk::Token *terminal);
+    void set_value(Reference *ref);
     tk::Token *get_token();
+    int get_type();
+    void push_contents(rf::Reference *element);
+    void push_dimension(unsigned d);
     void print();
 };
 

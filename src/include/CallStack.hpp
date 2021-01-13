@@ -19,9 +19,10 @@ public:
     void pop();
     void push_AR(std::string name, ast::AST *root);
     void push(std::string key, tk::Token *terminal);
+    void push(std::string key, rf::Reference *terminal);
     ast::AST *peek_for_root();
     std::string peek_for_name();
-    tk::Token *peek(std::string key, ast::AST *leaf);
+    rf::Reference *peek(std::string key, ast::AST *leaf);
     bool empty();
     void test();
     CallStack(ast::AST *tree);

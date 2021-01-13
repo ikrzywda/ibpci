@@ -24,9 +24,10 @@ public:
     AR(std::string name, ast::AST *root);
     void error_uref(std::string key, ast::AST *leaf);
     void error_itp(std::string key, int type, ast::AST *leaf);
+    void insert(std::string key, rf::Reference *terminal);
     void insert(std::string key, ast::AST *root);
     void insert(std::string key, tk::Token *terminal);
-    tk::Token *lookup(std::string key, ast::AST *leaf);
+    rf::Reference *lookup(std::string key, ast::AST *leaf);
     ast::AST *lookup_root();
     std::string lookup_name();
     void print();

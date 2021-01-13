@@ -39,6 +39,15 @@ void AR::insert(std::string key, tk::Token *terminal){
     }
 }
 
+void AR::insert(std::string key, rf::Reference *terminal){
+    if(contents.find(key) == contents.end()){
+        contents[key] = std::make_unique<rf::Reference>(terminal);
+    }else{
+        contents[key].get()->set_value(terminal);
+    }
+}
+
+
 ast::AST *AR::lookup_root(){
     return root;
 }
@@ -47,10 +56,10 @@ std::string AR::lookup_name(){
     return name;
 }
 
-tk::Token *AR::lookup(std::string key, ast::AST *leaf){
+rf::Reference *AR::lookup(std::string key, ast::AST *leaf){
     data::iterator it = contents.find(key);
     if(it != contents.end())
-        return it->second.get()->get_token();
+        return it->second.get();
     error_uref(key, leaf);
     return nullptr;
 }

@@ -18,6 +18,11 @@ void CallStack::push(std::string key, tk::Token *terminal){
     call_stack.top().get()->insert(key, terminal);
 }
 
+void CallStack::push(std::string key, rf::Reference *terminal){
+    call_stack.top().get()->insert(key, terminal);
+}
+
+
 ast::AST *CallStack::peek_for_root(){
     return call_stack.top()->lookup_root();
 }
@@ -26,7 +31,7 @@ std::string CallStack::peek_for_name(){
     return call_stack.top().get()->lookup_name();
 }
 
-tk::Token *CallStack::peek(std::string key, ast::AST *leaf){
+rf::Reference *CallStack::peek(std::string key, ast::AST *leaf){
     return call_stack.top().get()->lookup(key, leaf);
 }
 

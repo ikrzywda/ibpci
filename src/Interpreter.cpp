@@ -2,7 +2,7 @@
 
 namespace IBPCI{
 
-Interpreter::Interpreter(ast::AST *tree){
+Interpreter::Interpreter(ast::AST *tree) : void_return(VOID_RETURN){
     this->tree = tree;
     call_stack = cstk::CallStack(tree);
 }
@@ -12,6 +12,13 @@ void Interpreter::interpret(){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
             case ast::STD_VOID: std_void(a); break;
+            case ast::IF: exec_if(a); break;
+            case ast::WHILE: exec_whl(a); break;
+            case ast::FOR: exec_for(a); break;
+            case ast::METHOD: method_decl(a); break;
+            //case ast::METHOD_CALL: method_call(a); break;
+            //case ast::INPUT: input(a);
+            //case ast::OUTPUT: output(a); break;
         }
     }
     ast::delete_tree(tree);
@@ -37,6 +44,82 @@ void Interpreter::method_decl(ast::AST *root){
     }else{
         error("Duplicate method declaration", root);
     }
+}
+
+/*rf::Reference *Interpreter::method_call(ast::AST *root){
+    std::string method_name = root->token.val_str;
+    collect_params(root);
+    call_stack.push_AR(method_name, lookup_method(method_name, root));
+    init_record(root);
+    return exec_block(call_stack.peek_for_root()->children[1]);
+}*/
+
+void Interpreter::exec_if(ast::AST *root){
+    bool b = condition(root->children[0]);
+    ast::AST *n;
+    if(b){
+        exec_block(root->children[1]);
+    }else if(root->children.size() > 2){
+        for(unsigned i = 2; n = root->children[i], i < root->children.size(); ++i){
+            if(n->id == ast::ELSE){
+                if(n->children[0]->id == ast::COND){
+                    exec_if(n);
+                }else if(!b){
+                    exec_block(n->children[0]);
+                }
+            }
+        }
+    }
+}
+
+void Interpreter::exec_whl(ast::AST *root){
+    while(condition(root->children[0])){
+        exec_block(root->children[1]);
+    }
+}
+
+void Interpreter::exec_for(ast::AST *root){
+    ast::AST *rng = root->children[0];
+    ast::AST *block = root->children[1];
+    std::string iter = rng->children[0]->token.val_str;
+    rf::Reference *from = compute(rng->children[1]);
+    rf::Reference *to = compute(rng->children[2]);
+    int fr = from->token.val_num;
+    int t = to->token.val_num;
+    call_stack.push(iter, from);
+    delete to;
+    if(fr < t){
+        for(; fr <= t; ++fr){
+            from->token.val_num = fr;
+            call_stack.push(iter, from);
+            exec_block(block);
+        }
+    }else{
+        for(; fr >= t; --fr){
+            from->token.val_num = fr;
+            call_stack.push(iter, from);
+            exec_block(block);
+        }
+    }
+    delete from;
+}
+
+rf::Reference *Interpreter::exec_block(ast::AST *root){
+    for(auto &a : root->children){
+        switch(a->id){        
+            case ast::ASSIGN: assign(a); break;
+            case ast::IF: exec_if(a); break;
+            case ast::WHILE: exec_whl(a); break;
+            case ast::STD_VOID: std_void(a); break;
+            case ast::FOR: exec_for(a); break;
+            //case ast::METHOD_CALL: method_call(a);
+            case ast::RETURN: return compute(a);
+            //case ast::INPUT: input(a); break;
+            //case ast::OUTPUT: output(a); break;
+            default: error("Unexpected behavior", root);
+        }
+    }
+    return &void_return;
 }
 
 void Interpreter::assign(ast::AST *root){
@@ -227,13 +310,22 @@ rf::Reference *Interpreter::access_array(ast::AST *root){
 }
 
 unsigned Interpreter::compute_key(ast::AST *accessor, rf::Reference *arr){
-    unsigned addr = 0, nod; // number of dimensions
+    rf::Reference *computed_node;
+    unsigned addr = 1, nod; // number of dimensions
     if((nod = accessor->children.size()) == arr->s.size()){
         for(unsigned i = 0; i < nod - 1; ++i){
-            addr = 1;
-            addr *= (accessor->children[i]->token.val_num * arr->s[i]); 
+            computed_node = compute(accessor->children[i]);
+            addr *= computed_node->token.val_num * arr->s[i]; 
+            delete computed_node;
         }
-        addr += accessor->children[nod - 1]->token.val_num;
+        computed_node = compute(accessor->children[nod - 1]);
+        if(addr == 0) addr += computed_node->token.val_num;
+        else if(addr == 1) addr = computed_node->token.val_num;
+        else addr += computed_node->token.val_num;
+        delete computed_node;
+        if(addr > arr->adt.size() - 1 || addr < 0){
+            error(("index " + std::to_string(addr) + " out of bounds"), accessor);
+        }
     }
     return addr;
 }
@@ -327,6 +419,20 @@ rf::Reference *Interpreter::empty(ast::AST *root){
     rf::Reference *ref = call_stack.peek(root->token.val_str, root);
     if(ref->adt.empty()) return new rf::Reference(1.f);
     else return new rf::Reference(0.f);
+}
+
+/*ast::AST *Interpreter::lookup_method(std::string key, ast::AST *leaf){
+    method_map::iterator it;
+    if((it = methods.find(key)) != methods.end()){
+        return it->second;
+    }else{
+        error(("Undefined reference to method " + key), leaf);
+    }
+    return NULL;
+}*/
+
+void Interpreter::output(ast::AST *root){
+
 }
 
 }

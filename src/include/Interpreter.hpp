@@ -11,6 +11,8 @@
 
 namespace IBPCI{
 
+const int VOID_RETURN = -1;
+
 typedef std::map<std::string, ast::AST*> method_map;
 typedef std::vector<std::unique_ptr<rf::Reference>> computed_params;
 typedef std::unique_ptr<rf::Reference> return_ref;
@@ -20,11 +22,15 @@ private:
     cstk::CallStack call_stack;
     ast::AST *tree;
     method_map methods;
-    computed_params cp;
+    rf::Reference void_return;
     void error(std::string message, ast::AST *leaf);
     void error(std::string message, rf::Reference *token);
     void method_decl(ast::AST *root);
-    rf::Reference *method_call(ast::AST *root);
+    //rf::Reference *method_call(ast::AST *root);
+    void exec_if(ast::AST *root);
+    void exec_whl(ast::AST *root);
+    void exec_for(ast::AST *root);
+    rf::Reference *exec_block(ast::AST *root);
     void assign(ast::AST *root);
     rf::Reference *compute(ast::AST *root);
     rf::Reference *binop(rf::Reference *l, rf::Reference *r, int op);
@@ -50,6 +56,11 @@ private:
     rf::Reference *dequeue(ast::AST *root);
     rf::Reference *get_next(ast::AST *root);
     rf::Reference *empty(ast::AST *root);
+    //ast::AST *lookup_method(std::string key, ast::AST *leaf);
+    //void collect_params(ast::AST *root);
+    //void init_record(ast::AST *root);
+    //tk::Token &input(ast::AST *root);
+    void output(ast::AST *root);
 public:
     Interpreter(ast::AST *tree);
     void interpret();

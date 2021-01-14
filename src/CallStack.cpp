@@ -50,4 +50,8 @@ void CallStack::test(){
     }while(!call_stack.empty()); 
 }
 
+void CallStack::print(){
+    call_stack.top().get()->print();
+}
+
 }

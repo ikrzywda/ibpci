@@ -12,13 +12,11 @@
 namespace ar{
 
 typedef std::unordered_map<std::string, std::unique_ptr<rf::Reference>> data;
-typedef std::vector<std::unique_ptr<tk::Token>> computed_vals;
 
 class AR{
 private:
     ast::AST *root;
     data contents;   
-    computed_vals token_buffer;
     std::string name;
 public:
     AR(std::string name, ast::AST *root);

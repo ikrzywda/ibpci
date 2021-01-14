@@ -35,7 +35,8 @@ Reference::~Reference(){
     while(!adt.empty()){
         delete adt.back();
         adt.pop_back();
-    } }
+    } 
+}
 
 void Reference::set_value(ast::AST *terminal){
     switch(terminal->id){

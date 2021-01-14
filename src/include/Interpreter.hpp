@@ -22,11 +22,10 @@ private:
     cstk::CallStack call_stack;
     ast::AST *tree;
     method_map methods;
-    rf::Reference void_return;
     void error(std::string message, ast::AST *leaf);
     void error(std::string message, rf::Reference *token);
     void method_decl(ast::AST *root);
-    //rf::Reference *method_call(ast::AST *root);
+    rf::Reference *method_call(ast::AST *root);
     void exec_if(ast::AST *root);
     void exec_whl(ast::AST *root);
     void exec_for(ast::AST *root);
@@ -56,9 +55,10 @@ private:
     rf::Reference *dequeue(ast::AST *root);
     rf::Reference *get_next(ast::AST *root);
     rf::Reference *empty(ast::AST *root);
-    //ast::AST *lookup_method(std::string key, ast::AST *leaf);
-    //void collect_params(ast::AST *root);
-    //void init_record(ast::AST *root);
+    ast::AST *lookup_method(std::string key, ast::AST *leaf);
+    void collect_params(ast::AST *root, std::vector<rf::Reference*> *container);
+    void init_record(ast::AST *root, std::vector<rf::Reference*> *params);
+    void print_methods();
     //tk::Token &input(ast::AST *root);
     void output(ast::AST *root);
 public:

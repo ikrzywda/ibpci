@@ -50,6 +50,7 @@ std::string id_to_str(int id){
         case FOR: out = "for"; return out;
         case RANGE: out = "range"; return out;
         case IF: out = "if"; return out;
+        case ELIF: out = "elif"; return out;
         case ELSE:  out = "else"; return out;
         case COND:  out = "cond"; return out;
         case CMP: out = "cmp"; return out;

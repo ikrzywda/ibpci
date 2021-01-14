@@ -72,7 +72,7 @@ ast::AST *Parser::if_block(){
 
 ast::AST *Parser::method(){
     eat(tk::METHOD);
-    ast::AST *params;
+    ast::AST *params = nullptr;
     ast::AST *root = new ast::AST(token, ast::METHOD);
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
@@ -85,7 +85,7 @@ ast::AST *Parser::method(){
         }
     }
     eat(tk::RPAREN);
-    if(params != NULL) root->push_child(params);
+    if(params != nullptr) root->push_child(params);
     root->push_child(block());
     eat(tk::METHOD);
     return root;
@@ -135,12 +135,13 @@ ast::AST *Parser::if_stmt(){
 }
 
 ast::AST *Parser::else_stmt(){
-    ast::AST *root = new ast::AST(token, ast::ELSE);
+    ast::AST *root;
     eat(tk::ELSE);
     if(token.id == tk::IF){
-        root->push_child(elif_stmt());
+        root = elif_stmt();
         return root;
     }else{
+        root = new ast::AST(ast::ELSE);
         root->push_child(if_block());
     }
     return root;
@@ -148,7 +149,7 @@ ast::AST *Parser::else_stmt(){
 
 ast::AST *Parser::elif_stmt(){
     eat(tk::IF);
-    ast::AST *root = new ast::AST(token, ast::IF);
+    ast::AST *root = new ast::AST(ast::ELIF);
     root->push_child(cond());
     eat(tk::THEN);
     root->push_child(if_block());
@@ -202,7 +203,7 @@ ast::AST *Parser::assign(){
 
 ast::AST *Parser::method_call(){
     ast::AST *root = new ast::AST(token, ast::METHOD_CALL); 
-    ast::AST *params;
+    ast::AST *params = nullptr;
     eat(tk::ID_METHOD);
     eat(tk::LPAREN);
     if(token.id != tk::RPAREN){
@@ -214,7 +215,8 @@ ast::AST *Parser::method_call(){
         }
     }
     eat(tk::RPAREN);
-    root->push_child(params);
+    if(params != nullptr)
+        root->push_child(params);
     return root;
 }
 

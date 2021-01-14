@@ -2,12 +2,13 @@
 
 namespace IBPCI{
 
-Interpreter::Interpreter(ast::AST *tree) : void_return(VOID_RETURN){
+Interpreter::Interpreter(ast::AST *tree){
     this->tree = tree;
     call_stack = cstk::CallStack(tree);
 }
 
 void Interpreter::interpret(){
+    rf::Reference *method;
     for(auto *a : tree->children){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
@@ -16,13 +17,12 @@ void Interpreter::interpret(){
             case ast::WHILE: exec_whl(a); break;
             case ast::FOR: exec_for(a); break;
             case ast::METHOD: method_decl(a); break;
-            //case ast::METHOD_CALL: method_call(a); break;
+            case ast::METHOD_CALL: method = method_call(a); delete method; break;
             //case ast::INPUT: input(a);
-            //case ast::OUTPUT: output(a); break;
+            case ast::OUTPUT: output(a); break;
         }
     }
     ast::delete_tree(tree);
-    call_stack.test();
 }   
 
 void Interpreter::error(std::string message, ast::AST *leaf){
@@ -44,15 +44,26 @@ void Interpreter::method_decl(ast::AST *root){
     }else{
         error("Duplicate method declaration", root);
     }
+    print_methods();
 }
 
-/*rf::Reference *Interpreter::method_call(ast::AST *root){
+rf::Reference *Interpreter::method_call(ast::AST *root){
     std::string method_name = root->token.val_str;
-    collect_params(root);
+    std::vector<rf::Reference*> computed_params;
+    rf::Reference *return_reference;
+    if(!root->children.empty())
+        collect_params(root->children[0], &computed_params);
     call_stack.push_AR(method_name, lookup_method(method_name, root));
-    init_record(root);
-    return exec_block(call_stack.peek_for_root()->children[1]);
-}*/
+    ast::AST *method_root = call_stack.peek_for_root();
+    init_record(root, &computed_params);
+    if(method_root->children.size() == 2)
+        return_reference = exec_block(method_root->children[1]);
+    else{
+        return_reference = exec_block(method_root->children[0]);
+    }
+    call_stack.pop();
+    return return_reference;
+}
 
 void Interpreter::exec_if(ast::AST *root){
     bool b = condition(root->children[0]);
@@ -61,11 +72,15 @@ void Interpreter::exec_if(ast::AST *root){
         exec_block(root->children[1]);
     }else if(root->children.size() > 2){
         for(unsigned i = 2; n = root->children[i], i < root->children.size(); ++i){
-            if(n->id == ast::ELSE){
-                if(n->children[0]->id == ast::COND){
-                    exec_if(n);
-                }else if(!b){
+            if(n->id == ast::ELIF){
+                if(condition(n->children[0])){ 
+                    exec_block(n->children[1]);
+                    return;
+                }
+            }else if(n->id == ast::ELSE){
+                if(!b){ 
                     exec_block(n->children[0]);
+                    return;
                 }
             }
         }
@@ -105,6 +120,7 @@ void Interpreter::exec_for(ast::AST *root){
 }
 
 rf::Reference *Interpreter::exec_block(ast::AST *root){
+    rf::Reference *method;
     for(auto &a : root->children){
         switch(a->id){        
             case ast::ASSIGN: assign(a); break;
@@ -112,14 +128,14 @@ rf::Reference *Interpreter::exec_block(ast::AST *root){
             case ast::WHILE: exec_whl(a); break;
             case ast::STD_VOID: std_void(a); break;
             case ast::FOR: exec_for(a); break;
-            //case ast::METHOD_CALL: method_call(a);
-            case ast::RETURN: return compute(a);
+            case ast::METHOD_CALL: method = method_call(a); delete method; break;
             //case ast::INPUT: input(a); break;
-            //case ast::OUTPUT: output(a); break;
+            case ast::OUTPUT: output(a); break;
+            case ast::RETURN: return compute(a->children[0]);
             default: error("Unexpected behavior", root);
         }
     }
-    return &void_return;
+    return nullptr;
 }
 
 void Interpreter::assign(ast::AST *root){
@@ -136,6 +152,7 @@ void Interpreter::assign(ast::AST *root){
 }
 
 rf::Reference *Interpreter::compute(ast::AST *root){
+    rf::Reference *ref;
     if(root == nullptr) return nullptr;
     switch(root->id){
         case ast::NUM: return new rf::Reference(&root->token);
@@ -148,6 +165,10 @@ rf::Reference *Interpreter::compute(ast::AST *root){
         case ast::ARR_ACC: return access_array(root);
         case ast::ARR_DYN: return declare_empty_array(root);
         case ast::STD_RETURN: return std_return(root);
+        case ast::METHOD_CALL:
+                ref = method_call(root);
+                if(ref == nullptr) return new rf::Reference(VOID_RETURN);
+                else return ref;
         case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
     }
     return nullptr;
@@ -233,18 +254,19 @@ bool Interpreter::numerical_comparison(rf::Reference *l, rf::Reference *r, int o
     int type = check_types(l, r);
     bool out;
     if(type == tk::STRING){
-        if(op == tk::IS) return equal(l, r);
+        if(op == tk::IS) out = equal(l, r);
         else{ 
             delete l;
             error("cannot make this type of comparison on strings", r);
         }
     }
     switch(op){
-        case tk::LT: out = l->token.val_num < r->token.val_num; 
-        case tk::GT: out = l->token.val_num > r->token.val_num;
-        case tk::LEQ: out = l->token.val_num <= r->token.val_num;
-        case tk::GEQ: out = l->token.val_num >= r->token.val_num;
-        case tk::DNEQ: out = l->token.val_num != r->token.val_num;
+        case tk::LT: out = l->token.val_num < r->token.val_num; break;
+        case tk::GT: out = l->token.val_num > r->token.val_num; break;
+        case tk::LEQ: out = l->token.val_num <= r->token.val_num; break;
+        case tk::GEQ: out = l->token.val_num >= r->token.val_num; break;
+        case tk::DNEQ: out = l->token.val_num != r->token.val_num; break;
+        case tk::IS: out = equal(l,r); break;
     }
     delete l; delete r;
     return out;
@@ -254,16 +276,20 @@ bool Interpreter::equal(rf::Reference *l, rf::Reference *r){
     bool out;
     if(l->type == tk::STRING) out = l->token.val_str == r->token.val_str;
     else if(l->type == tk::NUM) out = l->token.val_num == r->token.val_num;
-    delete l; delete r;
+    std::cout << "equal: " << out;
     return out;
 }
 
 rf::Reference *Interpreter::declare_empty_array(ast::AST *root){
     rf::Reference *arr = new rf::Reference;
+    rf::Reference *arg;
     unsigned size = 1;
     for(auto &a : root->children){
-        size *= a->token.val_num;
-        arr->push_dimension(a->token.val_num);
+        arg = compute(a);
+        if(arg->type != tk::NUM) error("Only viable argument is a number", a);
+        size *= arg->token.val_num;
+        arr->push_dimension(arg->token.val_num);
+        delete arg;
     }
     for(unsigned i = 0; i < size; ++i){
         arr->push_zero();
@@ -421,7 +447,7 @@ rf::Reference *Interpreter::empty(ast::AST *root){
     else return new rf::Reference(0.f);
 }
 
-/*ast::AST *Interpreter::lookup_method(std::string key, ast::AST *leaf){
+ast::AST *Interpreter::lookup_method(std::string key, ast::AST *leaf){
     method_map::iterator it;
     if((it = methods.find(key)) != methods.end()){
         return it->second;
@@ -429,10 +455,49 @@ rf::Reference *Interpreter::empty(ast::AST *root){
         error(("Undefined reference to method " + key), leaf);
     }
     return NULL;
-}*/
-
-void Interpreter::output(ast::AST *root){
-
 }
 
+void Interpreter::collect_params(ast::AST *root, std::vector<rf::Reference*> *container){
+    if(root->id == ast::PARAM)
+        for(auto &a : root->children){
+            container->push_back(compute(a));
+        }
+}
+
+void Interpreter::init_record(ast::AST *root, std::vector<rf::Reference*> *params){
+    ast::AST *method_root = call_stack.peek_for_root();
+    if(method_root->children[0]->id != ast::BLOCK){
+        ast::AST *param_proto = method_root->children[0];
+        std::string param_name;
+        if(params->size() == param_proto->children.size()){
+            for(unsigned i = 0; i < params->size(); ++i){
+                param_name = param_proto->children[i]->token.val_str;
+                call_stack.push(param_name, params->at(i));
+            }
+        }else{
+            error(("Incorrect number of arguments in the call of function " 
+                        + call_stack.peek_for_name()), root); 
+        }
+        for(auto &a : *params){
+            delete a;
+        }
+    }
+}
+
+void Interpreter::output(ast::AST *root){
+    rf::Reference *output;
+    for(auto &a : root->children){
+        output = compute(a);
+        output->print();
+        delete output;
+    }
+    std::cout << std::endl;
+}
+
+void Interpreter::print_methods(){
+    std::cout << "METHODS" << "\n==============================\n";
+    for(auto &a : methods){
+        std::cout << a.first << " : " << a.second << std::endl;
+    }
+}
 }

@@ -14,7 +14,7 @@ enum ast_id{
     START, BLOCK,
     METHOD, METHOD_CALL, PARAM, RETURN,
     WHILE, FOR, RANGE,
-    IF, ELSE, 
+    IF, ELSE, ELIF, 
     ASSIGN,
     BINOP, UN_MIN, COND, CMP,
     NUM, STRING, 

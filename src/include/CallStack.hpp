@@ -26,6 +26,7 @@ public:
     rf::Reference *peek(std::string key, ast::AST *leaf);
     bool empty();
     void test();
+    void print();
     CallStack(ast::AST *tree);
     CallStack() = default;
 };

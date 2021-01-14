@@ -1,0 +1,16 @@
+method bubble_sort(ARR)
+    LEN = ARR.length() - 1
+    loop I from 0 to LEN - 1
+        loop J from 0 to LEN - I - 1
+            if ARR[J] > ARR[J + 1] then
+                TEMP = ARR[J]
+                ARR[J] = ARR[J + 1]
+                ARR[J + 1] = TEMP
+            end if
+        end loop
+    end loop
+    return ARR
+end method
+
+ARR = [10,1,3,2,4,7,6,8,5,9]
+output(bubble_sort(ARR))

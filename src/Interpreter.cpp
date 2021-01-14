@@ -165,11 +165,12 @@ rf::Reference *Interpreter::compute(ast::AST *root){
         case ast::ARR_ACC: return access_array(root);
         case ast::ARR_DYN: return declare_empty_array(root);
         case ast::STD_RETURN: return std_return(root);
+        case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
+        case ast::INPUT: return input(root);
         case ast::METHOD_CALL:
                 ref = method_call(root);
                 if(ref == nullptr) return new rf::Reference(VOID_RETURN);
                 else return ref;
-        case ast::BINOP: return binop(compute(root->children[0]), compute(root->children[1]), root->token.id);
     }
     return nullptr;
 }
@@ -494,10 +495,21 @@ void Interpreter::output(ast::AST *root){
     std::cout << std::endl;
 }
 
+rf::Reference *Interpreter::input(ast::AST *root){
+    std::cout << root->children[0]->token.val_str;
+    std::string buffer;
+    std::cin >> buffer;
+    buffer.push_back('\0');
+    std::cout << std::endl;
+    lxr::Lexer lex(std::move(buffer)); 
+    return new rf::Reference(&lex.get_next_token());
+}
+
 void Interpreter::print_methods(){
     std::cout << "METHODS" << "\n==============================\n";
     for(auto &a : methods){
         std::cout << a.first << " : " << a.second << std::endl;
     }
 }
+
 }

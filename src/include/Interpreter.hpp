@@ -59,7 +59,7 @@ private:
     void collect_params(ast::AST *root, std::vector<rf::Reference*> *container);
     void init_record(ast::AST *root, std::vector<rf::Reference*> *params);
     void print_methods();
-    //tk::Token &input(ast::AST *root);
+    rf::Reference *input(ast::AST *root);
     void output(ast::AST *root);
 public:
     Interpreter(ast::AST *tree);

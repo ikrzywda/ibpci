@@ -2,12 +2,14 @@
 
 namespace cstk{
 
-CallStack::CallStack(ast::AST *tree){
+CallStack::CallStack(ast::AST *tree, bool log){
     call_stack.push(std::make_unique<ar::AR>("main", tree));
+    log_stack = log;
 }
 
 void CallStack::pop(){
     call_stack.pop();
+    if(log_stack) print(false);
 }
 
 void CallStack::push_AR(std::string name, ast::AST *root){
@@ -50,8 +52,10 @@ void CallStack::test(){
     }while(!call_stack.empty()); 
 }
 
-void CallStack::print(){
+void CallStack::print(bool entering){
+    std::cout << std::endl;
     call_stack.top().get()->print();
+    std::cout << std::endl;
 }
 
 }

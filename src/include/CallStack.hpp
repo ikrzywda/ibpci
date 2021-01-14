@@ -15,6 +15,7 @@ typedef std::stack<std::unique_ptr<ar::AR>> c_stck;
 class CallStack{
 private:
     c_stck call_stack;
+    bool log_stack;
 public:
     void pop();
     void push_AR(std::string name, ast::AST *root);
@@ -26,8 +27,8 @@ public:
     rf::Reference *peek(std::string key, ast::AST *leaf);
     bool empty();
     void test();
-    void print();
-    CallStack(ast::AST *tree);
+    void print(bool entering);
+    CallStack(ast::AST *tree, bool log);
     CallStack() = default;
 };
 

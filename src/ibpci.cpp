@@ -1,12 +1,13 @@
-#include "include/test.hpp"
-
-namespace test{
+#include "include/ibpci.hpp"
 
 std::string get_buffer(char *filename){
     char c;
-    std::fstream file;
+    std::fstream file(filename);
+    if(!file.good()){
+        std::cout << "ERROR: file " << filename << " does not exist" << std::endl;
+        exit(1);
+    }
     std::string buffer;
-    file.open(filename, std::ios::in);
     while(!file.eof()){
         file.get(c);
         buffer += c;
@@ -15,7 +16,8 @@ std::string get_buffer(char *filename){
     return buffer;
 }
 
-void test_lexer(char *filename){
+
+void run_lexer(char *filename){
     lxr::Lexer lex(get_buffer(filename));
     tk::Token token = lex.get_next_token();
     while(token.id != tk::END_FILE){
@@ -25,18 +27,16 @@ void test_lexer(char *filename){
     }
 }
 
-void test_parser(char *filename){
+void run_parser(char *filename){
     prs::Parser parser(get_buffer(filename)); 
     ast::AST *root = parser.parse();
     ast::print_tree(root, 0);
     ast::delete_tree(root);
 }
 
-void test_interpreter(char *filename){
+void run_interpreter(char *filename, bool logging){
     prs::Parser parser(get_buffer(filename)); 
     ast::AST *root = parser.parse();
-    IBPCI::Interpreter ibpci(root);
+    IBPCI::Interpreter ibpci(root, logging);
     ibpci.interpret();
-}
-
 }

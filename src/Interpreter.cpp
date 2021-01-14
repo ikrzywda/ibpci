@@ -2,9 +2,10 @@
 
 namespace IBPCI{
 
-Interpreter::Interpreter(ast::AST *tree){
+Interpreter::Interpreter(ast::AST *tree, bool log){
     this->tree = tree;
-    call_stack = cstk::CallStack(tree);
+    log_stack = log;
+    call_stack = cstk::CallStack(tree, log);
 }
 
 void Interpreter::interpret(){
@@ -18,7 +19,6 @@ void Interpreter::interpret(){
             case ast::FOR: exec_for(a); break;
             case ast::METHOD: method_decl(a); break;
             case ast::METHOD_CALL: method = method_call(a); delete method; break;
-            //case ast::INPUT: input(a);
             case ast::OUTPUT: output(a); break;
         }
     }
@@ -44,7 +44,6 @@ void Interpreter::method_decl(ast::AST *root){
     }else{
         error("Duplicate method declaration", root);
     }
-    print_methods();
 }
 
 rf::Reference *Interpreter::method_call(ast::AST *root){

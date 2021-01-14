@@ -1,5 +1,5 @@
-#ifndef IBPCI_HPP
-#define IBPCI_HPP
+#ifndef INTERPRETER_HPP
+#define INTERPRETER_HPP
 
 #include "AST.hpp"
 #include "CallStack.hpp"
@@ -22,6 +22,7 @@ private:
     cstk::CallStack call_stack;
     ast::AST *tree;
     method_map methods;
+    bool log_stack;
     void error(std::string message, ast::AST *leaf);
     void error(std::string message, rf::Reference *token);
     void method_decl(ast::AST *root);
@@ -62,7 +63,7 @@ private:
     rf::Reference *input(ast::AST *root);
     void output(ast::AST *root);
 public:
-    Interpreter(ast::AST *tree);
+    Interpreter(ast::AST *tree, bool log);
     void interpret();
 };
 

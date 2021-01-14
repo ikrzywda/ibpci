@@ -1,5 +1,5 @@
-#ifndef TEST_HPP
-#define TEST_HPP
+#ifndef IBPCI_HPP
+#define IBPCI_HPP
 
 #include "Lexer.hpp"
 #include "Parser.hpp"
@@ -9,15 +9,10 @@
 #include <fstream>
 #include <iostream>
 
-namespace test{
 
 std::string get_buffer(char *filename);
-
-void test_lexer(char *filename);
-
-void test_parser(char *filename);
-
-void test_interpreter(char *filename);
-}
+void run_lexer(char *filename);
+void run_parser(char *filename);
+void run_interpreter(char *filename, bool logging);
 
 #endif

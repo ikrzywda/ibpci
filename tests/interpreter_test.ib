@@ -1,4 +1,17 @@
-A = "Hello"
-B = 10
-C = 10 + 10
-D = "Hello " + "world"
+method test()
+    output("hello")
+end method
+    
+method fib(A,B)
+    if A > 255 then 
+    else 
+        output(A)
+        fib(A+B,B+1)
+    end if
+end method
+
+A = input("name: ")
+output(A)
+
+fib(0,0)
+test()

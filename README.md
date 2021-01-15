@@ -1,5 +1,5 @@
 # IBPCI - IB PseudoCode Interpreter
-IBPCI is a simple interpreter made to be used by students and teachers to develop and practice pseudocode in IB CS program. It is not an ideal replication of what the paper version as it maintains the syntax but forces the user to 
+IBPCI is a simple interpreter made to be used by students and teachers to develop and practice pseudocode in IB CS program. It is not an ideal replication of what the paper version as it maintains the syntax but it has more constraints than its paper counterpart.
 
 ## Compiling
 You need a C++14 compiler and optionally cmake.

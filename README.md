@@ -12,7 +12,7 @@ make
 ```
 ### Using g++
 ```
-g++ -o ibpci -std=c++14 src/*cpp 
+g++ -o ibpci -std=c++14 src/*.cpp 
 ```
 
 ## Features

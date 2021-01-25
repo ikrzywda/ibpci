@@ -1,0 +1,122 @@
+=================================
+            TOKENS
+=================================
+
+NUM = [0-9][0-9]*
+
+METHOD_ID = [a-Z][a-z][a-9-_]*
+
+ID = [A-Z][A-9-_]*
+
+STRING = "[a-Z]*"
+
+-- keywords like THEN or IF are all lower-case
+
+=================================
+            GRAMMAR
+=================================
+
+program :: block
+         | block method
+         | empty
+
+method_decl :: METHOD METHOD_ID (param_decl) block END METHOD
+
+param_decl  :: ID
+             | ID, param_decl
+             | empty
+
+block   :: stmt block 
+         | stmt
+         | empty
+
+stmt    :: assignment
+         | if
+         | for loop
+         | while loop
+         | method_call
+         | expr
+         | return
+         | std_method
+         | BREAK
+
+assignment  :: ID = expr
+             | ID = condition
+             | ID = arr_decl
+             | ID = arr_empty
+             | ID = std_method
+             | ID = STACK
+             | ID = QUEUE
+
+if  :: IF condition THEN block END IF
+     | IF condition THEN block ELSE if END IF
+     | IF condition THEN block ELSE if ELSE block END IF
+     | IF condition THEN block ELSE block
+
+for_loop    :: LOOP id FROM expr TO expr block END LOOP
+
+while_loop  :: LOOP WHILE condition block END LOOP
+
+method_call :: method_id(params) 
+
+return  :: RETURN expr
+         | RETURN condition
+         | RETURN
+
+params  :: list_of_elements
+
+condition   :: cmp AND cmp
+             | cmp OR cmp
+             | cmp
+
+cmp :: expr > expr
+     | expr < expr
+     | expr >= expr
+     | expr <= expr
+     | expr == expr
+     | expr != expr
+
+expr    :: term + term
+         | term - term
+         | term
+
+term    :: factor * factor
+         | factor / factor
+         | factor DIV factor
+         | factor MOD factor
+         | factor
+
+factor  :: NUM
+         | STRING
+         | ID
+         | method_call
+         | std_method
+         | arr_acc
+         | (expr)
+
+arr_decl    :: [list_of_elements]
+             | [arr_decl, arr_decl]
+
+list_of_elements    :: expr
+                     | expr, list_of_elements
+                     | empty
+
+arr_empty   :: ARRAY(list_of_elements)
+
+arr_acc :: ID accessor
+
+accessor    :: [NUM]
+             | [NUM] accessor
+             | empty
+
+std_method  :: OUTPUT(params)
+             | INPUT(STRING)
+             | container_method
+
+container_method    :: ID.length()
+                     | ID.push()
+                     | ID.pop(params)
+                     | ID.enqueue(params)
+                     | ID.dequeue()
+                     | ID.getNext()
+

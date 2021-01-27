@@ -1,0 +1,13 @@
+method allEven(N)
+    EVEN = 1
+    loop while N > 10 AND EVEN == 1
+       // if (N mod 10) mod 2 == 1 then
+       //     ouptut(EVEN)
+       //     EVEN = 0
+       // end if
+        N = N div 10
+    end loop
+end method
+
+output((146 mod 10) mod 2)
+

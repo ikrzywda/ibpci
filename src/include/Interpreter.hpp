@@ -8,6 +8,8 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <cmath>
+#include <cfenv>
 
 namespace IBPCI{
 

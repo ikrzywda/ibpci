@@ -207,14 +207,16 @@ rf::Reference *Interpreter::add(rf::Reference *l, rf::Reference *r){
 }
 
 rf::Reference *Interpreter::divide(rf::Reference *l, rf::Reference *r, int op){
+    int a = (int)l->token.val_num;
+    int b = (int)r->token.val_num;
     if(r->token.val_num == 0){
         delete l; 
         error("Division by 0 is illegal", r);
     }
     switch(op){
         case tk::DIV_WOQ: return new rf::Reference(l->token.val_num / r->token.val_num);
-        case tk::DIV_WQ: return new rf::Reference((int)l->token.val_num / (int)r->token.val_num);
-        case tk::MOD: return new rf::Reference((int)l->token.val_num % (int)r->token.val_num);
+        case tk::DIV_WQ: return new rf::Reference((double)((int)l->token.val_num / (int)r->token.val_num));
+        case tk::MOD: return new rf::Reference((double)(a % b));
     }
     return nullptr;
 }

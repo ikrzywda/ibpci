@@ -1,0 +1,5 @@
+method hello(A)
+   return A 
+end method
+
+output(hello("Hello world!"))

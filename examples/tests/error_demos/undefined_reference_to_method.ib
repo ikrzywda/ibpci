@@ -1,0 +1,5 @@
+method bar(A)
+    output(A)
+end method
+
+foo(100)

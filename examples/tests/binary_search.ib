@@ -1,0 +1,21 @@
+// because of a bug (which will be fixed), return does not terminate the 
+// execution of a method
+
+INPUT = [3,6,8,10,11,14,23,36,45,76,89]
+
+method binary_search(ARR, L, R, X)
+    OUT = -1
+    if R >= L then
+        PIV = L + (R - L) div 2
+        if ARR[PIV] == X then 
+            OUT = PIV
+        else if ARR[PIV] > X then
+            OUT = binary_search(ARR, L, PIV - 1, X)
+        else 
+            OUT = binary_search(ARR, PIV + 1, R, X)
+        end if
+    end if
+    return OUT
+end method
+
+output(binary_search(INPUT, 0, INPUT.length() - 1, 45))

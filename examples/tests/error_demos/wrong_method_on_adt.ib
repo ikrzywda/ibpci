@@ -1,0 +1,3 @@
+S = Stack()
+
+S.enqueue(100)

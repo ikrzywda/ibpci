@@ -1,0 +1,5 @@
+method foo(A,B)
+    output(A + B)
+end method
+
+foo("I am the only argument!")

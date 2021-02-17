@@ -1,0 +1,17 @@
+
+method fizzbuzz(N)
+    S = ""
+    loop I from 0 to N
+        if (I % 15) == 0 then
+            output("FizzBuzz")
+        else if (I % 3) == 0 then
+            output("Fizz")
+        else if (I % 5) then
+            output("Buzz")
+        else
+            output(I)
+        end if
+    end loop
+end method
+
+fizzbuzz(input("FizzBuzz to: "))

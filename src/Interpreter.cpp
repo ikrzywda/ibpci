@@ -278,7 +278,6 @@ bool Interpreter::equal(rf::Reference *l, rf::Reference *r){
     bool out;
     if(l->type == tk::STRING) out = l->token.val_str == r->token.val_str;
     else if(l->type == tk::NUM) out = l->token.val_num == r->token.val_num;
-    std::cout << "equal: " << out;
     return out;
 }
 

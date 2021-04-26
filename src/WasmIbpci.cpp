@@ -1,6 +1,6 @@
-#include "include/ibpci.hpp"
+#include "include/WasmIbpci.hpp"
 
-void throw_error(unsigned type, unsigned line_number, std::string message)
+std::string wasm_throw_error(unsigned type, unsigned line_number, std::string message)
 {
     std::string error;
 
@@ -28,27 +28,7 @@ void throw_error(unsigned type, unsigned line_number, std::string message)
     exit(1);
 }
 
-std::string get_buffer(char *filename)
-{
-    char c;
-    std::string buffer;
-    std::fstream file(filename);
-
-    if(!file.good()){
-        throw_error(FILE_NOT_FOUND, 0, 
-                    "File \'" + std::string(filename) + "\' does not exist");
-    }
-
-    while(!file.eof()){
-        file.get(c);
-        buffer += c;
-    }
-
-    file.close();
-    return buffer;
-}
-
-void interpret (char *filename, unsigned mode)
+const char *wasm_interpret (char *filename, unsigned mode)
 {
     std::string buffer = std::move(get_buffer(filename)); 
 
@@ -78,7 +58,7 @@ void interpret (char *filename, unsigned mode)
 
 }
 
-void run_lexer(std::string buffer)
+std::string wasm_run_lexer(std::string buffer)
 {
     lxr::Lexer lex(std::move(buffer));
     tk::Token token = lex.get_next_token();

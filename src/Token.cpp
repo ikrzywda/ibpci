@@ -51,6 +51,28 @@ void Token::print(){
         std::cout << val_str;
 }
 
+Token Token::operator+(Token &t)
+{
+    Token result;
+
+    if (t.id == this->id)
+    {
+        switch (t.id)
+        {
+            case NUM:
+                result.val_num = this->val_num + t.val_num;
+                break;
+            case STRING: 
+                result.val_str = this->val_str + t.val_str;
+                break;
+        }
+
+        result.id = t.id;
+    }
+
+    return result;
+}
+
 std::string id_to_str(int id){
     std::string out;
     switch(id){

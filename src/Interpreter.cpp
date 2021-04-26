@@ -141,7 +141,7 @@ void Interpreter::assign(ast::AST *root){
     std::string var_name = root->children[0]->token.val_str;
     ast::AST *rn = root->children[1]; 
     rf::Reference *in = compute(rn);
-        if(root->children[0]->id != ast::ARR_ACC){
+    if(root->children[0]->id != ast::ARR_ACC){
         call_stack.push(var_name, in);
     }else{
         unsigned address = compute_key(root->children[0], call_stack.peek(var_name, rn));

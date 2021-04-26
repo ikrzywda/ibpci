@@ -27,8 +27,17 @@ enum id{
     OUTPUT, INPUT
 };
 
-class Token{
+class Token
+{
     public:
+
+        Token(std::string val);
+        Token(double val);
+        Token(Token &tok);
+        Token(Token *tok);
+        Token() = default;
+        ~Token() = default;
+
         int id, op;
         double val_num;
         std::string val_str;
@@ -36,12 +45,8 @@ class Token{
         void mutate(int id, std::string val, unsigned ln);
         void mutate(int id, double val, unsigned ln);
         void print();
-        Token(std::string val);
-        Token(double val);
-        Token(Token &tok);
-        Token(Token *tok);
-        Token() = default;
-        ~Token() = default;
+
+        Token operator+(Token &t);
 };
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {

@@ -11,16 +11,10 @@ void print_help(){
 }
 
 int main(int argc, char **argv){
+
+    interpret(argv[1], INTERPRET);
+
     if(argc == 1){ 
         print_help();
     }
-    std::string flag = argv[1];
-    if(flag == "-l")
-        run_lexer(argv[2]);
-    else if(flag == "-p")
-        run_parser(argv[2]);
-    else if(flag == "-s")
-        run_interpreter(argv[2], true);
-    else
-        run_interpreter(argv[1], false);
 }

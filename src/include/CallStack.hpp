@@ -12,10 +12,13 @@ namespace cstk{
 
 typedef std::stack<std::unique_ptr<ar::AR>> c_stck;
 
-class CallStack{
+class CallStack
+{
+
 private:
     c_stck call_stack;
     bool log_stack;
+
 public:
     void pop();
     void push_AR(std::string name, ast::AST *root);

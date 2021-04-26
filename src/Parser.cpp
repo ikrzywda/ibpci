@@ -25,6 +25,7 @@ void Parser::error(int token_id){
 ast::AST *Parser::parse(){
     ast::AST *root = new ast::AST(ast::START);
     while(token.id != tk::END_FILE){
+        std::cout << "statement!\n";
         root->push_child(stmt());
     }
     return root;

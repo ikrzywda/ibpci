@@ -1,5 +1,5 @@
-#ifndef IBPCI_HPP
-#define IBPCI_HPP
+#ifndef IBPCI_LEGACY_HPP
+#define IBPCI_LEGACY_HPP
 
 #include "Lexer.hpp"
 #include "Parser.hpp"

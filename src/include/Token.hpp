@@ -6,16 +6,31 @@
 #include <string>
 #include <map>
 
-namespace tk{
+namespace IBPCI{
 
-enum id{
-    END_FILE,
+struct Token
+{
+    unsigned LINE_NUM;
+    unsigned ID;
+    double VAL_NUM;
+    std::string VAL_STR;
+
+    Token(unsigned line_num, unsigned id, double num);
+    Token(unsigned line_num, unsigned id, std::string str);
+    Token();
+
+    void print();
+};
+
+enum id 
+{
+    END_OF_FILE,
     PLUS, MINUS, MULT, DIV_WOQ, DIV_WQ, MOD,
     LSQBR, RSQBR, LPAREN, RPAREN, QTMARK,
     LT, GT, LEQ, GEQ, DNEQ, EQ, IS,
     AND, OR, 
     DOT, COMMA,
-    INT, FLOAT, NUM, STRING, BOOL,
+    INT, FLOAT, NUM, STR, BOOL,
     ID_VAR, ID_METHOD,
     METHOD, RETURN,
     LOOP, FROM, TO, WHILE, UNTIL,
@@ -27,27 +42,6 @@ enum id{
     OUTPUT, INPUT
 };
 
-class Token
-{
-    public:
-
-        Token(std::string val);
-        Token(double val);
-        Token(Token &tok);
-        Token(Token *tok);
-        Token() = default;
-        ~Token() = default;
-
-        int id, op;
-        double val_num;
-        std::string val_str;
-        unsigned line;
-        void mutate(int id, std::string val, unsigned ln);
-        void mutate(int id, double val, unsigned ln);
-        void print();
-
-        Token operator+(Token &t);
-};
 
 const std::map<std::string, int> RESERVED_KEYWORDS = {
     {"div", DIV_WQ},
@@ -81,11 +75,6 @@ const std::map<std::string, int> RESERVED_KEYWORDS = {
 };
 
 int lookup_keyword(std::string lexeme);
-
-void print_token(Token *token);
-   
-std::string id_to_str(int id);
-
 
 }
 #endif

@@ -24,7 +24,8 @@ enum ast_id{
     STD_RETURN, STD_VOID, INPUT, OUTPUT
 };
 
-class AST{
+class AST
+{
 public:
     int id;
     tk::Token token;

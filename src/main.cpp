@@ -1,4 +1,5 @@
-#include "include/ibpci.hpp"
+#include "include/IBPCI.hpp"
+#include "include/Lexer.hpp"
 
 void print_help(){
     std::cout << "Welcome to ibpci - the IB pseudocode interpreter" << std::endl
@@ -12,9 +13,13 @@ void print_help(){
 
 int main(int argc, char **argv){
 
-    interpret(argv[1], INTERPRET);
+    if(argc < 2) return 0;
 
-    if(argc == 1){ 
-        print_help();
+    if(IBPCI::file_exists(argv[1]))
+    {
+        IBPCI::Lexer ibpci{argv[1]};
+        ibpci.print_all_tokens();
     }
+
+
 }

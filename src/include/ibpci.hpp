@@ -14,7 +14,7 @@
 void throw_error(unsigned type, unsigned line_number, std::string message);
 void interpret(char *filename, unsigned mode);
 
-std::string get_buffer(std::string buffer);
+std::string get_buffer(char *filename);
 void run_lexer(std::string buffer);
 void run_parser(std::string buffer);
 void run_interpreter(std::string buffer, bool logging);

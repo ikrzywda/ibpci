@@ -1,4 +1,4 @@
-project('ibpci', 'cpp', default_options : ['cpp_std=c++20'])
+project('myproject', 'cpp', default_options : ['cpp_std=c++20'])
 
 # Define the target executable
 executable('mytarget',

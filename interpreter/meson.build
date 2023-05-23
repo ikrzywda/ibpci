@@ -1,4 +1,5 @@
-project('myproject', 'cpp', default_options : ['cpp_std=c++20'])
+project('myproject', 'cpp', default_options : ['cpp_std=c++17'])
+incldir = include_directories('src/include')
 
 # Define the target executable
 executable('mytarget',
@@ -12,5 +13,9 @@ executable('mytarget',
             'src/Reference.cpp',
             'src/Token.cpp',
             'src/ibpci.cpp'],
-           include_directories: 'src/include')
-
+           include_directories: incldir,
+           dependencies: [
+                dependency('jsoncpp'),
+                dependency('libjsonrpccpp-common'),
+                dependency('libjsonrpccpp-client'),
+            ])

@@ -14,9 +14,10 @@ class Parser {
  private:
   lxr::Lexer lex;
   tk::Token token;
-  tk::Token *lookahead();
+
   void eat(int token_id);
   void error(int token_id);
+
   ast::AST *stmt();
   ast::AST *block();
   ast::AST *if_block();
@@ -37,7 +38,6 @@ class Parser {
   ast::AST *arr();
   ast::AST *arr_dyn();
   ast::AST *std_method();
-  ast::AST *std_void();
   ast::AST *in_out();
 
  public:

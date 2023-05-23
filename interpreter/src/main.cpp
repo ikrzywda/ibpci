@@ -1,3 +1,4 @@
+#include <jsonrpccpp/client.h>
 #include "include/ibpci.hpp"
 
 void print_help() {

@@ -10,7 +10,6 @@
 
 namespace lxr {
 
-int is_upcase();
 const std::string noattr = "0";
 
 class Lexer {

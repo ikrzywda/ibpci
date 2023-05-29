@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "Token.hpp"
+#include "token.hpp"
 
 namespace ast {
 

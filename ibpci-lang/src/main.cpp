@@ -1,6 +1,6 @@
 // #include <jsonrpccpp/client.h>
 #include "include/ibpci.hpp"
-#include "include/trie.hpp"
+// #include "include/trie.hpp"
 
 void print_help() {
   std::cout << "Welcome to ibpci - the IB pseudocode interpreter" << std::endl

@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "AST.hpp"
-#include "Token.hpp"
+#include "ast.hpp"
+#include "token.hpp"
 
 namespace rf {
 

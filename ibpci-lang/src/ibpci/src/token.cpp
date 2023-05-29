@@ -1,4 +1,4 @@
-#include "include/Token.hpp"
+#include "../include/token.hpp"
 
 namespace tk {
 

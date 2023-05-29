@@ -4,9 +4,9 @@
 #include <iostream>
 #include <string>
 
-#include "AST.hpp"
-#include "Lexer.hpp"
-#include "Token.hpp"
+#include "ast.hpp"
+#include "lexer.hpp"
+#include "token.hpp"
 
 namespace prs {
 

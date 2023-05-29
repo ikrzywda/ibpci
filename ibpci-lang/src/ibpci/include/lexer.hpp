@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-#include "Token.hpp"
+#include "token.hpp"
 
 namespace lxr {
 

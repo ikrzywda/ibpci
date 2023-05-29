@@ -7,10 +7,10 @@
 #include <memory>
 #include <utility>
 
-#include "AST.hpp"
-#include "CallStack.hpp"
-#include "Lexer.hpp"
-#include "Token.hpp"
+#include "ast.hpp"
+#include "call_stack.hpp"
+#include "lexer.hpp"
+#include "token.hpp"
 
 namespace IBPCI {
 

@@ -5,11 +5,11 @@
 #include <iostream>
 #include <string>
 
-#include "AST.hpp"
-#include "ActivationRecord.hpp"
-#include "Interpreter.hpp"
-#include "Lexer.hpp"
-#include "Parser.hpp"
+#include "../include/ast.hpp"
+#include "../include/activation_record.hpp"
+#include "../include/runtime.hpp"
+#include "../include/lexer.hpp"
+#include "../include/parser.hpp"
 
 void throw_error(unsigned type, unsigned line_number, std::string message);
 void interpret(char *filename, unsigned mode);

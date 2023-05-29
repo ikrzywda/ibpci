@@ -1,4 +1,4 @@
-#include "include/Lexer.hpp"
+#include "../include/lexer.hpp"
 
 namespace lxr {
 

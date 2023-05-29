@@ -6,9 +6,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include "AST.hpp"
-#include "Reference.hpp"
-#include "Token.hpp"
+#include "ast.hpp"
+#include "reference.hpp"
+#include "token.hpp"
 
 namespace ar {
 

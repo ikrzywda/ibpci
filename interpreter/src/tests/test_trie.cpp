@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "../src/include/trie.hpp"
+#include "../text_service/trie.hpp"
 
 class TrieFixture : public ::testing::Test {
  protected:

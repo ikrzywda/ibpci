@@ -1,5 +1,5 @@
 // #include <jsonrpccpp/client.h>
-#include "include/ibpci.hpp"
+#include "../include/ibpci.hpp"
 // #include "include/trie.hpp"
 
 void print_help() {

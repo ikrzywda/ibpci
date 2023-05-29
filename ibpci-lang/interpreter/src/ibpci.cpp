@@ -1,4 +1,4 @@
-#include "include/ibpci.hpp"
+#include "../include/ibpci.hpp"
 
 void throw_error(unsigned type, unsigned line_number, std::string message) {
   std::string error;

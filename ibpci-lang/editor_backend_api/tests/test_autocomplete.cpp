@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "../text_service/autocomplete.hpp"
-#include "../text_service/trie.hpp"
+#include "../include/autocomplete.hpp"
+#include "../include/trie.hpp"
 
 
 class AutocompleteFixture : public ::testing::Test {

@@ -27,12 +27,31 @@ interpreter_sources = [
 executable('ibpci-test', interpreter_sources, include_directories: interpreter_include_dir, link_with: ibpci_lib)
 
 # TESTS
-# tests_src = files('src/trie.cpp', 'src/tests/test_trie.cpp')
-# tests = executable('tests', test_sources,
-#            include_directories: incldir,
-#            dependencies: [
-#                 gtest_dep,
-#                 gmock_dep,
-#             ])
 
-# test('gtest tests', tests)
+editor_backend_api_include_dir = include_directories('editor_backend_api/include')
+editor_backend_api_sources = [
+    'editor_backend_api/src/trie.cpp',
+    'editor_backend_api/src/text_buffers.cpp',
+    'editor_backend_api/src/autocomplete.cpp',
+]
+
+editor_backend_api_lib = library('editor_backend_api', editor_backend_api_sources, include_directories: editor_backend_api_include_dir)
+
+tests_sources = [
+  'editor_backend_api/tests/test_trie.cpp',
+  'editor_backend_api/tests/test_autocomplete.cpp',
+  'editor_backend_api/tests/run_all.cpp'
+] + editor_backend_api_sources
+
+tests = executable('editor_backend_tests', tests_sources,
+           include_directories: editor_backend_api_include_dir,
+           dependencies: [
+                gtest_dep,
+                gmock_dep,
+            ])
+
+test('gtest editor_backend_tests', tests)
+
+
+# EDITOR
+

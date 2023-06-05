@@ -32,3 +32,9 @@ ibpci_lib = library('ibpci', sources)
 # Export the library for other targets to use
 install_headers('include/*.hpp', subdir: 'ibpci')
 install_library(ibpci_lib)
+
+project('gtest', 'cpp', version : '1.10.0', license : 'bsd')
+
+subdir('googletest')
+
+subdir('googlemock')

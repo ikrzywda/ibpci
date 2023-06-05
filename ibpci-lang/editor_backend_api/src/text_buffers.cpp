@@ -2,6 +2,9 @@
 
 TextBuffers::TextBuffers() {
   text_trie = std::make_unique<Trie::Node>();
+  for (auto &keyword : tk::RESERVED_KEYWORDS) {
+    Trie::insert_node(text_trie.get(), keyword.first);
+  }
 }
 
 bool TextBuffers::insert_new_token(std::string token) {

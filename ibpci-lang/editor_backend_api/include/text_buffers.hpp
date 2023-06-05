@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <token.hpp>
+
 #include "trie.hpp"
 #include "autocomplete.hpp"
 

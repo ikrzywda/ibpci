@@ -16,30 +16,47 @@
           ibpci().then((ibpci) => {
             console.log(ibpci);
             let textBuffers = new ibpci.TextBuffers();
-            textBuffers.insertNewToken("test");
-            let strArray = new ibpci.StringVector();
-            strArray = textBuffers.getSuggestions("t");
-            console.log(strArray.get(0));
+            textBuffers.insertNewToken("hello");
+            textBuffers.insertNewToken("world");
+            textBuffers.insertNewToken("hell");
+            textBuffers.insertNewToken("help");
+            textBuffers.insertNewToken("helping");
+            textBuffers.insertNewToken("helped");
+            textBuffers.insertNewToken("helpful");
+            textBuffers.insertNewToken("helpfulness");
+
+            const textInput = document.getElementById("textInput");
+            const suggestionsDiv = document.getElementById("suggestions");
+
+            textInput.addEventListener("input", function () {
+              const inputText = textInput.value;
+              let strArray = new ibpci.StringVector();
+              strArray = textBuffers.getSuggestions(inputText);
+
+              // Clear previous suggestions
+              suggestionsDiv.innerHTML = "";
+
+              // Display new suggestions
+              for (let i = 0; i < strArray.size(); i++) {
+                const suggestionElement = document.createElement("div");
+                suggestionElement.textContent = strArray.get(i);
+                suggestionsDiv.appendChild(suggestionElement);
+              }
+            });
           });
         };
       }
 
-      // Attach click event listener to the button
-      window.addEventListener("DOMContentLoaded", () => {
-        const runButton = document.getElementById("runButton");
-        runButton.addEventListener("click", runWebAssembly);
-      });
+      // Attach event listener to the window load event
+      window.addEventListener("DOMContentLoaded", runWebAssembly);
     </script>
   </head>
   <body>
     <h1>WebAssembly Test</h1>
     <div id="result"></div>
 
-    <button id="runButton">Run WebAssembly</button>
+    <input type="text" id="textInput" placeholder="Type here..." />
 
-    <script>
-      // You can also write additional JavaScript code here if needed
-      // It will be executed after the WebAssembly module is loaded
-    </script>
+    <div id="suggestions"></div>
   </body>
 </html>

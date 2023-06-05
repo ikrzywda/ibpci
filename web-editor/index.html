@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>WebAssembly Test</title>
+    <script>
+      function runWebAssembly() {
+        // Dynamically load the wrapper.js script
+        const script = document.createElement("script");
+        script.src = "./wrapper.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Once the script is loaded, execute the WebAssembly code
+        script.onload = function () {
+          ibpci().then((ibpci) => {
+            console.log(ibpci);
+            let textBuffers = new ibpci.TextBuffers();
+            textBuffers.insertNewToken("test");
+            let strArray = new ibpci.StringVector();
+            strArray = textBuffers.getSuggestions("t");
+            console.log(strArray.get(0));
+          });
+        };
+      }
+
+      // Attach click event listener to the button
+      window.addEventListener("DOMContentLoaded", () => {
+        const runButton = document.getElementById("runButton");
+        runButton.addEventListener("click", runWebAssembly);
+      });
+    </script>
+  </head>
+  <body>
+    <h1>WebAssembly Test</h1>
+    <div id="result"></div>
+
+    <button id="runButton">Run WebAssembly</button>
+
+    <script>
+      // You can also write additional JavaScript code here if needed
+      // It will be executed after the WebAssembly module is loaded
+    </script>
+  </body>
+</html>

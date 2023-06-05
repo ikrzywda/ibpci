@@ -1,4 +1,4 @@
-#include "text_buffers.hpp"
+#include "../include/text_buffers.hpp"
 
 TextBuffers::TextBuffers() {
   text_trie = std::make_unique<Trie::Node>();

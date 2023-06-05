@@ -18,13 +18,13 @@ ibpci_sources = [
 
 ibpci_lib = library('ibpci', ibpci_sources, include_directories: ibpci_include_dir)
 
-interpreter_include_dir = include_directories('interpreter/include')
-interpreter_sources = [
-    'interpreter/src/ibpci.cpp',
-    'interpreter/src/main.cpp',
-]
-# Define the target executable
-executable('ibpci-test', interpreter_sources, include_directories: interpreter_include_dir, link_with: ibpci_lib)
+# interpreter_include_dir = include_directories('interpreter/include')
+# interpreter_sources = [
+#     'interpreter/src/ibpci.cpp',
+#     'interpreter/src/main.cpp',
+# ]
+# # Define the target executable
+# executable('ibpci-test', interpreter_sources, include_directories: interpreter_include_dir, link_with: ibpci_lib)
 
 # TESTS
 
@@ -52,6 +52,28 @@ tests = executable('editor_backend_tests', tests_sources,
 
 test('gtest editor_backend_tests', tests)
 
+# Configure Emscripten toolchain
+emscripten_args = [
+  '--bind',  # Enable binding support for C++ to JavaScript
+  '-s', 'WASM=1',  # Generate WebAssembly output
+  '-s', 'EXPORTED_FUNCTIONS=["_malloc", "_free"]',  # Specify exported functions
+  # Add any other Emscripten arguments as needed
+]
 
-# EDITOR
+add_project_arguments(emscripten_args, language: 'cpp')
 
+test_editor_backend_api = executable('test_editor_backend_api', editor_backend_api_sources + 'editor_backend_api/main.cpp',
+           include_directories: editor_backend_api_include_dir,
+           link_with: editor_backend_api_lib,
+)
+
+# if get_option('build_target') == 'edit'
+#   build_target = test_editor_backend_api
+# elif get_option('build_target') == 'interpreter'
+#   build_target = interpreter
+# else
+#   build_target = interpreter
+# endif
+
+# # Build the selected target
+# build_target

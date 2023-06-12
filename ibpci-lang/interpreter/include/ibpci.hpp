@@ -5,11 +5,11 @@
 #include <iostream>
 #include <string>
 
-#include <ibpci/include/ast.hpp>
-#include <ibpci/include/activation_record.hpp>
-#include <ibpci/include/runtime.hpp>
-#include <ibpci/include/lexer.hpp>
-#include <ibpci/include/parser.hpp>
+#include <ast.hpp>
+#include <activation_record.hpp>
+#include <runtime.hpp>
+#include <lexer.hpp>
+#include <parser.hpp>
 
 void throw_error(unsigned type, unsigned line_number, std::string message);
 void interpret(char *filename, unsigned mode);

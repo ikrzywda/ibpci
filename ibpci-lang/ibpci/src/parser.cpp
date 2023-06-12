@@ -4,12 +4,21 @@ namespace prs {
 
 Parser::Parser(std::string &&buffer) {
   lex = lxr::Lexer(std::move(buffer));
-  token = lex.get_next_token();
+  if (!lex.get_next_token(token)) {
+    error(-1);
+  }
+  std::cout << "Token: " << tk::id_to_str(token.id) << std::endl;
 }
 
 void Parser::eat(int token_id) {
   if (token.id == token_id) {
-    token = lex.get_next_token();
+    if (!lex.get_next_token(token)) {
+      std::cout << "Explicitly throwing error from eat() in parser.cpp\n";
+      Error err = lex.get_error();
+      std::cout << "Error message: " << err.message << std::endl;
+      error(-1);
+    }
+
   } else
     error(token_id);
 }

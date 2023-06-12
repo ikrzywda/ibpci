@@ -3,7 +3,6 @@
 namespace lxr {
 
 Lexer::Lexer(std::string &&buffer) : input_buffer(buffer) {
-  token = tk::Token();
   pos = 0, len = buffer.size();
   c = input_buffer.at(pos);
   line_num = 1;
@@ -13,18 +12,16 @@ int is_upcase(char c) {
   return (c >= 'A' && c <= 'Z') || isdigit(c) || c == '_' ? 1 : 0;
 }
 
-void Lexer::error() {
-  std::cout << "Unexpected character at line " << line_num << ": '" << c
-            << "'\n";
-  exit(1);
-}
-
 void Lexer::set_error() {
   current_error.message = "Unexpected character at line " + std::to_string(line_num) +
                   ": '" + c + "'\n";
   current_error.line_num = line_num;
   current_error.type = ErrorType::LEXER;
   error_flag = true;
+}
+
+Error Lexer::get_error() {
+  return current_error;
 }
 
 void Lexer::advance() {
@@ -48,22 +45,9 @@ void Lexer::skip_comment() {
   }
 }
 
-tk::Token &Lexer::number() {
-  int id = tk::INT;
-  std::string buffer;
-  buffer.push_back(c);
-  advance();
-  while (std::isdigit(c) || c == '.') {
-    if (c == '.' && id == tk::FLOAT) break;
-    if (c == '.') id = tk::FLOAT;
-    buffer.push_back(c);
-    advance();
-  }
-  token.mutate(tk::NUM, std::stod(buffer), line_num);
-  return token;
-}
 
-tk::Token Lexer::number_v2() {
+
+tk::Token Lexer::number() {
   int id = tk::INT;
   std::string buffer;
   buffer.push_back(c);
@@ -77,22 +61,8 @@ tk::Token Lexer::number_v2() {
   return tk::Token(tk::NUM, std::stod(buffer), line_num);
 }
 
-tk::Token &Lexer::id() {
-  int id = tk::ID_VAR;
-  attr_buffer.push_back(c);
-  if (!is_upcase(c)) id = tk::ID_METHOD;
-  advance();
-  while (std::isalnum(c) || c == '_') {
-    if (!is_upcase(c)) id = tk::ID_METHOD;
-    attr_buffer.push_back(c);
-    advance();
-  }
-  if (tk::lookup_keyword(attr_buffer) > 0) id = tk::lookup_keyword(attr_buffer);
-  token.mutate(id, attr_buffer, line_num);
-  return token;
-}
 
-tk::Token Lexer::id_v2() {
+tk::Token Lexer::id() {
   int id = tk::ID_VAR;
   int keyword_id = 0;
   attr_buffer.push_back(c);
@@ -112,18 +82,8 @@ tk::Token Lexer::id_v2() {
   return tk::Token(id, attr_buffer, line_num);
 }
 
-tk::Token &Lexer::string() {
-  advance();
-  while (c != '\"' && c != EOF) {
-    attr_buffer.push_back(c);
-    advance();
-  }
-  advance();
-  token.mutate(tk::STRING, attr_buffer, line_num);
-  return token;
-}
 
-tk::Token Lexer::string_v2() {
+tk::Token Lexer::string() {
   advance();
   while (c != '\"' && c != EOF) {
     attr_buffer.push_back(c);
@@ -133,51 +93,7 @@ tk::Token Lexer::string_v2() {
   return tk::Token(tk::STRING, attr_buffer, line_num);
 }
 
-tk::Token &Lexer::op_eq(char ch) {
-  advance();
-  if (c == '=') {
-    switch (ch) {
-      case '=':
-        advance();
-        attr_buffer = "==";
-        token.mutate(tk::IS, attr_buffer, line_num);
-        return token;
-      case '<':
-        advance();
-        attr_buffer = "<=";
-        token.mutate(tk::LEQ, attr_buffer, line_num);
-        return token;
-      case '>':
-        advance();
-        attr_buffer = ">=";
-        token.mutate(tk::GEQ, attr_buffer, line_num);
-        return token;
-      case '!':
-        advance();
-        attr_buffer = "!=";
-        token.mutate(tk::DNEQ, attr_buffer, line_num);
-        return token;
-    }
-  } else {
-    switch (ch) {
-      case '=':
-        attr_buffer = "=";
-        token.mutate(tk::EQ, attr_buffer, line_num);
-        return token;
-      case '<':
-        attr_buffer = "<";
-        token.mutate(tk::LT, attr_buffer, line_num);
-        return token;
-      case '>':
-        attr_buffer = ">";
-        token.mutate(tk::GT, attr_buffer, line_num);
-        return token;
-    }
-  }
-  return token;
-}
-
-tk::Token Lexer::op_eq_v2(char base_character) {
+tk::Token Lexer::equals_operator(char base_character) {
   advance();
   if (c == '=') {
     switch (base_character) {
@@ -215,76 +131,82 @@ tk::Token Lexer::op_eq_v2(char base_character) {
   return tk::Token();
 }
 
-tk::Token &Lexer::get_next_token() {
+
+int Lexer::get_next_token(tk::Token &token) {
   while (1) {
     skip_whitespace();
     attr_buffer.clear();
     if (std::isdigit(c)) {
-      return number();
+      token = number();
+      return !error_flag;
     } else if (std::isalnum(c)) {
-      return id();
+      token = id();
+      return !error_flag;
     } else {
       switch (c) {
         case '+':
           advance();
           attr_buffer = "+";
-          token.mutate(tk::PLUS, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::PLUS, attr_buffer, line_num);
+          return !error_flag;
         case '-':
           advance();
           attr_buffer = "-";
-          token.mutate(tk::MINUS, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::MINUS, attr_buffer, line_num);
+          return !error_flag;
         case '*':
           advance();
           attr_buffer = "*";
-          token.mutate(tk::MULT, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::MULT, attr_buffer, line_num);
         case '%':
           advance();
           attr_buffer = "%";
-          token.mutate(tk::MOD, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::MOD, attr_buffer, line_num);
         case '[':
           advance();
           attr_buffer = "]";
-          token.mutate(tk::LSQBR, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::LSQBR, attr_buffer, line_num);
+          return !error_flag;
         case ']':
           advance();
           attr_buffer = "]";
-          token.mutate(tk::RSQBR, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::RSQBR, attr_buffer, line_num);
+          return !error_flag;
         case '(':
           advance();
           attr_buffer = "(";
-          token.mutate(tk::LPAREN, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::LPAREN, attr_buffer, line_num);
+          return !error_flag;
         case ')':
           advance();
           attr_buffer = ")";
-          token.mutate(tk::RPAREN, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::RPAREN, attr_buffer, line_num);
+          return !error_flag;
         case '.':
           advance();
           attr_buffer = ".";
-          token.mutate(tk::DOT, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::DOT, attr_buffer, line_num);
+          return !error_flag;
         case ',':
           advance();
           attr_buffer = ",";
-          token.mutate(tk::COMMA, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::COMMA, attr_buffer, line_num);
+          return !error_flag;
         case '\"':
-          return string();
+          token = string();
+          return !error_flag;
         case '=':
-          return op_eq('=');
+          token = equals_operator('=');
+          return !error_flag;
         case '>':
-          return op_eq('>');
+          token = equals_operator('>');
+          return !error_flag;
         case '<':
-          return op_eq('<');
+          token = equals_operator('<');
+          return !error_flag;
         case '!':
-          return op_eq('!');
+          token = equals_operator('!');
+          return !error_flag;
         case '/':
           advance();
           if (c == '/') {
@@ -292,8 +214,8 @@ tk::Token &Lexer::get_next_token() {
             break;
           } else {
             attr_buffer = "/";
-            token.mutate(tk::DIV_WOQ, attr_buffer, line_num);
-            return token;
+            token = tk::Token(tk::DIV_WOQ, attr_buffer, line_num);
+            return !error_flag;
           }
         case '\n':
           advance();
@@ -301,120 +223,16 @@ tk::Token &Lexer::get_next_token() {
           break;
         case EOF:
           attr_buffer = "EOF";
-          token.mutate(tk::END_FILE, attr_buffer, line_num);
-          return token;
+          token = tk::Token(tk::END_FILE, attr_buffer, line_num);
+          return !error_flag;
         default:
-          error();
-      }
-    }
-  }
-  return token;
-}
-
-int Lexer::get_next_token_v2(tk::Token &token) {
-  tk::Token result_token;
-  while (1) {
-    skip_whitespace();
-    attr_buffer.clear();
-    if (std::isdigit(c)) {
-      result_token = number();
-      break;
-    } else if (std::isalnum(c)) {
-      result_token = id_v2();
-    } else {
-      switch (c) {
-        case '+':
-          advance();
-          attr_buffer = "+";
-          result_token = tk::Token(tk::PLUS, attr_buffer, line_num);
-          break;
-        case '-':
-          advance();
-          attr_buffer = "-";
-          result_token = tk::Token(tk::MINUS, attr_buffer, line_num);
-          break;
-        case '*':
-          advance();
-          attr_buffer = "*";
-          result_token = tk::Token(tk::MULT, attr_buffer, line_num);
-        case '%':
-          advance();
-          attr_buffer = "%";
-          result_token = tk::Token(tk::MOD, attr_buffer, line_num);
-        case '[':
-          advance();
-          attr_buffer = "]";
-          result_token = tk::Token(tk::LSQBR, attr_buffer, line_num);
-          break;
-        case ']':
-          advance();
-          attr_buffer = "]";
-          result_token = tk::Token(tk::RSQBR, attr_buffer, line_num);
-          break;
-        case '(':
-          advance();
-          attr_buffer = "(";
-          result_token = tk::Token(tk::LPAREN, attr_buffer, line_num);
-          break;
-        case ')':
-          advance();
-          attr_buffer = ")";
-          result_token = tk::Token(tk::RPAREN, attr_buffer, line_num);
-          break;
-        case '.':
-          advance();
-          attr_buffer = ".";
-          result_token = tk::Token(tk::DOT, attr_buffer, line_num);
-          break;
-        case ',':
-          advance();
-          attr_buffer = ",";
-          result_token = tk::Token(tk::COMMA, attr_buffer, line_num);
-          break;
-        case '\"':
-          result_token = string();
-          break;
-        case '=':
-          result_token = op_eq_v2('=');
-          break;
-        case '>':
-          result_token = op_eq_v2('>');
-          break;
-        case '<':
-          result_token = op_eq_v2('<');
-          break;
-        case '!':
-          result_token = op_eq_v2('!');
-          break;
-        case '/':
-          advance();
-          if (c == '/') {
-            skip_comment();
-            break;
-          } else {
-            attr_buffer = "/";
-            result_token = tk::Token(tk::DIV_WOQ, attr_buffer, line_num);
-            break;
-          }
-        case '\n':
-          advance();
-          ++line_num;
-          break;
-        case EOF:
-          attr_buffer = "EOF";
-          result_token = tk::Token(tk::END_FILE, attr_buffer, line_num);
-          break;
-        default:
-          error();
+          set_error();
+          return !error_flag;
       }
     }
   }
 
-  if (error_flag) {
-    return 0;
-  }
-  token = result_token;
-  return 1;
+  return !error_flag;
 }
 
 }  // namespace lxr

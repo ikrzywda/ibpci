@@ -67,11 +67,18 @@ void interpret(char *filename, unsigned mode) {
 
 void run_lexer(std::string buffer) {
   lxr::Lexer lex(std::move(buffer));
-  tk::Token token = lex.get_next_token();
+  tk::Token token;
+  if (!lex.get_next_token(token)) {
+    std::cout << lex.get_error().message;
+    return;
+  }
   while (token.id != tk::END_FILE) {
     std::cout << "line " << lex.line_num << ": ";
     tk::print_token(&token);
-    token = lex.get_next_token();
+    if (!lex.get_next_token(token)) {
+      std::cout << lex.get_error().message;
+      return;
+    }
   }
 }
 

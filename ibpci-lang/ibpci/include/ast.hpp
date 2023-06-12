@@ -52,6 +52,7 @@ class AST {
   std::vector<AST *> children;
   AST(tk::Token &token, int node_id);
   AST(int node_id);
+  AST() = default;
   void push_child(AST *child);
 };
 

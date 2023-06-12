@@ -23,6 +23,22 @@ void Parser::eat(int token_id) {
     error(token_id);
 }
 
+bool Parser::eat_v2(int token_id) {
+  if (token.id == token_id) {
+    if (!lex.get_next_token(token)) {
+      std::cout << "Explicitly throwing error from eat() in parser.cpp\n";
+      Error err = lex.get_error();
+      std::cout << "Error message: " << err.message << std::endl;
+      set_error(-1);
+      return false;
+    }
+    return true;
+  } else {
+    set_error(token_id);
+    return false;
+  }
+}
+
 void Parser::error(int token_id) {
   std::cout << "SYNTAX ERROR at line " << lex.line_num
             << ":unexpected token: " << tk::id_to_str(token.id);
@@ -38,6 +54,25 @@ ast::AST *Parser::parse() {
     root->push_child(stmt());
   }
   return root;
+}
+
+int Parser::parse_v2(ast::AST *root) {
+  // TODO: add new error type for null root
+  if (root == nullptr) {
+    return 0;
+  }
+  ast::AST *stmt_root;
+  root->id = ast::START;
+  while (token.id != tk::END_FILE) {
+    stmt_root = new ast::AST;
+    if (!stmt_v2(stmt_root)) {
+      delete stmt_root;
+      ast::delete_tree(root);
+      return 0;
+    }
+    root->push_child(stmt_root);
+  }
+  return 1;
 }
 
 ast::AST *Parser::stmt() {
@@ -68,6 +103,38 @@ ast::AST *Parser::stmt() {
   return NULL;
 }
 
+int Parser::stmt_v2(ast::AST *root) {
+  if (root == nullptr) {
+    return 0;
+  }
+  ast::AST *root = new ast::AST;
+  switch (token.id) {
+    case tk::ID_VAR:
+      return assign_v2(root);
+    case tk::ID_METHOD:
+      return method_call_v2(root);
+    case tk::METHOD:
+      return method_v2(root);
+    case tk::IF:
+      return if_stmt_v2(root);
+    case tk::RETURN:
+      return ret_v2(root);
+    case tk::LOOP:
+      eat(tk::LOOP);
+      if (token.id == tk::WHILE)
+        return loop_whl_v2(root);
+      else if (token.id == tk::ID_VAR || token.id == tk::ID_METHOD)
+        return loop_for_v2(root);
+    case tk::INPUT:
+      return in_out_v2(root);
+    case tk::OUTPUT:
+      return in_out_v2(root);
+    default:
+      set_error(-1);
+  }
+  return 0;
+}
+
 ast::AST *Parser::block() {
   ast::AST *root = new ast::AST(ast::BLOCK);
   while (token.id != tk::END) {
@@ -75,6 +142,22 @@ ast::AST *Parser::block() {
   }
   eat(tk::END);
   return root;
+}
+
+int Parser::block_v2(ast::AST *root) {
+  if (root == nullptr) {
+    return 0;
+  }
+  ast::AST *stmt_root;
+  while (token.id != tk::END) {
+    stmt_root = new ast::AST;
+    if (!stmt_v2(stmt_root)) {
+      delete stmt_root;
+      return 0;
+    }
+    root->push_child(stmt_root);
+  }
+  return eat_v2(tk::END);
 }
 
 ast::AST *Parser::if_block() {
@@ -87,6 +170,26 @@ ast::AST *Parser::if_block() {
     }
   }
   return root;
+}
+
+int Parser::if_block_v2(ast::AST *root) {
+  if (root == nullptr) {
+    return 0;
+  }
+  ast::AST *stmt_root;
+  while (token.id != tk::END) {
+    if (token.id == tk::ELSE) {
+      return 1;
+    } else {
+      stmt_root = new ast::AST;
+      if (!stmt_v2(stmt_root)) {
+        delete stmt_root;
+        return 0;
+      }
+      root->push_child(stmt_root);
+    }
+  }
+  return 1;
 }
 
 ast::AST *Parser::method() {

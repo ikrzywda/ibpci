@@ -4,15 +4,38 @@ namespace prs {
 
 Parser::Parser(std::string &&buffer) {
   lex = lxr::Lexer(std::move(buffer));
-  token = lex.get_next_token();
+  if (!lex.get_next_token(token)) {
+    error(-1);
+  }
 }
 
 void Parser::eat(int token_id) {
+  if (error_flag) {
+    return;
+  }
   if (token.id == token_id) {
-    token = lex.get_next_token();
+    if (!lex.get_next_token(token)) {
+      std::cout << "Explicitly throwing error from eat() in parser.cpp\n";
+      Error err = lex.get_error();
+      std::cout << "Error message: " << err.message << std::endl;
+      error(-1);
+    }
+
   } else
     error(token_id);
 }
+
+void Parser::set_error(int token_id) {
+  error_flag = true;
+  current_error.line_num = lex.line_num;
+  current_error.message = "SYNTAX ERROR at line " +
+                          std::to_string(lex.line_num) +
+                          ":unexpected token: " + tk::id_to_str(token.id);
+  if (token_id >= 0)
+    current_error.message += ", expected token: " + tk::id_to_str(token_id);
+}
+
+Error Parser::get_error() { return current_error; }
 
 void Parser::error(int token_id) {
   std::cout << "SYNTAX ERROR at line " << lex.line_num
@@ -25,8 +48,12 @@ void Parser::error(int token_id) {
 
 ast::AST *Parser::parse() {
   ast::AST *root = new ast::AST(ast::START);
-  while (token.id != tk::END_FILE) {
+  while (token.id != tk::END_FILE && !error_flag) {
     root->push_child(stmt());
+  }
+  if (error_flag) {
+    ast::delete_tree(root);
+    return nullptr;
   }
   return root;
 }
@@ -54,9 +81,9 @@ ast::AST *Parser::stmt() {
     case tk::OUTPUT:
       return in_out();
     default:
-      error(-1);
+      set_error(-1);
   }
-  return NULL;
+  return nullptr;
 }
 
 ast::AST *Parser::block() {
@@ -320,7 +347,7 @@ ast::AST *Parser::factor() {
     case tk::END_FILE:
       std::cout << "END";
     default:
-      error(-1);
+      set_error(-1);
   }
   return 0;
 }

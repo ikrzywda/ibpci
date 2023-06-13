@@ -30,6 +30,18 @@ Token::Token(double val) {
   val_num = val;
 }
 
+Token::Token(int id, std::string string_value, unsigned line_number) {
+  this->id = id;
+  val_str = string_value;
+  line = line_number;
+}
+
+Token::Token(int id, double num_value, unsigned line_number) {
+  this->id = id;
+  val_num = num_value;
+  line = line_number;
+}
+
 void Token::mutate(int id, std::string val, unsigned ln) {
   this->id = id;
   val_str = val;

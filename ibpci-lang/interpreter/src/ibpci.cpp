@@ -67,17 +67,28 @@ void interpret(char *filename, unsigned mode) {
 
 void run_lexer(std::string buffer) {
   lxr::Lexer lex(std::move(buffer));
-  tk::Token token = lex.get_next_token();
+  tk::Token token;
+  if (!lex.get_next_token(token)) {
+    std::cout << lex.get_error().message;
+    return;
+  }
   while (token.id != tk::END_FILE) {
     std::cout << "line " << lex.line_num << ": ";
     tk::print_token(&token);
-    token = lex.get_next_token();
+    if (!lex.get_next_token(token)) {
+      std::cout << lex.get_error().message;
+      return;
+    }
   }
 }
 
 void run_parser(std::string buffer) {
   prs::Parser parser(std::move(buffer));
+  // ast::AST *root = parser.parse();
   ast::AST *root = parser.parse();
+  if (root == nullptr) {
+    std::cout << parser.get_error().message;
+  }
   ast::print_tree(root, 0);
   ast::delete_tree(root);
 }
@@ -85,6 +96,10 @@ void run_parser(std::string buffer) {
 void run_interpreter(std::string buffer, bool logging) {
   prs::Parser parser(std::move(buffer));
   ast::AST *root = parser.parse();
+  if (!root) {
+    std::cout << parser.get_error().message;
+    return;
+  }
   IBPCI::Interpreter ibpci(root, logging);
   ibpci.interpret();
 }

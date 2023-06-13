@@ -10,7 +10,7 @@ API_SOURCES := $(wildcard bindings/wasm/*.cpp) $(wildcard src/*.cpp)
 INTERPRETER_SOURCES := $(wildcard src/*.cpp)
 
 # Include directories
-INCLUDE_DIRS := -Iinclude -I$(IBPCI_DIR)/include
+INCLUDE_DIRS := -Iinclude -I$(IBPCI_DIR)/include -fsanitize=address
 
 # Library path and flags
 LIB_PATH := -L$(IBPCI_DIR)

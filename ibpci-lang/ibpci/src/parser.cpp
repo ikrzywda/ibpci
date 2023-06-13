@@ -7,10 +7,10 @@ Parser::Parser(std::string &&buffer) {
   if (!lex.get_next_token(token)) {
     error(-1);
   }
-  std::cout << "Token: " << tk::id_to_str(token.id) << std::endl;
 }
 
 void Parser::eat(int token_id) {
+  std::cout << "aaa Token: " << tk::id_to_str(token.id) << std::endl;
   if (token.id == token_id) {
     if (!lex.get_next_token(token)) {
       std::cout << "Explicitly throwing error from eat() in parser.cpp\n";
@@ -71,15 +71,14 @@ ast::AST *Parser::parse() {
 int Parser::parse_v2(ast::AST *root) {
   // TODO: add new error type for null root
   if (root == nullptr) {
-    std::cout << "Error: null root in parse_v2()\n";
     return 0;
   }
   ast::AST *stmt_root;
   root->id = ast::START;
   while (token.id != tk::END_FILE) {
+    std::cout << "STMT" << std::endl;
     stmt_root = new ast::AST;
     if (!stmt_v2(stmt_root)) {
-      std::cout << "Error: null stmt_root in parse_v2()\n";
       delete stmt_root;
       ast::delete_tree(root);
       return 0;
@@ -122,13 +121,14 @@ int Parser::stmt_v2(ast::AST *root) {
     std::cout << "Error: null root in stmt_v2()asdfsadffsda\n";
     return 0;
   }
-  std::cout << "Token: " << tk::id_to_str(token.id) << std::endl;
   switch (token.id) {
     case tk::ID_VAR:
       return assign_v2(root);
     case tk::ID_METHOD:
+    std::cout << "Method call in stmt_v2()\n";
       return method_call_v2(root);
     case tk::METHOD:
+      std::cout << "Method call in stmt_v2()\n";
       return method_v2(root);
     case tk::IF:
       return if_stmt_v2(root);
@@ -143,6 +143,7 @@ int Parser::stmt_v2(ast::AST *root) {
     case tk::INPUT:
       return in_out_v2(root);
     case tk::OUTPUT:
+      std::cout << "Output in stmt_v2()\n";
       return in_out_v2(root);
     default:
       set_error(-1);
@@ -276,6 +277,7 @@ int Parser::method_v2(ast::AST *root) {
     return 0;
   }
   root->push_child(block_root);
+
   return eat_v2(tk::METHOD);
 }
 
@@ -688,14 +690,13 @@ int Parser::expr_v2(ast::AST *root) {
   if (root == nullptr) {
     return 0;
   }
-  root->id = ast::BINOP;
-  ast::AST *term_root = nullptr;
+  ast::AST *term_root = new ast::AST;
   ast::AST *expression_root = nullptr;
-  if (!term_v2(term_root)) {
+  if (!term_v2(root)) {
+    std::cout << "term_v2 failed first" << std::endl;
     delete term_root;
     return 0;
   }
-  root->push_child(term_root);
   while (token.id == tk::PLUS || token.id == tk::MINUS) {
     expression_root = new ast::AST(token, ast::BINOP);
     expression_root->push_child(root);
@@ -706,10 +707,11 @@ int Parser::expr_v2(ast::AST *root) {
     }
     term_root = new ast::AST;
     if (!term_v2(term_root)) {
+      std::cout << "term_v2 failed" << std::endl;
       delete term_root;
       return 0;
     }
-    root->push_child(term_root);
+    expression_root->push_child(term_root);
   }
   return 1;
 }
@@ -730,12 +732,14 @@ ast::AST *Parser::term() {
 
 int Parser::term_v2(ast::AST *root) {
   if (root == nullptr) {
+    std::cout << "passin null root" << std::endl; // TODO: remove this
     return 0;
   }
   root->id = ast::BINOP;
-  ast::AST *factor_root = nullptr;
+  ast::AST *factor_root = new ast::AST;
   ast::AST *expression_root = nullptr;
   if (!factor_v2(factor_root)) {
+    std::cout << "factor failed first" << std::endl;
     delete factor_root;
     return 0;
   }
@@ -751,6 +755,7 @@ int Parser::term_v2(ast::AST *root) {
     }
     factor_root = new ast::AST;
     if (!factor_v2(factor_root)) {
+      std::cout << "factor failed" << std::endl;
       delete factor_root;
       return 0;
     }
@@ -936,7 +941,7 @@ int Parser::factor_v2(ast::AST *root) {
       set_error(-1);
       return 0;
   }
-  return 0;
+  return 1;
   }
 
 ast::AST *Parser::arr() {
@@ -1107,17 +1112,20 @@ ast::AST *Parser::in_out() {
 
 int Parser::in_out_v2(ast::AST *root) {
   if (root == nullptr) {
+    std::cout << "root is null" << std::endl;
     return 0;
   }
-  if (token.id == tk::INPUT)
+  if (token.id == tk::INPUT) {
     *root = ast::AST(token, ast::INPUT);
-  else if (token.id == tk::OUTPUT)
+  } else if (token.id == tk::OUTPUT){
     *root = ast::AST(token, ast::OUTPUT);
+  }
   if (!eat_v2(token.id) || !eat_v2(tk::LPAREN)) {
     return 0;
   }
   ast::AST *expression_root = new ast::AST;
   if (!expr_v2(expression_root)) {
+    std::cout << "expr_v2 failed first one" << std::endl;
     delete expression_root;
     return 0;
   }
@@ -1128,6 +1136,7 @@ int Parser::in_out_v2(ast::AST *root) {
     }
     expression_root = new ast::AST;
     if (!expr_v2(expression_root)) {
+      std::cout << "expr_v2 failed" << std::endl;
       delete expression_root;
       return 0;
     }

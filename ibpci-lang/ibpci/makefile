@@ -2,7 +2,7 @@ CXX := clang++
 CXXFLAGS := -std=c++17 -Iinclude
 LIB := libibpci.a
 
-# Source files
+#Source files
 SOURCES := $(wildcard src/*.cpp)
 OBJECTS := $(patsubst src/%.cpp, obj/%.o, $(SOURCES))
 

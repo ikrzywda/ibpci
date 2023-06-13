@@ -1,11 +1,11 @@
 CXX := clang++
-CXXFLAGS := -std=c++17 
+CXXFLAGS := -std=c++17
 
-# Directory paths
+#Directory paths
 API_DIR := $(CURDIR)
 IBPCI_DIR := $(CURDIR)/../ibpci
 
-# Source files
+#Source files
 API_SOURCES := $(wildcard bindings/wasm/*.cpp) $(wildcard src/*.cpp)
 INTERPRETER_SOURCES := $(wildcard src/*.cpp)
 

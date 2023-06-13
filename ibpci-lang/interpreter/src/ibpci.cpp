@@ -91,7 +91,12 @@ void run_parser(std::string buffer) {
 
 void run_interpreter(std::string buffer, bool logging) {
   prs::Parser parser(std::move(buffer));
-  ast::AST *root = parser.parse();
+  ast::AST *root = new ast::AST;
+  if (!parser.parse_v2(root)) {
+    std::cout << "dupa";
+    std::cout << parser.get_error().message;
+    return;
+  }
   IBPCI::Interpreter ibpci(root, logging);
   ibpci.interpret();
 }

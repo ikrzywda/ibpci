@@ -1,11 +1,11 @@
 CXX := em++
 CXXFLAGS := --bind -s ENVIRONMENT=web -s MODULARIZE=1 -s SINGLE_FILE=1 -s "EXPORTED_FUNCTIONS=['_malloc', '_free']" -s "EXPORT_NAME='ibpci'"
 
-# Directory paths
+#Directory paths
 API_DIR := $(CURDIR)
 IBPCI_DIR := $(CURDIR)/../ibpci
 
-# Source files
+#Source files
 API_SOURCES := $(wildcard bindings/wasm/*.cpp) $(wildcard src/*.cpp)
 
 # Include directories

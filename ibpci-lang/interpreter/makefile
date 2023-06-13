@@ -1,5 +1,5 @@
-CXX := em++
-CXXFLAGS := --bind -s ENVIRONMENT=web -s MODULARIZE=1 -s SINGLE_FILE=1 -s "EXPORTED_FUNCTIONS=['_malloc', '_free']" -s "EXPORT_NAME='ibpci'"
+CXX := clang++
+CXXFLAGS := -std=c++17
 
 #Directory paths
 API_DIR := $(CURDIR)
@@ -7,16 +7,17 @@ IBPCI_DIR := $(CURDIR)/../ibpci
 
 #Source files
 API_SOURCES := $(wildcard bindings/wasm/*.cpp) $(wildcard src/*.cpp)
+INTERPRETER_SOURCES := $(wildcard src/*.cpp)
 
 # Include directories
-INCLUDE_DIRS := -Ibindings/wasm -Iinclude -I$(IBPCI_DIR)/include
+INCLUDE_DIRS := -Iinclude -I$(IBPCI_DIR)/include -fsanitize=address
 
 # Library path and flags
 LIB_PATH := -L$(IBPCI_DIR)
 LIB := -libpci
 
 # Output file
-OUTPUT_FILE := wrapper.js
+OUTPUT_FILE := interpreter
 
 # Build target
 api: $(API_SOURCES)

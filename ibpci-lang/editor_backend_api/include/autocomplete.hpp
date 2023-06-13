@@ -3,11 +3,12 @@
 
 #include <string>
 #include <vector>
+
 #include "trie.hpp"
 
 namespace Autocomplete {
-  bool get_suggestions(Trie::Node *root, std::string prefix, std::vector<std::string> &completion_list);
+bool get_suggestions(Trie::Node *root, std::string prefix,
+                     std::vector<std::string> &completion_list);
 }
-
 
 #endif

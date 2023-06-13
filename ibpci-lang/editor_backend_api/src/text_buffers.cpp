@@ -23,6 +23,7 @@ bool TextBuffers::update_text_buffer(std::string text) {
 std::vector<std::string> TextBuffers::get_suggestions(std::string prefix) {
   std::vector<std::string> suggestions_list;
   Trie::Node *prefix_root = Trie::get_prefix_node(text_trie.get(), prefix);
-  bool result = Autocomplete::get_suggestions(prefix_root, prefix, suggestions_list);
+  bool result =
+      Autocomplete::get_suggestions(prefix_root, prefix, suggestions_list);
   return suggestions_list;
 }

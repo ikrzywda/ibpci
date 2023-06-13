@@ -5,6 +5,7 @@
 #include <string>
 
 #include "ast.hpp"
+#include "error.hpp"
 #include "lexer.hpp"
 #include "token.hpp"
 
@@ -17,6 +18,9 @@ class Parser {
 
   void eat(int token_id);
   void error(int token_id);
+  void set_error(int token_id);
+  bool error_flag{false};
+  Error current_error;
 
   ast::AST *stmt();
   ast::AST *block();
@@ -42,6 +46,7 @@ class Parser {
 
  public:
   Parser(std::string &&buffer);
+  Error get_error();
   ast::AST *parse();
 };
 

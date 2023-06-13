@@ -604,7 +604,11 @@ rf::Reference *Interpreter::input(ast::AST *root) {
   buffer.push_back('\0');
   std::cout << std::endl;
   lxr::Lexer lex(std::move(buffer));
-  return new rf::Reference(&lex.get_next_token());
+  tk::Token token;
+  if (!lex.get_next_token(token)) {
+    error(lex.get_error().message, root);
+  }
+  return new rf::Reference(&token);
 }
 
 void Interpreter::print_methods() {

@@ -71,6 +71,9 @@ class Token {
   Token(double val);
   Token(Token &tok);
   Token(Token *tok);
+  Token(int id, std::string string_value, unsigned line_number);
+  Token(int id, double num_value, unsigned line_number);
+
   Token() = default;
   ~Token() = default;
 

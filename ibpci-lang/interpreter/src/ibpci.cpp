@@ -85,11 +85,9 @@ void run_lexer(std::string buffer) {
 void run_parser(std::string buffer) {
   prs::Parser parser(std::move(buffer));
   // ast::AST *root = parser.parse();
-  ast::AST *root = new ast::AST;
-    if (!parser.parse_v2(root)) {
-    std::cout << "error" << std::endl;
+  ast::AST *root = parser.parse();
+  if (root == nullptr) {
     std::cout << parser.get_error().message;
-    return;
   }
   ast::print_tree(root, 0);
   ast::delete_tree(root);
@@ -97,9 +95,8 @@ void run_parser(std::string buffer) {
 
 void run_interpreter(std::string buffer, bool logging) {
   prs::Parser parser(std::move(buffer));
-  ast::AST *root = new ast::AST;
-  if (!parser.parse_v2(root)) {
-    std::cout << "error" << std::endl;
+  ast::AST *root = parser.parse();
+  if (!root) {
     std::cout << parser.get_error().message;
     return;
   }

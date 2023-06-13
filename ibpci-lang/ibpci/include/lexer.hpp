@@ -6,8 +6,8 @@
 #include <iostream>
 #include <string>
 
-#include "token.hpp"
 #include "error.hpp"
+#include "token.hpp"
 
 namespace lxr {
 
@@ -18,7 +18,7 @@ class Lexer {
   std::string input_buffer;
   std::string attr_buffer;
   Error current_error;
-  bool error_flag {false};
+  bool error_flag{false};
   int pos, len;
   char c;
 
@@ -37,9 +37,8 @@ class Lexer {
   ~Lexer() = default;
   unsigned int line_num;
   Error get_error();
-  
+
   int get_next_token(tk::Token &token);
-  
 };
 
 }  // namespace lxr

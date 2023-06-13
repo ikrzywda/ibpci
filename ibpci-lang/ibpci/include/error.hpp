@@ -3,14 +3,7 @@
 
 #include <string>
 
-enum class ErrorType {
-  LEXER,
-  PARSER,
-  SEMANTIC,
-  RUNTIME,
-  INTERNAL,
-  UNKNOWN
-};
+enum class ErrorType { LEXER, PARSER, SEMANTIC, RUNTIME, INTERNAL, UNKNOWN };
 
 struct Error {
   std::string message;

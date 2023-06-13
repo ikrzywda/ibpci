@@ -5,8 +5,8 @@
 #include <stack>
 #include <string>
 
-#include "ast.hpp"
 #include "activation_record.hpp"
+#include "ast.hpp"
 #include "token.hpp"
 
 namespace cstk {

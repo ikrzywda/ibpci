@@ -13,16 +13,14 @@ int is_upcase(char c) {
 }
 
 void Lexer::set_error() {
-  current_error.message = "Unexpected character at line " + std::to_string(line_num) +
-                  ": '" + c + "'\n";
+  current_error.message = "Unexpected character at line " +
+                          std::to_string(line_num) + ": '" + c + "'\n";
   current_error.line_num = line_num;
   current_error.type = ErrorType::LEXER;
   error_flag = true;
 }
 
-Error Lexer::get_error() {
-  return current_error;
-}
+Error Lexer::get_error() { return current_error; }
 
 void Lexer::advance() {
   pos++;
@@ -45,8 +43,6 @@ void Lexer::skip_comment() {
   }
 }
 
-
-
 tk::Token Lexer::number() {
   int id = tk::INT;
   std::string buffer;
@@ -60,7 +56,6 @@ tk::Token Lexer::number() {
   }
   return tk::Token(tk::NUM, std::stod(buffer), line_num);
 }
-
 
 tk::Token Lexer::id() {
   int id = tk::ID_VAR;
@@ -81,7 +76,6 @@ tk::Token Lexer::id() {
   id = keyword_id > 0 ? keyword_id : id;
   return tk::Token(id, attr_buffer, line_num);
 }
-
 
 tk::Token Lexer::string() {
   advance();
@@ -130,7 +124,6 @@ tk::Token Lexer::equals_operator(char base_character) {
   set_error();
   return tk::Token();
 }
-
 
 int Lexer::get_next_token(tk::Token &token) {
   while (1) {

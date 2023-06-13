@@ -5,9 +5,9 @@
 #include <string>
 
 #include "ast.hpp"
+#include "error.hpp"
 #include "lexer.hpp"
 #include "token.hpp"
-#include "error.hpp"
 
 namespace prs {
 
@@ -20,7 +20,7 @@ class Parser {
   bool eat_v2(int token_id);
   void error(int token_id);
   void set_error(int token_id);
-  bool error_flag {false};
+  bool error_flag{false};
   Error current_error;
 
   ast::AST *stmt();
@@ -44,7 +44,6 @@ class Parser {
   ast::AST *arr_dyn();
   ast::AST *std_method();
   ast::AST *in_out();
-
 
   int stmt_v2(ast::AST *root);
   int block_v2(ast::AST *root);
@@ -72,7 +71,6 @@ class Parser {
   Parser(std::string &&buffer);
   Error get_error();
   ast::AST *parse();
-  int parse_v2(ast::AST *root);
 };
 
 }  // namespace prs

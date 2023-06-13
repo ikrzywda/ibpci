@@ -1,15 +1,14 @@
 #ifndef IBPCI_LEGACY_HPP
 #define IBPCI_LEGACY_HPP
 
+#include <activation_record.hpp>
+#include <ast.hpp>
 #include <fstream>
 #include <iostream>
-#include <string>
-
-#include <ast.hpp>
-#include <activation_record.hpp>
-#include <runtime.hpp>
 #include <lexer.hpp>
 #include <parser.hpp>
+#include <runtime.hpp>
+#include <string>
 
 void throw_error(unsigned type, unsigned line_number, std::string message);
 void interpret(char *filename, unsigned mode);

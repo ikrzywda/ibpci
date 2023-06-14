@@ -25,9 +25,9 @@ void Parser::eat(int token_id) {
       std::cout << "Error message: " << err.message << std::endl;
       set_error(-1);
     }
-
-  } else
+  } else {
     set_error(token_id);
+  }
 }
 
 void Parser::set_error(int token_id) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 
 export default function Home() {
   const editorRef = useRef<any>(null);
@@ -6,6 +6,7 @@ export default function Home() {
   const [wasm, setWasm] = useState<any>(null);
   const [textBuffers, setTextBuffers] = useState<any>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const runWebAssembly = async () => {
@@ -21,13 +22,24 @@ export default function Home() {
     runWebAssembly();
   }, []);
 
-  const handleCodeChange = (code: string) => {
-    setCode(code.toString());
+  const handleCodeChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setCode(event.target.value.toString());
+    console.log(event.target.value.toString());
 
     if (textBuffers && wasm) {
-      const cursorPosition = editorRef.current?.editor?.getPosition();
-      console.log(cursorPosition);
-      const strArray = textBuffers.getSuggestions(code.toString());
+      const cursorPosition = event.target.selectionStart;
+
+      let startIndex = code.lastIndexOf(" ", cursorPosition) + 1;
+      let endIndex = code.indexOf(" ", cursorPosition);
+      if (endIndex === -1) {
+        endIndex = code.length;
+      }
+
+      const currentToken = code.substring(startIndex, endIndex);
+
+      console.log(currentToken);
+
+      const strArray = textBuffers.getSuggestions(currentToken.toString());
       const suggestionsArray: string[] = [];
       for (let i = 0; i < strArray.size(); i++) {
         suggestionsArray.push(strArray.get(i));
@@ -36,6 +48,7 @@ export default function Home() {
       try {
         textBuffers.updateTextBuffer(code.toString());
         const error = textBuffers.runParser();
+        setError(error);
         console.log(error);
       } catch (e) {
         console.log(e);
@@ -47,7 +60,7 @@ export default function Home() {
     <div>
       <textarea
         value={code}
-        onChange={(e) => handleCodeChange(e.target.value)}
+        onChange={(e) => handleCodeChange(e)}
         style={{ fontFamily: "monospace" }}
       />
 
@@ -56,6 +69,7 @@ export default function Home() {
           <div key={index}>{suggestion}</div>
         ))}
       </div>
+      <div id="error">{error}</div>
     </div>
   );
 }

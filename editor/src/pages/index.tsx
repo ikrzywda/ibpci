@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import Editor from "react-simple-code-editor";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
-  const [code, setCode] = useState("");
+  const editorRef = useRef<any>(null);
+  const [code, setCode] = useState("no i chuj");
   const [wasm, setWasm] = useState<any>(null);
   const [textBuffers, setTextBuffers] = useState<any>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -22,29 +22,33 @@ export default function Home() {
   }, []);
 
   const handleCodeChange = (code: string) => {
-    setCode(code);
+    setCode(code.toString());
 
     if (textBuffers && wasm) {
-      const strArray = textBuffers.getSuggestions(code);
+      const cursorPosition = editorRef.current?.editor?.getPosition();
+      console.log(cursorPosition);
+      const strArray = textBuffers.getSuggestions(code.toString());
       const suggestionsArray: string[] = [];
       for (let i = 0; i < strArray.size(); i++) {
         suggestionsArray.push(strArray.get(i));
       }
       setSuggestions(suggestionsArray);
+      try {
+        textBuffers.updateTextBuffer(code.toString());
+        const error = textBuffers.runParser();
+        console.log(error);
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
 
   return (
     <div>
-      <Editor
+      <textarea
         value={code}
-        onValueChange={(code) => handleCodeChange(code)}
-        highlight={(code) => code}
-        padding={10}
-        style={{
-          fontFamily: '"Fira code", "Fira Mono", monospace',
-          fontSize: 12,
-        }}
+        onChange={(e) => handleCodeChange(e.target.value)}
+        style={{ fontFamily: "monospace" }}
       />
 
       <div id="suggestions">

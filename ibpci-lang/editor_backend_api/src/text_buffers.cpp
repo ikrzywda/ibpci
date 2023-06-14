@@ -20,6 +20,16 @@ bool TextBuffers::update_text_buffer(std::string text) {
   return true;
 }
 
+std::string TextBuffers::run_parser() {
+  prs::Parser parser(text_buffer);
+  ast::AST *ast = parser.parse();
+  if (ast == nullptr) {
+    return parser.get_error().message;
+  }
+  ast::delete_tree(ast);
+  return "dupa";
+}
+
 std::vector<std::string> TextBuffers::get_suggestions(std::string prefix) {
   std::vector<std::string> suggestions_list;
   Trie::Node *prefix_root = Trie::get_prefix_node(text_trie.get(), prefix);

@@ -1,5 +1,5 @@
 CXX := em++
-CXXFLAGS := --bind -s ENVIRONMENT=web -s MODULARIZE=1 -s SINGLE_FILE=1 -s "EXPORTED_FUNCTIONS=['_malloc', '_free']" -s "EXPORT_NAME='ibpci'"
+CXXFLAGS := --bind -s ENVIRONMENT=web -s MODULARIZE=1 -s SINGLE_FILE=1 -s "EXPORTED_FUNCTIONS=['_malloc', '_free']" -s "EXPORT_NAME='ibpci'"  -s ALLOW_MEMORY_GROWTH
 
 #Directory paths
 API_DIR := $(CURDIR)
@@ -9,11 +9,11 @@ IBPCI_DIR := $(CURDIR)/../ibpci
 API_SOURCES := $(wildcard bindings/wasm/*.cpp) $(wildcard src/*.cpp)
 
 # Include directories
-INCLUDE_DIRS := -Ibindings/wasm -Iinclude -I$(IBPCI_DIR)/include
+INCLUDE_DIRS := -Iinclude -I$(IBPCI_DIR)/include -Ibindings/wasm 
 
 # Library path and flags
 LIB_PATH := -L$(IBPCI_DIR)
-LIB := -libpci
+LIB := -libpciwasm
 
 # Output file
 OUTPUT_FILE := wrapper.js

@@ -2,15 +2,20 @@
 
 namespace prs {
 
-Parser::Parser(std::string &&buffer) {
-  lex = lxr::Lexer(std::move(buffer));
+Parser::Parser(std::string buffer) {
+  if (buffer == "") {
+    std::cout << "Empty buffer passed to parser\n";
+    exit(1);
+  }
+  lex = lxr::Lexer(buffer);
   if (!lex.get_next_token(token)) {
-    error(-1);
+    set_error(-1);
   }
 }
 
 void Parser::eat(int token_id) {
   if (error_flag) {
+    std::cout << "error set, eating token: " << error_flag << "\n";
     return;
   }
   if (token.id == token_id) {
@@ -18,21 +23,23 @@ void Parser::eat(int token_id) {
       std::cout << "Explicitly throwing error from eat() in parser.cpp\n";
       Error err = lex.get_error();
       std::cout << "Error message: " << err.message << std::endl;
-      error(-1);
+      set_error(-1);
     }
 
   } else
-    error(token_id);
+    set_error(token_id);
 }
 
 void Parser::set_error(int token_id) {
+  std::cout << "setting error\n";
   error_flag = true;
   current_error.line_num = lex.line_num;
   current_error.message = "SYNTAX ERROR at line " +
                           std::to_string(lex.line_num) +
                           ":unexpected token: " + tk::id_to_str(token.id);
-  if (token_id >= 0)
+  if (token_id >= 0) {
     current_error.message += ", expected token: " + tk::id_to_str(token_id);
+  }
 }
 
 Error Parser::get_error() { return current_error; }
@@ -59,6 +66,9 @@ ast::AST *Parser::parse() {
 }
 
 ast::AST *Parser::stmt() {
+  if (error_flag) {
+    return nullptr;
+  }
   switch (token.id) {
     case tk::ID_VAR:
       return assign();
@@ -81,14 +91,18 @@ ast::AST *Parser::stmt() {
     case tk::OUTPUT:
       return in_out();
     default:
+      std::cout << "defautl stmt()\n";
       set_error(-1);
   }
   return nullptr;
 }
 
 ast::AST *Parser::block() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(ast::BLOCK);
-  while (token.id != tk::END) {
+  while (token.id != tk::END && !error_flag) {
     root->push_child(stmt());
   }
   eat(tk::END);
@@ -96,8 +110,11 @@ ast::AST *Parser::block() {
 }
 
 ast::AST *Parser::if_block() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(ast::BLOCK);
-  while (token.id != tk::END) {
+  while (token.id != tk::END && !error_flag) {
     if (token.id == tk::ELSE) {
       return root;
     } else {
@@ -108,6 +125,9 @@ ast::AST *Parser::if_block() {
 }
 
 ast::AST *Parser::method() {
+  if (error_flag) {
+    return nullptr;
+  }
   eat(tk::METHOD);
   ast::AST *params = nullptr;
   ast::AST *root = new ast::AST(token, ast::METHOD);
@@ -116,7 +136,7 @@ ast::AST *Parser::method() {
   if (token.id == tk::ID_VAR) {
     params = new ast::AST(ast::PARAM);
     params->push_child(factor());
-    while (token.id != tk::RPAREN) {
+    while (token.id != tk::RPAREN && !error_flag) {
       eat(tk::COMMA);
       params->push_child(factor());
     }
@@ -129,6 +149,9 @@ ast::AST *Parser::method() {
 }
 
 ast::AST *Parser::ret() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(token, ast::RETURN);
   eat(tk::RETURN);
   root->push_child(expr());
@@ -136,6 +159,9 @@ ast::AST *Parser::ret() {
 }
 
 ast::AST *Parser::loop_whl() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(ast::WHILE);
   eat(tk::WHILE);
   root->push_child(cond());
@@ -145,6 +171,9 @@ ast::AST *Parser::loop_whl() {
 }
 
 ast::AST *Parser::loop_for() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(ast::FOR);
   ast::AST *loop_range = new ast::AST(ast::RANGE);
   loop_range->push_child(factor());
@@ -159,12 +188,15 @@ ast::AST *Parser::loop_for() {
 }
 
 ast::AST *Parser::if_stmt() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(token, ast::IF);
   eat(tk::IF);
   root->push_child(cond());
   eat(tk::THEN);
   root->push_child(if_block());
-  while (token.id == tk::ELSE) {
+  while (token.id == tk::ELSE && !error_flag) {
     root->push_child(else_stmt());
   }
   eat(tk::END);
@@ -173,6 +205,9 @@ ast::AST *Parser::if_stmt() {
 }
 
 ast::AST *Parser::else_stmt() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root;
   eat(tk::ELSE);
   if (token.id == tk::IF) {
@@ -186,6 +221,9 @@ ast::AST *Parser::else_stmt() {
 }
 
 ast::AST *Parser::elif_stmt() {
+  if (error_flag) {
+    return nullptr;
+  }
   eat(tk::IF);
   ast::AST *root = new ast::AST(ast::ELIF);
   root->push_child(cond());
@@ -195,9 +233,12 @@ ast::AST *Parser::elif_stmt() {
 }
 
 ast::AST *Parser::cond() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root, *new_node;
   root = cmp();
-  while (token.id == tk::AND || token.id == tk::OR) {
+  while ((token.id == tk::AND || token.id == tk::OR) && !error_flag) {
     new_node = new ast::AST(token, ast::COND);
     new_node->push_child(root);
     root = new_node;
@@ -208,6 +249,9 @@ ast::AST *Parser::cond() {
 }
 
 ast::AST *Parser::cmp() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root, *new_node;
   root = factor();
   if (token.id == tk::IS || token.id == tk::LT || token.id == tk::GT ||
@@ -222,6 +266,9 @@ ast::AST *Parser::cmp() {
 }
 
 ast::AST *Parser::assign() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(ast::ASSIGN);
   root->push_child(factor());
   if (root->children[0]->id == ast::STD_VOID) {
@@ -235,6 +282,9 @@ ast::AST *Parser::assign() {
 }
 
 ast::AST *Parser::method_call() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(token, ast::METHOD_CALL);
   ast::AST *params = nullptr;
   eat(tk::ID_METHOD);
@@ -242,7 +292,7 @@ ast::AST *Parser::method_call() {
   if (token.id != tk::RPAREN) {
     params = new ast::AST(ast::PARAM);
     params->push_child(expr());
-    while (token.id != tk::RPAREN) {
+    while (token.id != tk::RPAREN && !error_flag) {
       eat(tk::COMMA);
       params->push_child(expr());
     }
@@ -253,6 +303,9 @@ ast::AST *Parser::method_call() {
 }
 
 ast::AST *Parser::expr() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root, *new_node;
   root = term();
   while (token.id == tk::PLUS || token.id == tk::MINUS) {
@@ -266,6 +319,9 @@ ast::AST *Parser::expr() {
 }
 
 ast::AST *Parser::term() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *subroot, *new_node;
   subroot = factor();
   while (token.id == tk::MULT || token.id == tk::DIV_WQ ||
@@ -280,6 +336,9 @@ ast::AST *Parser::term() {
 }
 
 ast::AST *Parser::factor() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *new_node;
   switch (token.id) {
     case tk::NUM:
@@ -304,7 +363,7 @@ ast::AST *Parser::factor() {
       new_node = new ast::AST(token, ast::ID);
       eat(tk::ID_VAR);
       if (token.id == tk::LSQBR) {
-        while (token.id == tk::LSQBR) {
+        while (token.id == tk::LSQBR && !error_flag) {
           eat(tk::LSQBR);
           new_node->push_child(expr());
           eat(tk::RSQBR);
@@ -353,11 +412,14 @@ ast::AST *Parser::factor() {
 }
 
 ast::AST *Parser::arr() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root = new ast::AST(token, ast::ARR);
   eat(tk::LSQBR);
   if (token.id == tk::NUM || token.id == tk::STRING || token.id == tk::LSQBR) {
     root->push_child(factor());
-    while (token.id != tk::RSQBR) {
+    while (token.id != tk::RSQBR && !error_flag) {
       eat(tk::COMMA);
       root->push_child(factor());
     }
@@ -367,11 +429,14 @@ ast::AST *Parser::arr() {
 }
 
 ast::AST *Parser::arr_dyn() {
+  if (error_flag) {
+    return nullptr;
+  }
   eat(tk::NEW_ARR);
   ast::AST *root = new ast::AST(token, ast::ARR_DYN);
   eat(tk::LPAREN);
   root->push_child(expr());
-  while (token.id != tk::RPAREN) {
+  while (token.id != tk::RPAREN && !error_flag) {
     eat(tk::COMMA);
     root->push_child(expr());
   }
@@ -380,6 +445,9 @@ ast::AST *Parser::arr_dyn() {
 }
 
 ast::AST *Parser::std_method() {
+  if (error_flag) {
+    return nullptr;
+  }
   eat(tk::DOT);
   ast::AST *root;
   if (token.id == tk::LENGTH || token.id == tk::GET_NEXT ||
@@ -396,7 +464,7 @@ ast::AST *Parser::std_method() {
   eat(tk::LPAREN);
   if (token.id != tk::RPAREN) {
     root->push_child(expr());
-    while (token.id != tk::RPAREN) {
+    while (token.id != tk::RPAREN && !error_flag) {
       eat(tk::COMMA);
       root->push_child(expr());
     }
@@ -406,6 +474,9 @@ ast::AST *Parser::std_method() {
 }
 
 ast::AST *Parser::in_out() {
+  if (error_flag) {
+    return nullptr;
+  }
   ast::AST *root;
   if (token.id == tk::INPUT)
     root = new ast::AST(token, ast::INPUT);
@@ -414,7 +485,7 @@ ast::AST *Parser::in_out() {
   eat(token.id);
   eat(tk::LPAREN);
   root->push_child(expr());
-  while (token.id != tk::RPAREN) {
+  while (token.id != tk::RPAREN && !error_flag) {
     eat(tk::COMMA);
     root->push_child(expr());
   }

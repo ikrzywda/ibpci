@@ -45,7 +45,7 @@ class Parser {
   ast::AST *in_out();
 
  public:
-  Parser(std::string &&buffer);
+  Parser(std::string buffer);
   Error get_error();
   ast::AST *parse();
 };

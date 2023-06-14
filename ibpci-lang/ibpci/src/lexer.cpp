@@ -2,8 +2,8 @@
 
 namespace lxr {
 
-Lexer::Lexer(std::string &&buffer) : input_buffer(buffer) {
-  pos = 0, len = buffer.size();
+Lexer::Lexer(std::string buffer) : input_buffer(buffer) {
+  pos = 0, len = input_buffer.size();
   c = input_buffer.at(pos);
   line_num = 1;
 }
@@ -126,7 +126,8 @@ tk::Token Lexer::equals_operator(char base_character) {
 }
 
 int Lexer::get_next_token(tk::Token &token) {
-  while (1) {
+  std::cout << "dupa" << std::endl;
+  while (!error_flag && c != EOF) {
     skip_whitespace();
     attr_buffer.clear();
     if (std::isdigit(c)) {

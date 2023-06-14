@@ -43,7 +43,7 @@ std::string get_buffer(char *filename) {
 }
 
 void interpret(char *filename, unsigned mode) {
-  std::string buffer = std::move(get_buffer(filename));
+  std::string buffer = get_buffer(filename);
 
   switch (mode) {
     case INTERPRET: {
@@ -66,7 +66,7 @@ void interpret(char *filename, unsigned mode) {
 }
 
 void run_lexer(std::string buffer) {
-  lxr::Lexer lex(std::move(buffer));
+  lxr::Lexer lex(buffer);
   tk::Token token;
   if (!lex.get_next_token(token)) {
     std::cout << lex.get_error().message;
@@ -83,8 +83,7 @@ void run_lexer(std::string buffer) {
 }
 
 void run_parser(std::string buffer) {
-  prs::Parser parser(std::move(buffer));
-  // ast::AST *root = parser.parse();
+  prs::Parser parser(buffer);
   ast::AST *root = parser.parse();
   if (root == nullptr) {
     std::cout << parser.get_error().message;
@@ -94,7 +93,7 @@ void run_parser(std::string buffer) {
 }
 
 void run_interpreter(std::string buffer, bool logging) {
-  prs::Parser parser(std::move(buffer));
+  prs::Parser parser(buffer);
   ast::AST *root = parser.parse();
   if (!root) {
     std::cout << parser.get_error().message;

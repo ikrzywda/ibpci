@@ -603,7 +603,7 @@ rf::Reference *Interpreter::input(ast::AST *root) {
   std::cin >> buffer;
   buffer.push_back('\0');
   std::cout << std::endl;
-  lxr::Lexer lex(std::move(buffer));
+  lxr::Lexer lex(buffer);
   tk::Token token;
   if (!lex.get_next_token(token)) {
     error(lex.get_error().message, root);

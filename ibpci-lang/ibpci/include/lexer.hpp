@@ -32,7 +32,7 @@ class Lexer {
   tk::Token equals_operator(char base_character);
 
  public:
-  Lexer(std::string &&buffer);
+  Lexer(std::string buffer);
   Lexer() = default;
   ~Lexer() = default;
   unsigned int line_num;
